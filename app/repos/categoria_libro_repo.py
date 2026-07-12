@@ -1,5 +1,5 @@
-from app.models.categorias_libros_model import Categorias
-from app.schemas.categorias_libros_schema import CategoriaCreate, CategoriaUpdate
+from app.models.categoria_libro_model import Categorias
+from app.schemas.categoria_libro_schema import CategoriaCreate, CategoriaUpdate
 from app.repos.base_repo import BaseRepoConEstado
 
 

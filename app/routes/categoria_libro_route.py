@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from beanie import PydanticObjectId
-from app.schemas.categorias_libros_schema import (
+from app.schemas.categoria_libro_schema import (
     CategoriaCreate,
     CategoriaUpdate,
     CategoriasResponse

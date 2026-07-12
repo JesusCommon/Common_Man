@@ -1,7 +1,7 @@
 from fastapi import HTTPException, status
-from app.models.categorias_libros_model import Categorias
-from app.schemas.categorias_libros_schema import CategoriaCreate, CategoriaUpdate
-from app.repos.categorias_libros_repo import CategoriaRepo
+from app.models.categoria_libro_model import Categorias
+from app.schemas.categoria_libro_schema import CategoriaCreate, CategoriaUpdate
+from app.repos.categoria_libro_repo import CategoriaRepo
 from beanie import PydanticObjectId
 
 
