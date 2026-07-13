@@ -3,7 +3,7 @@ from pydantic import Field, HttpUrl
 from enum import Enum
 from pymongo import IndexModel, ASCENDING
 from app.models.mixins import TimestampMixim, StatusMixin
-from app.models.categoria_libro_model import Categorias
+from app.models.categoria_libro_model import Categoria
 
 
 class Idioma(str, Enum):
@@ -72,7 +72,7 @@ class Libro(Document, TimestampMixim, StatusMixin):
         examples=[50000]
     )
 
-    categoria: Link[Categorias] = Field(
+    categoria: Link[Categoria] = Field(
         ...,
         description="Categoría del libro"
     )

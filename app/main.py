@@ -4,12 +4,12 @@ from app.core.cors import configurar_cors
 from app.database.connection import connect_db, disconnect_db
 from app.models.usuarios_model import Usuario
 from app.models.follow import Seguimiento
-from app.models.categoria_libro_model import Categorias
+from app.models.categoria_libro_model import Categoria
 from app.routes.usuarios_route import router as usuarios_router
 from app.routes.auth_route import router as auth_router
 from app.routes.categoria_libro_route import router as categorias_libros_router
 
-DOCUMENT_MODELS = [Usuario, Seguimiento, Categorias]
+DOCUMENT_MODELS = [Usuario, Seguimiento, Categoria]
 
 
 @asynccontextmanager

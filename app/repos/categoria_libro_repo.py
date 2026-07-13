@@ -1,11 +1,11 @@
-from app.models.categoria_libro_model import Categorias
+from app.models.categoria_libro_model import Categoria
 from app.schemas.categoria_libro_schema import CategoriaCreate, CategoriaUpdate
 from app.repos.base_repo import BaseRepoConEstado
 
 
-class CategoriaRepo(BaseRepoConEstado[Categorias, CategoriaCreate, CategoriaUpdate]):
+class CategoriaRepo(BaseRepoConEstado[Categoria, CategoriaCreate, CategoriaUpdate]):
     def __init__(self):
-        super().__init__(Categorias)
+        super().__init__(Categoria)
 
-    async def obtener_por_nombre(self, nombre: str) -> Categorias | None:
-        return await Categorias.find_one(Categorias.nombre == nombre)
+    async def obtener_por_nombre(self, nombre: str) -> Categoria | None:
+        return await Categoria.find_one(Categoria.nombre == nombre)
