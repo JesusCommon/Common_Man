@@ -20,7 +20,7 @@ class categoriaService:
         if await self.repo.obtener_por_nombre(data.nombre):
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail=f"Ya existe una categoria registrada con el correo '{data.nombre}'"
+                detail=f"Ya existe una categoria registrada con el nombre '{data.nombre}'"
             )
 
         datos = data.model_dump(exclude_unset=True)
@@ -52,7 +52,7 @@ class categoriaService:
             if existente and existente.id != id:
                 raise HTTPException(
                     status_code=status.HTTP_409_CONFLICT,
-                    detail=f"Ya existe una categoria con el correo '{data.nombre}'"
+                    detail=f"Ya existe una categoria con el nombre '{data.nombre}'"
                 )
 
         return await self.repo.actualizar(id, data)

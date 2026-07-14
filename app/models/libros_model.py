@@ -1,10 +1,9 @@
 from beanie import Document, Link
-from pydantic import Field, HttpUrl
+from pydantic import Field, HttpUrl, ConfigDict
 from enum import Enum
 from pymongo import IndexModel, ASCENDING
 from app.models.mixins import TimestampMixim, StatusMixin
 from app.models.categoria_libro_model import Categoria
-
 
 class Idioma(str, Enum):
     ESPANOL = "Español"
@@ -13,6 +12,8 @@ class Idioma(str, Enum):
 
 
 class Libro(Document, TimestampMixim, StatusMixin):
+    model_config = ConfigDict(validate_assignment=True)  # 👈 agregar esto
+
     nombre: str = Field(
         ...,
         min_length=1,
