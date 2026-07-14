@@ -4,14 +4,16 @@ from app.core.cors import configurar_cors
 from app.database.connection import connect_db, disconnect_db
 from app.models.usuarios_model import Usuario
 from app.models.follow import Seguimiento
+from app.models.categoria_libro_model import CategoriaLibro
+from app.models.categoria_tienda_model import CategoriaTienda
 from app.models.libros_model import Libro
-from app.models.categoria_libro_model import Categoria
 from app.routes.usuarios_route import router as usuarios_router
 from app.routes.auth_route import router as auth_router
-from app.routes.categoria_libro_route import router as categorias_libros_router
+from app.routes.categoria_libro_route import router as categoria_libro_router
 from app.routes.libros_route import router as libros_router
+from app.routes.categoria_tienda_route import router as categoria_tienda_router
 
-DOCUMENT_MODELS = [Usuario, Seguimiento, Categoria, Libro]
+DOCUMENT_MODELS = [Usuario, Seguimiento, CategoriaTienda, CategoriaLibro, Libro]
 
 
 @asynccontextmanager
@@ -27,5 +29,6 @@ configurar_cors(app)
 
 app.include_router(usuarios_router)
 app.include_router(auth_router)
-app.include_router(categorias_libros_router)
+app.include_router(categoria_libro_router)
+app.include_router(categoria_tienda_router)
 app.include_router(libros_router)

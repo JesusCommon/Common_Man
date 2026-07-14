@@ -3,7 +3,7 @@ from pydantic import Field, HttpUrl, ConfigDict
 from enum import Enum
 from pymongo import IndexModel, ASCENDING
 from app.models.mixins import TimestampMixim, StatusMixin
-from app.models.categoria_libro_model import Categoria
+from app.models.categoria_libro_model import CategoriaLibro
 
 class Idioma(str, Enum):
     ESPANOL = "Español"
@@ -12,7 +12,7 @@ class Idioma(str, Enum):
 
 
 class Libro(Document, TimestampMixim, StatusMixin):
-    model_config = ConfigDict(validate_assignment=True)  # 👈 agregar esto
+    model_config = ConfigDict(validate_assignment=True)
 
     nombre: str = Field(
         ...,
@@ -73,7 +73,7 @@ class Libro(Document, TimestampMixim, StatusMixin):
         examples=[50000]
     )
 
-    categoria: Link[Categoria] = Field(
+    categoria: Link[CategoriaLibro] = Field(
         ...,
         description="Categoría del libro"
     )

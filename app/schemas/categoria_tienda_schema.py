@@ -10,7 +10,7 @@ class CategoriasValidacion:
         if v is None:
             return None
         if not isinstance(v, str):
-            raise ValueError("El nombre de la categoria debe ser texto")
+            raise ValueError("El nombre debe ser texto")
         v = v.strip()
         if len(v) < 2:
             raise ValueError("El nombre de la categoria debe tener al menos 2 caracteres")
@@ -26,8 +26,8 @@ class CategoriasValidacion:
         if not isinstance(v, str):
             raise ValueError("La descripcion debe ser texto")
         v = v.strip()
-        if len(v) > 500:
-            raise ValueError("La descripcion no puede tener más de 500 caracteres")
+        if len(v) > 1000:
+            raise ValueError("La descripcion no puede tener más de 1000 caracteres")
         return v
     
 class CategoriaCreate(BaseModel, CategoriasValidacion):
@@ -38,7 +38,7 @@ class CategoriaUpdate(BaseModel, CategoriasValidacion):
     nombre : str | None = Field(default=None)
     descripcion : str | None = Field(default=None)
 
-class CategoriasResponse(BaseModel):
+class CategoriaResponse(BaseModel):
     id: PydanticObjectId
     nombre: str
     descripcion: str | None = None

@@ -1,7 +1,7 @@
 from fastapi import HTTPException, status
 from app.models.libros_model import Libro
 from app.schemas.libros_schema import LibroCreate, LibroUpdate
-from app.models.categoria_libro_model import Categoria
+from app.models.categoria_libro_model import CategoriaLibro
 from app.repos.libros_repo import LibroRepo
 from beanie import PydanticObjectId
 
@@ -25,7 +25,7 @@ class LibroService:
                 detail=f"Ya existe un libro registrado con el nombre '{data.nombre}'"
             )
 
-        categoria = await Categoria.get(data.categoria)
+        categoria = await CategoriaLibro.get(data.categoria)
         if not categoria:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
