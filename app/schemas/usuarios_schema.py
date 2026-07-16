@@ -1,6 +1,8 @@
 import re
 from pydantic import field_validator, BaseModel, Field, EmailStr, HttpUrl, ConfigDict
 from beanie import PydanticObjectId
+from uuid import UUID
+from app.models.usuarios_model import RolUsuario
 from datetime import datetime
 
 class UsuarioValidaciones:
@@ -77,6 +79,16 @@ class UsuarioValidaciones:
         v = v.strip()
         if len(v) > 40:
             raise ValueError("La bio no puede tener más de 40 caracteres")
+        return v
+    
+    @field_validator("avatar", mode="before")
+    @classmethod
+    def validar_avatar(cls, v):
+        if v is None:
+            return None
+        url = str(v)
+        if not url.lower().endswith((".jpg", ".jpeg", ".png", ".webp")):
+            raise ValueError("El avatar debe ser una URL con extensión .jpg, .jpeg, .png o .webp")
         return v
 
 
@@ -162,6 +174,8 @@ class UsuarioResponse(BaseModel):
     correo: EmailStr
     bio: str | None = None
     avatar: HttpUrl | None = None
+    identificador : UUID
+    rol : RolUsuario
     saldo: float
     activo: bool
     fecha_creacion: datetime

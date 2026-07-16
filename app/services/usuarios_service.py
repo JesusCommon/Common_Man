@@ -1,6 +1,6 @@
 import bcrypt
 from fastapi import HTTPException, status
-from app.models.usuarios_model import Usuario
+from app.models.usuarios_model import Usuario, RolUsuario
 from app.schemas.usuarios_schema import UsuarioCreate, UsuarioUpdate, UsuarioCambiarPassword, UsuarioRecargarSaldo
 from app.repos.usuarios_repo import UsuarioRepo
 from beanie import PydanticObjectId
@@ -46,6 +46,7 @@ class UsuarioService:
 
         datos = data.model_dump(exclude_unset=True)
         datos["password"] = hashear_password(datos["password"])
+        datos["rol"] = RolUsuario.USUARIO
         documento = Usuario(**datos)
         await documento.insert()
         return documento

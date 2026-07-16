@@ -4,7 +4,7 @@ from app.schemas.categoria_tienda_schema import (
     CategoriaResponse,
     CategoriaUpdate
 )
-from app.services.categoria_libro_service import categoriaService
+from app.services.categoria_tienda_service import categoriaService
 
 
 class CategoriaController:

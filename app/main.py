@@ -7,13 +7,15 @@ from app.models.follow import Seguimiento
 from app.models.categoria_libro_model import CategoriaLibro
 from app.models.categoria_tienda_model import CategoriaTienda
 from app.models.libros_model import Libro
+from app.models.tienda_model import ProductoTienda
 from app.routes.usuarios_route import router as usuarios_router
 from app.routes.auth_route import router as auth_router
 from app.routes.categoria_libro_route import router as categoria_libro_router
 from app.routes.libros_route import router as libros_router
 from app.routes.categoria_tienda_route import router as categoria_tienda_router
+from app.routes.tienda_route import router as tienda_router
 
-DOCUMENT_MODELS = [Usuario, Seguimiento, CategoriaTienda, CategoriaLibro, Libro]
+DOCUMENT_MODELS = [Usuario, Seguimiento, CategoriaTienda, CategoriaLibro, Libro, ProductoTienda]
 
 
 @asynccontextmanager
@@ -32,3 +34,4 @@ app.include_router(auth_router)
 app.include_router(categoria_libro_router)
 app.include_router(categoria_tienda_router)
 app.include_router(libros_router)
+app.include_router(tienda_router)
