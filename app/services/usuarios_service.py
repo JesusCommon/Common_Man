@@ -4,6 +4,7 @@ from app.models.usuarios_model import Usuario, RolUsuario
 from app.schemas.usuarios_schema import UsuarioCreate, UsuarioUpdate, UsuarioCambiarPassword, UsuarioRecargarSaldo
 from app.repos.usuarios_repo import UsuarioRepo
 from beanie import PydanticObjectId
+from uuid import UUID
 
 
 def hashear_password(password: str) -> str:
@@ -124,3 +125,28 @@ class UsuarioService:
     async def desactivar(self, id: PydanticObjectId) -> Usuario:
         await self.obtener_por_id(id)
         return await self.repo.desactivar(id)
+    
+    async def obtener_por_identificador(self, identificador: UUID) -> Usuario:
+        usuario = await self.repo.obtener_por_identificador(identificador)
+        if not usuario:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Usuario con identificador {identificador} no encontrado"
+            )
+        return usuario
+    
+    async def buscar_por_filtro(
+        self,
+        nombre: str | None = None,
+        apellido: str | None = None,
+        username: str | None = None,
+        skip: int = 0,
+        limit: int = 20,
+    ) -> list[Usuario]:
+        return await self.repo.buscar_por_filtro(
+            nombre=nombre,
+            apellido=apellido,
+            username=username,
+            skip=skip,
+            limit=limit,
+        )

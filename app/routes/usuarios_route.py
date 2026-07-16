@@ -1,5 +1,6 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 from beanie import PydanticObjectId
+from uuid import UUID
 from app.schemas.usuarios_schema import (
     UsuarioCreate,
     UsuarioUpdate,
@@ -30,6 +31,28 @@ async def listar_inactivos():
 @router.get("/activos", response_model=list[UsuarioResponse])
 async def listar_activos():
     return await controller.listar_activos()
+
+
+@router.get("/buscar", response_model=list[UsuarioResponse])
+async def buscar_por_filtro(
+    nombre: str | None = None,
+    apellido: str | None = None,
+    username: str | None = None,
+    skip: int = Query(default=0, ge=0),
+    limit: int = Query(default=20, ge=1, le=100),
+):
+    return await controller.buscar_por_filtro(
+        nombre=nombre,
+        apellido=apellido,
+        username=username,
+        skip=skip,
+        limit=limit,
+    )
+
+
+@router.get("/identificador/{identificador}", response_model=UsuarioResponse)
+async def obtener_por_identificador(identificador: UUID):
+    return await controller.obtener_por_identificador(identificador)
 
 
 @router.get("/{id}", response_model=UsuarioResponse)

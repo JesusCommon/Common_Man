@@ -4,6 +4,7 @@ from app.schemas.tienda_schema import TiendaCreate, TiendaUpdate
 from app.models.categoria_tienda_model import CategoriaTienda
 from app.repos.tienda_repo import TiendaRepo
 from beanie import PydanticObjectId
+from uuid import UUID
 
 
 class TiendaService:
@@ -74,3 +75,43 @@ class TiendaService:
     async def desactivar(self, id: PydanticObjectId) -> ProductoTienda:
         await self.obtener_por_id(id)
         return await self.repo.desactivar(id)
+    
+    async def obtener_por_identificador(self, identificador: UUID) -> ProductoTienda:
+        producto = await self.repo.obtener_por_identificador(identificador)
+        if not producto:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Usuario con identificador {identificador} no encontrado"
+            )
+        return producto
+    
+    async def buscar_por_filtro(
+        self,
+        nombre: str | None = None,
+        categoria_id: PydanticObjectId | None = None,
+        precio_min: float | None = None,
+        precio_max: float | None = None,
+        disponible: bool | None = None,
+        ordenar_por: str = "fecha_creacion",
+        orden_desc: bool = True,
+        skip: int = 0,
+        limit: int = 20,
+    ) -> list[ProductoTienda]:
+        campos_ordenables = {"precio", "compras", "fecha_creacion", "nombre", "stock"}
+        if ordenar_por not in campos_ordenables:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"No se puede ordenar por '{ordenar_por}'. Campos válidos: {', '.join(campos_ordenables)}"
+            )
+
+        return await self.repo.buscar_con_filtros(
+            nombre=nombre,
+            categoria_id=categoria_id,
+            precio_min=precio_min,
+            precio_max=precio_max,
+            disponible=disponible,
+            ordenar_por=ordenar_por,
+            orden_desc=orden_desc,
+            skip=skip,
+            limit=limit,
+        )

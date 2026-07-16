@@ -7,7 +7,7 @@ from app.schemas.usuarios_schema import (
     UsuarioRecargarSaldo,
 )
 from app.services.usuarios_service import UsuarioService
-
+from uuid import UUID
 
 class UsuarioController:
     def __init__(self):
@@ -52,3 +52,24 @@ class UsuarioController:
     async def recargar_saldo(self, id: PydanticObjectId, data: UsuarioRecargarSaldo) -> UsuarioResponse:
         usuario = await self.service.recargar_saldo(id, data)
         return UsuarioResponse.model_validate(usuario)
+
+    async def obtener_por_identificador(self, identificador: UUID) -> UsuarioResponse:
+        usuario = await self.service.obtener_por_identificador(identificador)
+        return UsuarioResponse.model_validate(usuario)
+
+    async def buscar_por_filtro(
+        self,
+        nombre: str | None = None,
+        apellido: str | None = None,
+        username: str | None = None,
+        skip: int = 0,
+        limit: int = 20,
+    ) -> list[UsuarioResponse]:
+        usuarios = await self.service.buscar_por_filtro(
+            nombre=nombre,
+            apellido=apellido,
+            username=username,
+            skip=skip,
+            limit=limit,
+        )
+        return [UsuarioResponse.model_validate(u) for u in usuarios]
