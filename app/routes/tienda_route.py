@@ -6,14 +6,16 @@ from app.schemas.tienda_schema import (
     TiendaCreate
 )
 from app.controllers.tienda_controller import TiendaController
+from app.schemas.common_schema import RespuestaConMensaje
 from uuid import UUID
 
 router = APIRouter(prefix="/productos", tags=["Productos"])
 controller = TiendaController()
 
-@router.post("/", response_model=TiendaResponse, status_code=201)
+@router.post("/", response_model=RespuestaConMensaje[TiendaResponse], status_code=201)
 async def crear(data: TiendaCreate):
-    return await controller.crear(data)
+    producto = await controller.crear(data)
+    return RespuestaConMensaje(mensaje="Producto creado satisfactoriamente", data=producto)
 
 @router.get("/all", response_model=list[TiendaResponse])
 async def listar():
@@ -29,19 +31,20 @@ async def obtener_id(id: PydanticObjectId):
     return await controller.obtener_id(id)
 
 
-@router.put("/{id}", response_model=TiendaResponse)
+@router.put("/{id}", response_model=RespuestaConMensaje[TiendaResponse])
 async def actualizar(id: PydanticObjectId, data: TiendaUpdate):
-    return await controller.actualizar(id, data)
+    producto = await controller.actualizar(id, data)
+    return RespuestaConMensaje(mensaje="Producto actualizado satisfactoriamente", data=producto)
 
-
-@router.patch("/{id}/activar", response_model=TiendaResponse)
+@router.patch("/{id}/activar", response_model=RespuestaConMensaje[TiendaResponse])
 async def activar(id: PydanticObjectId):
-    return await controller.activar(id)
+    producto = await controller.activar(id)
+    return RespuestaConMensaje(mensaje="Producto activado satisfactoriamente", data=producto)
 
-
-@router.patch("/{id}/desactivar", response_model=TiendaResponse)
+@router.patch("/{id}/desactivar", response_model=RespuestaConMensaje[TiendaResponse])
 async def desactivar(id: PydanticObjectId):
-    return await controller.desactivar(id)
+    producto = await controller.desactivar(id)
+    return RespuestaConMensaje(mensaje="Producto desactivado satisfactoriamente", data=producto)
 
 @router.get("/buscar", response_model=list[TiendaResponse])
 async def buscar_por_filtro(

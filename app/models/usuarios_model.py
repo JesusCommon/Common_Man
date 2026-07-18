@@ -85,6 +85,17 @@ class Usuario(Document, TimestampMixim, StatusMixin):
         description="Breve descripción del usuario"
     )
 
+    seguidores_count: int = Field(
+        default=0,
+        ge=0,
+        description="Cantidad de usuarios que lo siguen"
+    )
+    seguidos_count: int = Field(
+        default=0,
+        ge=0,
+        description="Cantidad de usuarios a los que sigue"
+    )
+
     class Settings:
         name = "usuarios"
         indexes = [

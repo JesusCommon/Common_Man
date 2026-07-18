@@ -6,13 +6,15 @@ from app.schemas.categoria_libro_schema import (
     CategoriasResponse
 )
 from app.controllers.categoria_libro_controller import CategoriaController
+from app.schemas.common_schema import RespuestaConMensaje
 
 router = APIRouter(prefix="/categorias_libro", tags=["Categorias Libros"])
 controller = CategoriaController()
 
-@router.post("/", response_model=CategoriasResponse, status_code=201)
+@router.post("/", response_model=RespuestaConMensaje[CategoriasResponse], status_code=201)
 async def crear(data: CategoriaCreate):
-    return await controller.crear(data)
+    categoria = await controller.crear(data)
+    return RespuestaConMensaje(mensaje="Categoria creada satisfactoriamente", data=categoria)
 
 @router.get("/all", response_model=list[CategoriasResponse])
 async def listar():
@@ -28,16 +30,17 @@ async def obtener_id(id: PydanticObjectId):
     return await controller.obtener_id(id)
 
 
-@router.put("/{id}", response_model=CategoriasResponse)
+@router.put("/{id}", response_model=RespuestaConMensaje[CategoriasResponse])
 async def actualizar(id: PydanticObjectId, data: CategoriaUpdate):
-    return await controller.actualizar(id, data)
+    categoria = await controller.actualizar(id, data)
+    return RespuestaConMensaje(mensaje="Categoria actualizada satisfactoriamente", data=categoria)
 
-
-@router.patch("/{id}/activar", response_model=CategoriasResponse)
+@router.patch("/{id}/activar", response_model=RespuestaConMensaje[CategoriasResponse])
 async def activar(id: PydanticObjectId):
-    return await controller.activar(id)
+    categoria = await controller.activar(id)
+    return RespuestaConMensaje(mensaje="Categoria activada satisfactoriamente", data=categoria)
 
-
-@router.patch("/{id}/desactivar", response_model=CategoriasResponse)
+@router.patch("/{id}/desactivar", response_model=RespuestaConMensaje[CategoriasResponse])
 async def desactivar(id: PydanticObjectId):
-    return await controller.desactivar(id)
+    categoria = await controller.desactivar(id)
+    return RespuestaConMensaje(mensaje="Categoria desactivada satisfactoriamente", data=categoria)

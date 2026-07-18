@@ -6,13 +6,15 @@ from app.schemas.libros_schema import (
     LibroCreate
 )
 from app.controllers.libros_controller import LibroController
+from app.schemas.common_schema import RespuestaConMensaje
 
 router = APIRouter(prefix="/libros", tags=["Libros"])
 controller = LibroController()
 
-@router.post("/", response_model=LibroResponse, status_code=201)
+@router.post("/", response_model=RespuestaConMensaje[LibroResponse], status_code=201)
 async def crear(data: LibroCreate):
-    return await controller.crear(data)
+    libro = await controller.crear(data)
+    return RespuestaConMensaje(mensaje="Libro creado satisfactoriamente", data=libro)
 
 @router.get("/all", response_model=list[LibroResponse])
 async def listar():
@@ -28,19 +30,20 @@ async def obtener_id(id: PydanticObjectId):
     return await controller.obtener_id(id)
 
 
-@router.put("/{id}", response_model=LibroResponse)
+@router.put("/{id}", response_model=RespuestaConMensaje[LibroResponse])
 async def actualizar(id: PydanticObjectId, data: LibroUpdate):
-    return await controller.actualizar(id, data)
+    libro = await controller.actualizar(id, data)
+    return RespuestaConMensaje(mensaje="Libro actualizado satisfactoriamente", data=libro)
 
-
-@router.patch("/{id}/activar", response_model=LibroResponse)
+@router.patch("/{id}/activar", response_model=RespuestaConMensaje[LibroResponse])
 async def activar(id: PydanticObjectId):
-    return await controller.activar(id)
+    libro = await controller.activar(id)
+    return RespuestaConMensaje(mensaje="Libro activado satisfactoriamente", data=libro)
 
-
-@router.patch("/{id}/desactivar", response_model=LibroResponse)
+@router.patch("/{id}/desactivar", response_model=RespuestaConMensaje[LibroResponse])
 async def desactivar(id: PydanticObjectId):
-    return await controller.desactivar(id)
+    libro = await controller.desactivar(id)
+    return RespuestaConMensaje(mensaje="Libro desactivado satisfactoriamente", data=libro)
 
 @router.get("/buscar", response_model=list[LibroResponse])
 async def buscar_por_filtro(
