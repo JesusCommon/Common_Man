@@ -74,3 +74,40 @@ class LibroService:
     async def desactivar(self, id: PydanticObjectId) -> Libro:
         await self.obtener_por_id(id)
         return await self.repo.desactivar(id)
+    
+    async def buscar_con_filtro(
+        self,
+        nombre: str | None = None,
+        categoria_id: PydanticObjectId | None = None,
+        precio_min: float | None = None,
+        precio_max: float | None = None,
+        idioma: str | None = None,
+        anio_publicacion: int | None = None,
+        autor: str | None = None,
+        editorial: str | None = None,
+        ordenar_por: str = "fecha_creacion",
+        orden_desc: bool = True,
+        skip: int = 0,
+        limit: int = 20
+    ) -> list[Libro]:
+        campos_ordenados = {"precio", "fecha_creacion", "nombre"}
+        if ordenar_por not in campos_ordenados:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"No se puede ordenar por'{ordenar_por}'"
+            )
+        
+        return await self.repo.buscar_con_filtro(
+            nombre=nombre,
+            categoria_id=categoria_id,
+            precio_min=precio_min,
+            precio_max=precio_max,
+            idioma=idioma,
+            anio_publicacion=anio_publicacion,
+            autor=autor,
+            editorial=editorial,
+            orden_por=ordenar_por,
+            orden_desc=orden_desc,
+            skip=skip,
+            limit=limit,
+        )

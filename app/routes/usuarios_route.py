@@ -8,14 +8,17 @@ from app.schemas.usuarios_schema import (
     UsuarioCambiarPassword,
     UsuarioRecargarSaldo,
 )
+from app.schemas.common_schema import RespuestaConMensaje
 from app.controllers.usuarios_controller import UsuarioController
 
 router = APIRouter(prefix="/usuarios", tags=["Usuarios"])
 controller = UsuarioController()
 
-@router.post("/", response_model=UsuarioResponse, status_code=201)
+
+@router.post("/", response_model=RespuestaConMensaje[UsuarioResponse], status_code=201)
 async def crear(data: UsuarioCreate):
-    return await controller.crear(data)
+    usuario = await controller.crear(data)
+    return RespuestaConMensaje(mensaje="Usuario creado satisfactoriamente", data=usuario)
 
 
 @router.get("/all", response_model=list[UsuarioResponse])
@@ -60,26 +63,31 @@ async def obtener_id(id: PydanticObjectId):
     return await controller.obtener_id(id)
 
 
-@router.put("/{id}", response_model=UsuarioResponse)
+@router.put("/{id}", response_model=RespuestaConMensaje[UsuarioResponse])
 async def actualizar(id: PydanticObjectId, data: UsuarioUpdate):
-    return await controller.actualizar(id, data)
+    usuario = await controller.actualizar(id, data)
+    return RespuestaConMensaje(mensaje="Usuario actualizado correctamente", data=usuario)
 
 
-@router.patch("/{id}/activar", response_model=UsuarioResponse)
+@router.patch("/{id}/activar", response_model=RespuestaConMensaje[UsuarioResponse])
 async def activar(id: PydanticObjectId):
-    return await controller.activar(id)
+    usuario = await controller.activar(id)
+    return RespuestaConMensaje(mensaje="Usuario activado correctamente", data=usuario)
 
 
-@router.patch("/{id}/desactivar", response_model=UsuarioResponse)
+@router.patch("/{id}/desactivar", response_model=RespuestaConMensaje[UsuarioResponse])
 async def desactivar(id: PydanticObjectId):
-    return await controller.desactivar(id)
+    usuario = await controller.desactivar(id)
+    return RespuestaConMensaje(mensaje="Usuario desactivado correctamente", data=usuario)
 
 
-@router.patch("/{id}/password", response_model=UsuarioResponse)
+@router.patch("/{id}/password", response_model=RespuestaConMensaje[UsuarioResponse])
 async def cambiar_password(id: PydanticObjectId, data: UsuarioCambiarPassword):
-    return await controller.cambiar_password(id, data)
+    usuario = await controller.cambiar_password(id, data)
+    return RespuestaConMensaje(mensaje="Contraseña actualizada correctamente", data=usuario)
 
 
-@router.patch("/{id}/saldo", response_model=UsuarioResponse)
+@router.patch("/{id}/saldo", response_model=RespuestaConMensaje[UsuarioResponse])
 async def recargar_saldo(id: PydanticObjectId, data: UsuarioRecargarSaldo):
-    return await controller.recargar_saldo(id, data)
+    usuario = await controller.recargar_saldo(id, data)
+    return RespuestaConMensaje(mensaje="Saldo recargado con éxito", data=usuario)
