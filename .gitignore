@@ -28,11 +28,39 @@ dist/
 
 # Logs
 *.log
+logs/
 
 # Cache
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+
+# ==============================
+# Node / React / Vite (Frontend)
+# ==============================
+
+# Dependencias
+node_modules/
+
+# Build de producción
+dist/
+dist-ssr/
+
+# Logs de npm/pnpm/yarn
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Lockfiles de otros gestores (si usas pnpm, ignora los demás)
+package-lock.json
+yarn.lock
+
+# Cache de Vite
+.vite/
+
+# Archivos locales de editor específicos de Vite/TS
+*.local
 
 # Editor
 .vscode/
