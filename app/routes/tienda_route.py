@@ -25,11 +25,9 @@ async def listar():
 async def listar_activos():
     return await controller.listar_activos()
 
-
 @router.get("/{id}", response_model=TiendaResponse)
 async def obtener_id(id: PydanticObjectId):
     return await controller.obtener_id(id)
-
 
 @router.put("/{id}", response_model=RespuestaConMensaje[TiendaResponse])
 async def actualizar(id: PydanticObjectId, data: TiendaUpdate):
