@@ -1,12 +1,12 @@
 import { z } from "zod";
 import { descripcionCategoriaSchema, nombreCategoriaSchema } from "./campos";
 
-export const categoriaCreateSchema = z.object({
+export const categoriaTiendaCreateSchema = z.object({
   nombre: nombreCategoriaSchema,
   descripcion: descripcionCategoriaSchema.optional(),
 });
 
-export const categoriaUpdateSchema = z.object({
+export const categoriaTiendaUpdateSchema = z.object({
   nombre: nombreCategoriaSchema.optional(),
   descripcion: descripcionCategoriaSchema.optional(),
 });
