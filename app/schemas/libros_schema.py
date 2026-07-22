@@ -96,7 +96,7 @@ class LibroCreate(LibrosValidaciones, BaseModel):
     autor : str = Field(...)
     descripcion : str | None = Field(default=None)
     anio_publicacion : int = Field(...)
-    portada : HttpUrl | None = Field(None)
+    portada : HttpUrl | None = Field(default=None)
     editorial : str | None = Field(default=None)
     idioma: Idioma = Field(default=Idioma.ESPANOL)
     stock : int = Field(...)

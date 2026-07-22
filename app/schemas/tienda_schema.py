@@ -29,7 +29,7 @@ class TiendaValidacion:
         v = v.strip()
         if len(v) < 3 or len(v) > 50:
             raise ValueError("El codigo debe tener entre 3 a 50 caracteres")
-        if not re.fullmatch(r"[A-Za-z0-9-_]+", v):
+        if not re.fullmatch(r"[A-Za-z0-9_-]+", v):
             raise ValueError("El codigo solo puede llevar letras, numero o guiones")
         return v.upper()
     
