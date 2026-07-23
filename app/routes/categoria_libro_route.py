@@ -8,7 +8,7 @@ from app.schemas.categoria_libro_schema import (
 from app.controllers.categoria_libro_controller import CategoriaController
 from app.schemas.common_schema import RespuestaConMensaje
 
-router = APIRouter(prefix="/categorias_libro", tags=["Categorias Libros"])
+router = APIRouter(prefix="/categoria_libro", tags=["Categorias Libros"])
 controller = CategoriaController()
 
 @router.post("/", response_model=RespuestaConMensaje[CategoriasResponse], status_code=201)

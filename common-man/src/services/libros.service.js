@@ -5,7 +5,7 @@ import { createBaseService } from "./createBaseService";
 
 const { LIBROS } = ENDPOINTS;
 
-export const librosService = {
+export const libroService = {
   ...createBaseService(LIBROS),
 
   buscar: ({nombre, categoria_id, precio_min, precio_max, idioma, anio_publicacion, autor, 

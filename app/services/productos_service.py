@@ -1,17 +1,17 @@
 from fastapi import HTTPException, status
-from app.models.tienda_model import ProductoTienda
-from app.schemas.tienda_schema import TiendaCreate, TiendaUpdate
-from app.models.categoria_tienda_model import CategoriaTienda
-from app.repos.tienda_repo import TiendaRepo
+from app.models.productos_model import Producto
+from app.schemas.productos_schema import ProductoCreate, ProductoUpdate
+from app.models.categoria_producto_model import CategoriaProducto
+from app.repos.productos_repo import ProductoRepo
 from beanie import PydanticObjectId
 from uuid import UUID
 
 
-class TiendaService:
+class ProductoService:
     def __init__(self):
-        self.repo = TiendaRepo()
+        self.repo = ProductoRepo()
 
-    def _validar_activo(self, producto: ProductoTienda) -> None:
+    def _validar_activo(self, producto: Producto) -> None:
         if not producto.activo:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -19,14 +19,14 @@ class TiendaService:
             )
 
 
-    async def crear(self, data: TiendaCreate) -> ProductoTienda:
+    async def crear(self, data: ProductoCreate) -> Producto:
         if await self.repo.obtener_por_codigo(data.codigo):
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail=f"Ya existe un producto registrado con el codigo '{data.codigo}'"
             )
 
-        categoria = await CategoriaTienda.get(data.categoria)
+        categoria = await CategoriaProducto.get(data.categoria)
         if not categoria:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -35,17 +35,17 @@ class TiendaService:
 
         datos = data.model_dump(exclude_unset=True)
         datos["categoria"] = data.categoria
-        documento = ProductoTienda(**datos)
+        documento = Producto(**datos)
         await documento.insert()
         return documento
     
-    async def listar(self) -> list[ProductoTienda]:
+    async def listar(self) -> list[Producto]:
         return await self.repo.listar()
 
-    async def listar_activos(self) -> list[ProductoTienda]:
+    async def listar_activos(self) -> list[Producto]:
         return await self.repo.listar_activos()
 
-    async def obtener_por_id(self, id: PydanticObjectId) -> ProductoTienda:
+    async def obtener_por_id(self, id: PydanticObjectId) -> Producto:
         producto = await self.repo.obtener_por_id(id)
         if not producto:
             raise HTTPException(
@@ -54,7 +54,7 @@ class TiendaService:
             )
         return producto
 
-    async def actualizar(self, id: PydanticObjectId, data: TiendaUpdate) -> ProductoTienda:
+    async def actualizar(self, id: PydanticObjectId, data: ProductoUpdate) -> Producto:
         producto = await self.obtener_por_id(id)
         self._validar_activo(producto)
 
@@ -68,15 +68,15 @@ class TiendaService:
 
         return await self.repo.actualizar(id, data)
 
-    async def activar(self, id: PydanticObjectId) -> ProductoTienda:
+    async def activar(self, id: PydanticObjectId) -> Producto:
         await self.obtener_por_id(id)
         return await self.repo.activar(id)
 
-    async def desactivar(self, id: PydanticObjectId) -> ProductoTienda:
+    async def desactivar(self, id: PydanticObjectId) -> Producto:
         await self.obtener_por_id(id)
         return await self.repo.desactivar(id)
     
-    async def obtener_por_identificador(self, identificador: UUID) -> ProductoTienda:
+    async def obtener_por_identificador(self, identificador: UUID) -> Producto:
         producto = await self.repo.obtener_por_identificador(identificador)
         if not producto:
             raise HTTPException(
@@ -96,7 +96,7 @@ class TiendaService:
         orden_desc: bool = True,
         skip: int = 0,
         limit: int = 20,
-    ) -> list[ProductoTienda]:
+    ) -> list[Producto]:
         campos_ordenables = {"precio", "compras", "fecha_creacion", "nombre", "stock"}
         if ordenar_por not in campos_ordenables:
             raise HTTPException(

@@ -4,7 +4,7 @@ from datetime import datetime
 from uuid import UUID
 from beanie import PydanticObjectId, Link
 
-class TiendaValidacion:
+class ProductoValidacion:
     @field_validator("nombre", mode="before")
     @classmethod
     def validar_nombre(cls, v):
@@ -97,7 +97,7 @@ class TiendaValidacion:
             raise ValueError("La fotografía debe ser una URL con extensión .jpg, .jpeg, .png o .webp")
         return v
 
-class TiendaCreate(TiendaValidacion, BaseModel):
+class ProductoCreate(ProductoValidacion, BaseModel):
     nombre : str = Field(...)
     codigo : str = Field(...)
     descripcion : str | None = Field(default=None)
@@ -108,7 +108,7 @@ class TiendaCreate(TiendaValidacion, BaseModel):
     disponible : bool = Field(default=True)
     categoria : PydanticObjectId = Field(...)
 
-class TiendaUpdate(TiendaValidacion, BaseModel):
+class ProductoUpdate(ProductoValidacion, BaseModel):
     nombre : str | None = Field(default=None)
     codigo : str | None = Field(default=None)
     descripcion : str | None = Field(default=None)
@@ -120,7 +120,7 @@ class TiendaUpdate(TiendaValidacion, BaseModel):
     categoria : PydanticObjectId | None = Field(default=None)
 
 
-class TiendaResponse(BaseModel):
+class ProductoResponse(BaseModel):
     id: PydanticObjectId
     nombre: str
     codigo : str

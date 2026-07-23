@@ -3,7 +3,7 @@ from pydantic import Field
 from pymongo import IndexModel, ASCENDING
 from app.models.mixins import TimestampMixim, StatusMixin
 
-class CategoriaTienda(Document, TimestampMixim, StatusMixin):
+class CategoriaProducto(Document, TimestampMixim, StatusMixin):
     nombre : str = Field(
         ..., 
         min_length=2, 

@@ -3,7 +3,7 @@ from pydantic import field_validator, BaseModel, Field, ConfigDict
 from beanie import PydanticObjectId
 from datetime import datetime
 
-class CategoriasValidacion:
+class CategoriaValidacion:
     @field_validator("nombre", mode="before")
     @classmethod
     def validar_nombre(cls, v):
@@ -30,11 +30,11 @@ class CategoriasValidacion:
             raise ValueError("La descripcion no puede tener más de 1000 caracteres")
         return v
     
-class CategoriaCreate(BaseModel, CategoriasValidacion):
+class CategoriaCreate(BaseModel, CategoriaValidacion):
     nombre : str = Field(...)
     descripcion : str | None = Field(default=None)
 
-class CategoriaUpdate(BaseModel, CategoriasValidacion):
+class CategoriaUpdate(BaseModel, CategoriaValidacion):
     nombre : str | None = Field(default=None)
     descripcion : str | None = Field(default=None)
 

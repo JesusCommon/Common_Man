@@ -1,14 +1,14 @@
 from fastapi import APIRouter
 from beanie import PydanticObjectId
-from app.schemas.categoria_tienda_schema import (
+from app.schemas.categoria_producto_schema import (
     CategoriaCreate,
     CategoriaUpdate,
     CategoriaResponse
 )
-from app.controllers.categoria_tienda_controller import CategoriaController
+from app.controllers.categoria_producto_controller import CategoriaController
 from app.schemas.common_schema import RespuestaConMensaje
 
-router = APIRouter(prefix="/categorias_tienda", tags=["Categorias Tienda"])
+router = APIRouter(prefix="/categoria_producto", tags=["Categorias Tienda"])
 controller = CategoriaController()
 
 @router.post("/", response_model=RespuestaConMensaje[CategoriaResponse], status_code=201)

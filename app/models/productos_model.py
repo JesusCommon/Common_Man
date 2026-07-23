@@ -1,11 +1,11 @@
 from uuid import UUID, uuid4
 from beanie import Document, Link
 from app.models.mixins import TimestampMixim, StatusMixin
-from app.models.categoria_tienda_model import CategoriaTienda
+from app.models.categoria_producto_model import CategoriaProducto
 from pymongo import IndexModel, ASCENDING
 from pydantic import Field, ConfigDict, HttpUrl
 
-class ProductoTienda(Document, TimestampMixim, StatusMixin):
+class Producto(Document, TimestampMixim, StatusMixin):
     model_config = ConfigDict(validate_assignment=True)
 
     nombre: str = Field(
@@ -67,7 +67,7 @@ class ProductoTienda(Document, TimestampMixim, StatusMixin):
         description="Indica si el producto puede comprarse actualmente (independiente del stock)"
     )
 
-    categoria: Link[CategoriaTienda] = Field(
+    categoria: Link[CategoriaProducto] = Field(
         ...,
         description="Categoría del producto"
     )

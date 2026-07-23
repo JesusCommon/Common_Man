@@ -1,21 +1,21 @@
-from app.models.tienda_model import ProductoTienda
-from app.schemas.tienda_schema import TiendaCreate, TiendaUpdate
+from app.models.productos_model import Producto
+from app.schemas.productos_schema import ProductoCreate, ProductoUpdate
 from app.repos.base_repo import BaseRepoConEstado
 from uuid import UUID
 from beanie import PydanticObjectId
 
-class TiendaRepo(BaseRepoConEstado[ProductoTienda, TiendaCreate, TiendaUpdate]):
+class ProductoRepo(BaseRepoConEstado[Producto, ProductoCreate, ProductoUpdate]):
     def __init__(self):
-        super().__init__(ProductoTienda)
+        super().__init__(Producto)
 
-    async def obtener_por_nombre(self, nombre: str) -> ProductoTienda | None:
-        return await ProductoTienda.find_one(ProductoTienda.nombre == nombre)
+    async def obtener_por_nombre(self, nombre: str) -> Producto | None:
+        return await Producto.find_one(Producto.nombre == nombre)
 
-    async def obtener_por_codigo(self, codigo: str) -> ProductoTienda | None:
-        return await ProductoTienda.find_one(ProductoTienda.codigo == codigo)
+    async def obtener_por_codigo(self, codigo: str) -> Producto | None:
+        return await Producto.find_one(Producto.codigo == codigo)
 
-    async def obtener_por_identificador(self, identificador: UUID) -> ProductoTienda | None:
-        return await ProductoTienda.find_one(ProductoTienda.identificador == identificador)
+    async def obtener_por_identificador(self, identificador: UUID) -> Producto | None:
+        return await Producto.find_one(Producto.identificador == identificador)
 
     async def buscar_con_filtros(
         self,
@@ -28,7 +28,7 @@ class TiendaRepo(BaseRepoConEstado[ProductoTienda, TiendaCreate, TiendaUpdate]):
         orden_desc: bool = True,
         skip: int = 0,
         limit: int = 20,
-    ) -> list[ProductoTienda]:
+    ) -> list[Producto]:
         query = {}
 
         if nombre:
@@ -47,7 +47,7 @@ class TiendaRepo(BaseRepoConEstado[ProductoTienda, TiendaCreate, TiendaUpdate]):
         campo_orden = f"-{ordenar_por}" if orden_desc else ordenar_por
 
         return (
-            await ProductoTienda.find(query)
+            await Producto.find(query)
             .sort(campo_orden)
             .skip(skip)
             .limit(limit)

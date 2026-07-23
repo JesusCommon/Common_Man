@@ -1,14 +1,14 @@
 // pages/UsuariosPage.jsx
 import { useState } from "react";
-import { useCategoriasLibros } from "../hooks/categorias/useCategorias";
+import { useCategoriaLibro } from "../hooks/categorias/useCategorias";
 import { useCrearCategoriaLibro } from "../hooks/categorias/useCrearCategoria";
 import { Input } from "../components/ui/Input";
 import { Button } from "../components/ui/Button";
 import { ErrorText } from "../components/ui/ErrorText";
 import { Spinner } from "../components/ui/Spinner";
 
-export function CategoriaPage() {
-  const { categorias, loading: cargandoLista, error: errorLista, recargar } = useCategoriasLibros();
+export function CategoriaLibroPage() {
+  const { categorias, loading: cargandoLista, error: errorLista, recargar } = useCategoriaLibro();
   const { crear, loading: creando, errores, errorApi } = useCrearCategoriaLibro();
 
   const [form, setForm] = useState({

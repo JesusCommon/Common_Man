@@ -1,5 +1,5 @@
 import { categoriasLibroService } from "../../services/categoriaLibro.service";
-import { categoriasTiendaService } from "../../services/categoriasTienda.service";
+import { categoriaProductoService } from "../../services/categoriaProducto.service";
 import { useResourceMutation } from "../factories/useResourceMutation";
 
 export function useActivarCategoriaLibro() {
@@ -10,9 +10,9 @@ export function useActivarCategoriaLibro() {
   return { activar: ejecutar, loading, errorApi };
 }
 
-export function useActivarCategoriaTienda() {
+export function useActivarCategoriaProducto() {
   const { ejecutar, loading, errorApi } = useResourceMutation(
-    (id) => categoriasTiendaService.activar(id)
+    (id) => categoriaProductoService.activar(id)
   );
 
   return { activar: ejecutar, loading, errorApi };

@@ -1,10 +1,10 @@
 from beanie import PydanticObjectId
-from app.schemas.categoria_tienda_schema import (
+from app.schemas.categoria_producto_schema import (
     CategoriaCreate,
     CategoriaResponse,
     CategoriaUpdate
 )
-from app.services.categoria_tienda_service import categoriaService
+from app.services.categoria_producto_service import categoriaService
 
 
 class CategoriaController:

@@ -1,4 +1,4 @@
-export const PRODUCTOS_TIENDA_ENDPOINTS = {
+export const PRODUCTOS_ENDPOINTS = {
     BASE: "/productos",
     ALL: "/productos/all",
     ACTIVE: "/productos/activos",
