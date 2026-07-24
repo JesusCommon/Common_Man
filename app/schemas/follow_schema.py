@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, HttpUrl
 from beanie import PydanticObjectId
 
 class SeguirRequest(BaseModel):
@@ -9,6 +9,6 @@ class SeguidorResponse(BaseModel):
     nombre: str
     apellido: str | None
     username: str
-    avatar: str | None
+    avatar: HttpUrl | None
 
     model_config = ConfigDict(from_attributes=True)

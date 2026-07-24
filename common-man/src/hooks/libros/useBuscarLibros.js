@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { librosService } from "../../services/libros.service";
+import { libroService } from "../../services/libros.service";
 
 export function useBuscarLibros() {
   const [resultados, setResultados] = useState([]);
@@ -10,7 +10,7 @@ export function useBuscarLibros() {
     setErrorApi(null);
     setLoading(true);
     try {
-      const data = await librosService.buscar(filtros);
+      const data = await libroService.buscar(filtros);
       setResultados(data);
       return { success: true, data };
     } catch (err) {

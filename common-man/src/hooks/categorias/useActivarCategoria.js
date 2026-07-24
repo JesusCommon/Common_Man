@@ -1,10 +1,10 @@
-import { categoriasLibroService } from "../../services/categoriaLibro.service";
+import { categoriaLibroService } from "../../services/categoriaLibro.service";
 import { categoriaProductoService } from "../../services/categoriaProducto.service";
 import { useResourceMutation } from "../factories/useResourceMutation";
 
 export function useActivarCategoriaLibro() {
   const { ejecutar, loading, errorApi } = useResourceMutation(
-    (id) => categoriasLibroService.activar(id)
+    (id) => categoriaLibroService.activar(id)
   );
 
   return { activar: ejecutar, loading, errorApi };

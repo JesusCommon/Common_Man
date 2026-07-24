@@ -36,6 +36,7 @@ class JWTSettings(BaseSettings):
     secret_key : str = Field(alias="JWT_SECRET_KEY")
     algorithm : str = Field(alias="JWT_ALGORITHM")
     expire_minutes : int = Field(alias="JWT_EXPIRE_MINUTES")
+    refresh_expire_days : int = Field(alias="JWT_REFRESH_EXPIRE_DAYS")
 
 
 class Settings:

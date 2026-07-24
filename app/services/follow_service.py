@@ -1,4 +1,3 @@
-# services/seguimiento_service.py
 from fastapi import HTTPException, status
 from app.repos.follow_repo import SeguimientoRepo
 from app.models.usuarios_model import Usuario

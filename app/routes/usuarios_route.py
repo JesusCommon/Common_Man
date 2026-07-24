@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Depends
 from beanie import PydanticObjectId
 from uuid import UUID
 from app.schemas.usuarios_schema import (
@@ -10,6 +10,8 @@ from app.schemas.usuarios_schema import (
 )
 from app.schemas.common_schema import RespuestaConMensaje
 from app.controllers.usuarios_controller import UsuarioController
+from app.models.usuarios_model import Usuario
+from app.core.security import obtener_usuario_actual
 
 router = APIRouter(prefix="/usuarios", tags=["Usuarios"])
 controller = UsuarioController()
@@ -51,14 +53,33 @@ async def buscar_por_filtro(
 async def obtener_por_identificador(identificador: UUID):
     return await controller.obtener_por_identificador(identificador)
 
+@router.put("/me", response_model=RespuestaConMensaje[UsuarioResponse])
+async def actualizar_mi_perfil(
+    data: UsuarioUpdate,
+    usuario_actual: Usuario = Depends(obtener_usuario_actual)
+):
+    usuario = await controller.actualizar(usuario_actual.id, data)
+    return RespuestaConMensaje(mensaje="Usuario actualizado correctamente", data=usuario)
+
+@router.patch("/me/password", response_model=RespuestaConMensaje[UsuarioResponse])
+async def cambiar_mi_password(
+    data: UsuarioCambiarPassword,
+    usuario_actual: Usuario = Depends(obtener_usuario_actual)
+):
+    usuario = await controller.cambiar_password(usuario_actual.id, data)
+    return RespuestaConMensaje(mensaje="Contraseña actualizada correctamente", data=usuario)
+
+@router.patch("/me/saldo", response_model=RespuestaConMensaje[UsuarioResponse])
+async def recargar_mi_saldo(
+    data: UsuarioRecargarSaldo,
+    usuario_actual: Usuario = Depends(obtener_usuario_actual)
+):
+    usuario = await controller.recargar_saldo(usuario_actual.id, data)
+    return RespuestaConMensaje(mensaje="Saldo recargado con éxito", data=usuario)
+
 @router.get("/{id}", response_model=UsuarioResponse)
 async def obtener_id(id: PydanticObjectId):
     return await controller.obtener_id(id)
-
-@router.put("/{id}", response_model=RespuestaConMensaje[UsuarioResponse])
-async def actualizar(id: PydanticObjectId, data: UsuarioUpdate):
-    usuario = await controller.actualizar(id, data)
-    return RespuestaConMensaje(mensaje="Usuario actualizado correctamente", data=usuario)
 
 @router.patch("/{id}/activar", response_model=RespuestaConMensaje[UsuarioResponse])
 async def activar(id: PydanticObjectId):
@@ -69,13 +90,3 @@ async def activar(id: PydanticObjectId):
 async def desactivar(id: PydanticObjectId):
     usuario = await controller.desactivar(id)
     return RespuestaConMensaje(mensaje="Usuario desactivado correctamente", data=usuario)
-
-@router.patch("/{id}/password", response_model=RespuestaConMensaje[UsuarioResponse])
-async def cambiar_password(id: PydanticObjectId, data: UsuarioCambiarPassword):
-    usuario = await controller.cambiar_password(id, data)
-    return RespuestaConMensaje(mensaje="Contraseña actualizada correctamente", data=usuario)
-
-@router.patch("/{id}/saldo", response_model=RespuestaConMensaje[UsuarioResponse])
-async def recargar_saldo(id: PydanticObjectId, data: UsuarioRecargarSaldo):
-    usuario = await controller.recargar_saldo(id, data)
-    return RespuestaConMensaje(mensaje="Saldo recargado con éxito", data=usuario)

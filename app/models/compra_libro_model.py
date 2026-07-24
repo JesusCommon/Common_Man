@@ -5,8 +5,7 @@ from app.models.mixins import TimestampMixim
 from app.models.usuarios_model import Usuario
 from app.models.libros_model import Libro
 
-
-class Compra(Document, TimestampMixim):
+class CompraLibro(TimestampMixim, Document):
     usuario: Link[Usuario] = Field(
         ...,
         description="Usuario que realizó la compra"
@@ -25,12 +24,9 @@ class Compra(Document, TimestampMixim):
     )
 
     class Settings:
-        name = "compras"
+        name = "compras_libros"
         indexes = [
-            IndexModel(
-                [("usuario", ASCENDING), ("libro", ASCENDING)],
-                unique=True
-            ),
+            IndexModel([("usuario", ASCENDING), ("libro", ASCENDING)], unique=True),
             IndexModel([("usuario", ASCENDING)]),
             IndexModel([("libro", ASCENDING)]),
         ]

@@ -1,4 +1,4 @@
-import { categoriasLibroService } from "../../services/categoriaLibro.service";
+import { categoriaLibroService } from "../../services/categoriaLibro.service";
 import { categoriaLibroCreateSchema } from "../../validations/categorias/categoriaLibro.schema";
 import { categoriaProductoService } from "../../services/categoriaProducto.service";
 import { categoriaProductoCreateSchema } from "../../validations/categorias/categoriaProducto.schema";
@@ -6,7 +6,7 @@ import { useResourceMutation } from "../factories/useResourceMutation";
 
 export function useCrearCategoriaLibro() {
   const { ejecutar, loading, errores, errorApi } = useResourceMutation(
-    (data) => categoriasLibroService.crear(data),
+    (data) => categoriaLibroService.crear(data),
     categoriaLibroCreateSchema
   );
 

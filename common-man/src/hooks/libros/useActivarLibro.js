@@ -1,9 +1,9 @@
-import { librosService } from "../../services/libros.service";
+import { libroService } from "../../services/libros.service";
 import { useResourceMutation } from "../factories/useResourceMutation";
 
 export function useActivarLibro() {
   const { ejecutar, loading, errorApi } = useResourceMutation(
-    (id) => librosService.activar(id)
+    (id) => libroService.activar(id)
   );
 
   return { activar: ejecutar, loading, errorApi };

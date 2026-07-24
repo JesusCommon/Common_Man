@@ -6,6 +6,8 @@ import { HomePage } from "../pages/home"
 import { CategoriaProductoPage } from "../pages/CategoriaProducto"
 import { ProductosPage } from "../pages/ProductosPage"
 import { TiendaPage } from "../pages/TiendaPage"
+import { LibrosPage } from "../pages/LibrosPage"
+import { BibliotecaPage } from "../pages/BibliotecaPage"
 
 export function AppRouter() {
   return (
@@ -17,6 +19,8 @@ export function AppRouter() {
         <Route path={ROUTES.CATEGORIA_PRODUCTO} element={<CategoriaProductoPage />} />
         <Route path={ROUTES.PRODUCTOS} element={<ProductosPage />} />
         <Route path={ROUTES.TIENDA_PRODUCTO} element={<TiendaPage />} />
+        <Route path={ROUTES.LIBRO} element={<LibrosPage />} />
+        <Route path={ROUTES.BIBLIOTECA} element={<BibliotecaPage />} />
       </Routes>
     </BrowserRouter>
   );

@@ -4,5 +4,7 @@ export const ROUTES = {
   CATEGORIA_LIBRO: "/categorias_libros",
   PRODUCTOS: "/productos",
   TIENDA_PRODUCTO: "/tienda_productos",
-  CATEGORIA_PRODUCTO: "/categorias_producto"
+  CATEGORIA_PRODUCTO: "/categorias_producto",
+  LIBRO: "/libro",
+  BIBLIOTECA: "/biblioteca"
 };

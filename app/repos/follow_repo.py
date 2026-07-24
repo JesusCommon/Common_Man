@@ -1,6 +1,4 @@
-# repos/seguimiento_repo.py
 from app.models.follow_model import Seguimiento
-from app.models.usuarios_model import Usuario
 from beanie import PydanticObjectId
 
 class SeguimientoRepo:
