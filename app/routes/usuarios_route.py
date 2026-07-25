@@ -90,3 +90,7 @@ async def activar(id: PydanticObjectId):
 async def desactivar(id: PydanticObjectId):
     usuario = await controller.desactivar(id)
     return RespuestaConMensaje(mensaje="Usuario desactivado correctamente", data=usuario)
+
+@router.get("/me", response_model=UsuarioResponse)
+async def obtener_perfil_propio(usuario_actual: Usuario = Depends(obtener_usuario_actual)):
+    return usuario_actual
