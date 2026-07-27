@@ -1,10 +1,8 @@
 from datetime import UTC, datetime, timedelta
-
 from beanie import PydanticObjectId
 from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
-
 from src.core.exceptions import ForbiddenException, UnauthorizedException
 from src.core.settings.settings import get_settings
 from src.modules.usuarios.document import Usuario, RolUsuario

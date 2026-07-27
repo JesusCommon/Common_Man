@@ -1,4 +1,4 @@
-from src.modules.usuarios.document import Usuario
+from src.modules.usuarios.document import Usuario, RolUsuario
 from src.modules.usuarios.schema import UsuarioCreate, UsuarioUpdate
 from src.shared.repositories.BaseRepo import BaseRepoConEstado
 from beanie import PydanticObjectId
@@ -43,24 +43,24 @@ class UsuarioRepo(BaseRepoConEstado[Usuario, UsuarioCreate, UsuarioUpdate]):
     
     async def buscar_por_filtro(
         self,
-        nombre : str | None = None,
-        apellido : str | None = None,
-        username : str | None = None,
-        skip : int = 0,
-        limit : int = 20,
-    ) -> list[Usuario]: 
+        nombre: str | None = None,
+        apellido: str | None = None,
+        username: str | None = None,
+        skip: int = 0,
+        limit: int = 20,
+        excluir_rol: RolUsuario | None = None,
+        solo_activos: bool = False,
+    ) -> list[Usuario]:
         query = {}
-    
-        if nombre: 
+        if nombre:
             query["nombre"] = {"$regex": nombre, "$options": "i"}
-        if apellido: 
+        if apellido:
             query["apellido"] = {"$regex": apellido, "$options": "i"}
-        if username: 
+        if username:
             query["username"] = {"$regex": username, "$options": "i"}
-        
-        return (
-            await Usuario.find(query)
-            .skip(skip)
-            .limit(limit)
-            .to_list()
-        )
+        if excluir_rol:
+            query["rol"] = {"$ne": excluir_rol}
+        if solo_activos:
+            query["activo"] = True
+
+        return await Usuario.find(query).skip(skip).limit(limit).to_list()

@@ -132,7 +132,25 @@ class UsuarioService:
                 detail=f"Usuario con identificador {identificador} no encontrado"
             )
         return usuario
-    
+
+    async def buscar_personas(
+        self,
+        nombre: str | None = None,
+        apellido: str | None = None,
+        username: str | None = None,
+        skip: int = 0,
+        limit: int = 20,
+    ) -> list[Usuario]:
+        return await self.repo.buscar_por_filtro(
+            nombre=nombre,
+            apellido=apellido,
+            username=username,
+            skip=skip,
+            limit=limit,
+            excluir_rol=RolUsuario.ADMIN,
+            solo_activos=True,
+        )
+
     async def buscar_por_filtro(
         self,
         nombre: str | None = None,

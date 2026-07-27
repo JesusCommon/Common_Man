@@ -170,13 +170,10 @@ class UsuarioResponse(BaseModel):
     nombre: str
     apellido: str | None = None
     username: str
-    telefono: str | None = None
-    correo: EmailStr
     bio: str | None = None
     avatar: HttpUrl | None = None
     identificador : UUID
     rol : RolUsuario
-    saldo: float
     activo: bool
     fecha_creacion: datetime
     fecha_actualizacion: datetime

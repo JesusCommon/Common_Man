@@ -11,13 +11,15 @@ from src.core.settings.settings import get_settings
 from src.modules.usuarios.route import router as usuarios_router
 from src.modules.auth.route import router as auth_router
 from src.modules.follow.route import router as follow_router
+from src.modules.categorias_libro.route import router as categoria_libro_router
 from src.modules.usuarios.document import Usuario
 from src.modules.follow.document import Seguimiento
+from src.modules.categorias_libro.document import CategoriaLibro
 
 settings = get_settings()
 setup_logging(environment=settings.app.environment, debug=settings.app.debug)
 
-document_models = [Usuario, Seguimiento]
+document_models = [Usuario, Seguimiento, CategoriaLibro]
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -37,7 +39,8 @@ app.add_exception_handler(Exception, unhandled_exception_handler)
 app.include_router(usuarios_router)
 app.include_router(auth_router)
 app.include_router(follow_router)
+app.include_router(categoria_libro_router)
 
-@app.get("/health")
+@app.get("/")
 async def health_check():
     return {"status": "ok", "environment": settings.app.environment}
