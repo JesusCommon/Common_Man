@@ -1,0 +1,32 @@
+from fastapi import APIRouter, Depends
+from beanie import PydanticObjectId
+from src.modules.follow.controller import SeguimientoController
+from src.modules.usuarios.document import Usuario
+from src.core.security.jwt import obtener_usuario_actual
+
+router = APIRouter(prefix="/seguimientos", tags=["Seguimientos"])
+controller = SeguimientoController()
+
+@router.post("/{seguido_id}/seguir")
+async def seguir(seguido_id: PydanticObjectId, usuario_actual: Usuario = Depends(obtener_usuario_actual)):
+    return await controller.seguir(usuario_actual.id, seguido_id)
+
+@router.delete("/{seguido_id}/dejar-de-seguir")
+async def dejar_de_seguir(seguido_id: PydanticObjectId, usuario_actual: Usuario = Depends(obtener_usuario_actual)):
+    return await controller.dejar_de_seguir(usuario_actual.id, seguido_id)
+
+@router.get("/me/seguidores")
+async def listar_mis_seguidores(usuario_actual: Usuario = Depends(obtener_usuario_actual)):
+    return await controller.listar_seguidores(usuario_actual.id)
+
+@router.get("/me/seguidos")
+async def listar_mis_seguidos(usuario_actual: Usuario = Depends(obtener_usuario_actual)):
+    return await controller.listar_seguidos(usuario_actual.id)
+
+@router.get("/{usuario_id}/seguidores")
+async def listar_seguidores(usuario_id: PydanticObjectId):
+    return await controller.listar_seguidores(usuario_id)
+
+@router.get("/{usuario_id}/seguidos")
+async def listar_seguidos(usuario_id: PydanticObjectId):
+    return await controller.listar_seguidos(usuario_id)

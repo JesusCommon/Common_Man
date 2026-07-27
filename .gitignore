@@ -1,71 +1,112 @@
-# Entornos virtuales
-venv/
+# =========================
+# FastAPI / Python
+# =========================
+
+# Virtual environments
 .venv/
+venv/
 env/
-ENV/
 
-# Variables de entorno
-.env
-.env.local
-.env.*.local
-
-# Python
+# Python cache
 __pycache__/
 *.py[cod]
 *$py.class
-*.so
-.Python
 
-# Distribución / empaquetado
+# Python packaging
 build/
 dist/
 *.egg-info/
-.eggs/
 
-# Bases de datos locales
-*.sqlite3
-*.db
+# Environment variables
+.env
+.env.*
+!.env.example
 
 # Logs
 *.log
 logs/
 
-# Cache
+# Testing
 .pytest_cache/
+.coverage
+htmlcov/
+
+# Type checking / linting
 .mypy_cache/
 .ruff_cache/
+.pyright/
 
-# ==============================
-# Node / React / Vite (Frontend)
-# ==============================
+# Jupyter
+.ipynb_checkpoints/
 
-# Dependencias
+
+# =========================
+# FastAPI specific
+# =========================
+
+# Uvicorn
+*.pid
+
+# SQLite local databases
+*.db
+*.sqlite3
+
+# Alembic (si generas archivos temporales)
+alembic.ini.tmp
+
+# Uploads / generated files
+uploads/
+static/uploads/
+
+
+# =========================
+# React + pnpm
+# =========================
+
+# Dependencies
 node_modules/
 
-# Build de producción
-dist/
-dist-ssr/
-
-# Logs de npm/pnpm/yarn
-npm-debug.log*
+# pnpm
+.pnpm-store/
 pnpm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
-# Lockfiles de otros gestores (si usas pnpm, ignora los demás)
-package-lock.json
-yarn.lock
+# Build files
+dist/
+build/
 
-# Cache de Vite
+# Vite
 .vite/
 
-# Archivos locales de editor específicos de Vite/TS
-*.local
+# React environment files
+.env
+.env.*
+!.env.example
 
-# Editor
+
+# =========================
+# Editors
+# =========================
+
+# VS Code
 .vscode/
-.idea/
 
-# Sistema operativo
+# JetBrains
+.idea/
+*.iml
+
+
+# =========================
+# OS
+# =========================
+
 .DS_Store
 Thumbs.db
+
+
+# =========================
+# Misc
+# =========================
+
+.cache/
+.temp/
+*.tmp
