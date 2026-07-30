@@ -5,11 +5,14 @@ from beanie import init_beanie
 from src.modules.usuarios.document import Usuario
 from src.modules.usuarios.repo import UsuarioRepo
 from src.modules.usuarios.schema import UsuarioCreate
+from src.core.security.password import hashear_password
 
 
 @pytest_asyncio.fixture(scope="session", autouse=True)
 async def mock_db():
     sync_client = MongoClient()
+    # Wait for the server to be ready by pinging
+    sync_client.admin.command('ping')
     port = sync_client.address[1]
     async_client = AsyncMongoClient(f"mongodb://localhost:{port}")
     db = async_client.test_db
@@ -33,12 +36,14 @@ async def repo() -> UsuarioRepo:
 
 @pytest_asyncio.fixture
 async def usuario_ejemplo(repo: UsuarioRepo) -> Usuario:
+    # Hash the password before storing
+    hashed_password = hashear_password("Hashed_Password_123")
     data = UsuarioCreate(
         nombre="Jesus Manuel",
         apellido="Teran Vergara",
         username="jesusteran",
         telefono="+573122960906",
         correo="jesus@example.com",
-        password="Hashed_Password_123"
+        password=hashed_password
     )
     return await repo.crear(data)
