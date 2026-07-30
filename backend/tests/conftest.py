@@ -1,6 +1,6 @@
 import pytest_asyncio
 from pymongo_inmemory import MongoClient
-from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo import AsyncMongoClient
 from beanie import init_beanie
 from src.modules.usuarios.document import Usuario
 from src.modules.usuarios.repo import UsuarioRepo
@@ -11,11 +11,11 @@ from src.modules.usuarios.schema import UsuarioCreate
 async def mock_db():
     sync_client = MongoClient()
     port = sync_client.address[1]
-    async_client = AsyncIOMotorClient(f"mongodb://localhost:{port}")
+    async_client = AsyncMongoClient(f"mongodb://localhost:{port}")
     db = async_client.test_db
     await init_beanie(database=db, document_models=[Usuario])
     yield db
-    async_client.close()
+    await async_client.close()
     sync_client.close()
 
 
