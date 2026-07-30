@@ -9,4 +9,4 @@ class AuthController:
         return await self.service.login(data)
 
     async def refrescar(self, data: RefreshRequest) -> TokenResponse:
-        return await self.service.refrescar(data)
+        return await self.service.refrescar(data.refresh_token)

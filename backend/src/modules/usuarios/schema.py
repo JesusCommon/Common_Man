@@ -5,8 +5,9 @@ from uuid import UUID
 from src.modules.usuarios.document import RolUsuario
 from datetime import datetime
 
+
 class UsuarioValidaciones:
-    @field_validator("nombre", mode="before")
+    @field_validator("nombre", mode="before", check_fields=False)
     @classmethod
     def validar_nombre(cls, v):
         if v is None:
@@ -20,7 +21,7 @@ class UsuarioValidaciones:
             raise ValueError("El nombre solo puede llevar letras")
         return v.title()
 
-    @field_validator("apellido", mode="before")
+    @field_validator("apellido", mode="before", check_fields=False)
     @classmethod
     def validar_apellido(cls, v):
         if v is None:
@@ -34,7 +35,7 @@ class UsuarioValidaciones:
             raise ValueError("El apellido solo puede llevar letras")
         return v.title()
 
-    @field_validator("telefono", mode="before")
+    @field_validator("telefono", mode="before", check_fields=False)
     @classmethod
     def validar_telefono(cls, v):
         if v is None:
@@ -46,7 +47,7 @@ class UsuarioValidaciones:
             raise ValueError("Número telefónico inválido")
         return v
 
-    @field_validator("username", mode="before")
+    @field_validator("username", mode="before", check_fields=False)
     @classmethod
     def validar_username(cls, v):
         if v is None:
@@ -60,7 +61,7 @@ class UsuarioValidaciones:
             raise ValueError("El username solo puede llevar letras, numero o guión bajo")
         return v.lower()
 
-    @field_validator("correo", mode="before")
+    @field_validator("correo", mode="before", check_fields=False)
     @classmethod
     def validar_correo(cls, v):
         if v is None:
@@ -69,7 +70,7 @@ class UsuarioValidaciones:
             raise ValueError("El correo debe ser texto")
         return v.strip().lower()
 
-    @field_validator("bio", mode="before")
+    @field_validator("bio", mode="before", check_fields=False)
     @classmethod
     def validar_bio(cls, v):
         if v is None:
@@ -77,18 +78,15 @@ class UsuarioValidaciones:
         if not isinstance(v, str):
             raise ValueError("La bio debe ser texto")
         v = v.strip()
-        if len(v) > 40:
-            raise ValueError("La bio no puede tener más de 40 caracteres")
+        if len(v) > 280:
+            raise ValueError("La bio no puede tener más de 280 caracteres")
         return v
-    
-    @field_validator("avatar", mode="before")
+
+    @field_validator("avatar", mode="before", check_fields=False)
     @classmethod
     def validar_avatar(cls, v):
         if v is None:
             return None
-        url = str(v)
-        if not url.lower().endswith((".jpg", ".jpeg", ".png", ".webp")):
-            raise ValueError("El avatar debe ser una URL con extensión .jpg, .jpeg, .png o .webp")
         return v
 
 
@@ -122,20 +120,6 @@ class UsuarioCreate(UsuarioValidaciones, PasswordValidacion, BaseModel):
     telefono: str | None = Field(default=None)
     correo: EmailStr = Field(...)
     password: str = Field(...)
-    bio: str | None = Field(default=None)
-    avatar: HttpUrl | None = Field(default=None)
-    saldo: float | None = Field(default=None)
-
-    @field_validator("saldo", mode="before")
-    @classmethod
-    def validar_saldo(cls, v):
-        if v is None:
-            return None
-        if not isinstance(v, (int, float)):
-            raise ValueError("El saldo debe ser un número")
-        if v <= 0:
-            raise ValueError("El saldo debe ser mayor a 0")
-        return v
 
 
 class UsuarioUpdate(UsuarioValidaciones, BaseModel):
@@ -148,34 +132,55 @@ class UsuarioUpdate(UsuarioValidaciones, BaseModel):
     avatar: HttpUrl | None = Field(default=None)
 
 
+class UsuarioAdminUpdate(UsuarioUpdate):
+    rol: RolUsuario | None = Field(default=None)
+    activo: bool | None = Field(default=None)
+    saldo: int | None = Field(default=None, ge=0)
+
+
 class UsuarioCambiarPassword(PasswordValidacion, BaseModel):
     password_actual: str = Field(...)
     password: str = Field(...)
 
 
 class UsuarioRecargarSaldo(BaseModel):
-    monto: float = Field(...)
+    monto: int = Field(...)
 
     @field_validator("monto", mode="before")
     @classmethod
     def validar_monto(cls, v):
-        if not isinstance(v, (int, float)):
+        if not isinstance(v, (int, float, str)):
             raise ValueError("El monto debe ser un número")
-        if v <= 0:
+        try:
+            monto = int(str(v))
+        except Exception:
+            raise ValueError("El monto debe ser un número válido")
+        if monto <= 0:
             raise ValueError("El monto debe ser mayor a 0")
-        return v
+        return monto
 
-class UsuarioResponse(BaseModel):
-    id: PydanticObjectId
+class UsuarioPublicResponse(BaseModel):
+    identificador: UUID
     nombre: str
     apellido: str | None = None
     username: str
     bio: str | None = None
     avatar: HttpUrl | None = None
-    identificador : UUID
-    rol : RolUsuario
     activo: bool
     fecha_creacion: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class UsuarioPropioResponse(UsuarioPublicResponse):
+    correo: EmailStr
+    telefono: str | None = None
+    saldo: int
+    rol: RolUsuario
     fecha_actualizacion: datetime
+
+
+class UsuarioAdminResponse(UsuarioPropioResponse):
+    id: PydanticObjectId
 
     model_config = ConfigDict(from_attributes=True)

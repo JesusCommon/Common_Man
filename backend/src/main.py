@@ -10,16 +10,14 @@ from src.core.logging import setup_logging
 from src.core.settings.settings import get_settings
 from src.modules.usuarios.route import router as usuarios_router
 from src.modules.auth.route import router as auth_router
-from src.modules.follow.route import router as follow_router
-from src.modules.categorias_libro.route import router as categoria_libro_router
 from src.modules.usuarios.document import Usuario
-from src.modules.follow.document import Seguimiento
-from src.modules.categorias_libro.document import CategoriaLibro
+
 
 settings = get_settings()
 setup_logging(environment=settings.app.environment, debug=settings.app.debug)
 
-document_models = [Usuario, Seguimiento, CategoriaLibro]
+document_models = [Usuario]
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -34,12 +32,13 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# ✅ 2. Exception handlers
 app.add_exception_handler(AppException, app_exception_handler)
 app.add_exception_handler(Exception, unhandled_exception_handler)
+
+# ✅ 3. Routers DESPUÉS
 app.include_router(usuarios_router)
 app.include_router(auth_router)
-app.include_router(follow_router)
-app.include_router(categoria_libro_router)
 
 @app.get("/")
 async def health_check():

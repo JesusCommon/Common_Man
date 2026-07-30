@@ -1,8 +1,20 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field, field_validator
+
 
 class LoginRequest(BaseModel):
-    correo: EmailStr = Field(...)
+    identidad: str = Field(
+        ...,
+        description="Correo electrónico o username del usuario",
+        examples=["jesusteran", "example@gmail.com"]
+    )
     password: str = Field(...)
+
+    @field_validator("identidad", mode="before")
+    @classmethod
+    def normalizar_identidad(cls, v):
+        if not isinstance(v, str):
+            raise ValueError("La identidad debe ser texto")
+        return v.strip().lower()
 
 class TokenResponse(BaseModel):
     access_token: str

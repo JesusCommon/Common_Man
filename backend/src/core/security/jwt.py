@@ -1,5 +1,5 @@
 from datetime import UTC, datetime, timedelta
-from beanie import PydanticObjectId
+from uuid import UUID
 from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
@@ -8,8 +8,7 @@ from src.core.settings.settings import get_settings
 from src.modules.usuarios.document import Usuario, RolUsuario
 
 settings = get_settings()
-bearer_scheme = HTTPBearer()
-
+bearer_scheme = HTTPBearer(auto_error=False)
 
 def crear_access_token(data: dict) -> str:
     to_encode = data.copy()
@@ -21,7 +20,6 @@ def crear_access_token(data: dict) -> str:
         algorithm=settings.jwt.algorithm,
     )
 
-
 def crear_refresh_token(data: dict) -> str:
     to_encode = data.copy()
     expira = datetime.now(UTC) + timedelta(days=settings.jwt.refresh_expire_days)
@@ -31,7 +29,6 @@ def crear_refresh_token(data: dict) -> str:
         settings.jwt.secret_key.get_secret_value(),
         algorithm=settings.jwt.algorithm,
     )
-
 
 def decodificar(token: str) -> dict | None:
     try:
@@ -43,12 +40,13 @@ def decodificar(token: str) -> dict | None:
     except JWTError:
         return None
 
-
 async def obtener_usuario_actual(
-    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
 ) -> Usuario:
-    token = credentials.credentials
-    payload = decodificar(token)
+    if credentials is None:
+        raise UnauthorizedException("Token no proporcionado")
+
+    payload = decodificar(credentials.credentials)
 
     if payload is None:
         raise UnauthorizedException("Token inválido o expirado")
@@ -57,11 +55,11 @@ async def obtener_usuario_actual(
         raise UnauthorizedException("Se requiere un access token")
 
     try:
-        usuario_id = PydanticObjectId(payload["sub"])
+        identificador = UUID(payload["sub"])
     except Exception:
         raise UnauthorizedException("Token inválido")
-
-    usuario = await Usuario.get(usuario_id)
+    
+    usuario = await Usuario.find_one(Usuario.identificador == identificador)
 
     if usuario is None or not usuario.activo:
         raise UnauthorizedException("Usuario no válido")

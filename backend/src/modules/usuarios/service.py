@@ -1,16 +1,16 @@
-import bcrypt
 from fastapi import HTTPException, status
 from src.modules.usuarios.document import Usuario, RolUsuario
-from src.modules.usuarios.schema import UsuarioCreate, UsuarioUpdate, UsuarioCambiarPassword, UsuarioRecargarSaldo
+from src.modules.usuarios.schema import (
+    UsuarioCreate,
+    UsuarioUpdate,
+    UsuarioAdminUpdate,
+    UsuarioCambiarPassword,
+    UsuarioRecargarSaldo,
+)
 from src.modules.usuarios.repo import UsuarioRepo
+from src.core.security.password import hashear_password, verificar_password
 from beanie import PydanticObjectId
 from uuid import UUID
-
-def hashear_password(password: str) -> str:
-    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
-
-def verificar_password(password: str, hashed: str) -> bool:
-    return bcrypt.checkpw(password.encode("utf-8"), hashed.encode("utf-8"))
 
 
 class UsuarioService:
@@ -50,27 +50,127 @@ class UsuarioService:
         await documento.insert()
         return documento
 
+    # ------------------------------------------------------------------
+    # Lectura / listados (uso administrativo)
+    # ------------------------------------------------------------------
+
     async def listar(self) -> list[Usuario]:
         return await self.repo.listar()
 
     async def listar_activos(self) -> list[Usuario]:
         return await self.repo.listar_activos()
 
-    async def listar_inactivos(self) -> list[Usuario]:
-        return await self.repo.listar_inactivos()
+    async def listar_inactivos(self, skip: int = 0, limit: int = 20) -> list[Usuario]:
+        return await self.repo.listar_inactivos(skip=skip, limit=limit)
 
     async def obtener_por_id(self, id: PydanticObjectId) -> Usuario:
+        """Uso exclusivo de rutas de admin."""
         usuario = await self.repo.obtener_por_id(id)
         if not usuario:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Usuario con ID {id} No encontrado"
+                detail="Usuario no encontrado"
             )
         return usuario
 
-    async def actualizar(self, id: PydanticObjectId, data: UsuarioUpdate) -> Usuario:
-        usuario = await self.obtener_por_id(id)
+    async def obtener_por_identificador(self, identificador: UUID) -> Usuario:
+        """Uso público / self-service."""
+        usuario = await self.repo.obtener_por_identificador(identificador)
+        if not usuario:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Usuario no encontrado"
+            )
+        return usuario
+
+    # ------------------------------------------------------------------
+    # Self-service: el propio usuario opera sobre sí mismo vía UUID.
+    # El identificador debe salir del token/sesión autenticada en la ruta,
+    # nunca de un parámetro libre en la URL.
+    # ------------------------------------------------------------------
+
+    async def _validar_conflictos(
+        self, data: UsuarioUpdate, identificador_actual: UUID
+    ) -> None:
+        if data.correo:
+            existente = await self.repo.obtener_por_correo(data.correo)
+            if existente and existente.identificador != identificador_actual:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail=f"Ya existe un usuario con el correo '{data.correo}'"
+                )
+
+        if data.username:
+            existente = await self.repo.obtener_por_username(data.username)
+            if existente and existente.identificador != identificador_actual:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail=f"El username '{data.username}' ya está en uso"
+                )
+
+        if data.telefono:
+            existente = await self.repo.obtener_por_telefono(data.telefono)
+            if existente and existente.identificador != identificador_actual:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail=f"Ya existe un usuario con el número '{data.telefono}'"
+                )
+
+    async def actualizar(self, identificador: UUID, data: UsuarioUpdate) -> Usuario:
+        usuario = await self.obtener_por_identificador(identificador)
         self._validar_activo(usuario)
+        await self._validar_conflictos(data, identificador)
+        return await self.repo.actualizar(usuario.id, data)
+
+    async def cambiar_password(
+        self, identificador: UUID, data: UsuarioCambiarPassword
+    ) -> Usuario:
+        usuario = await self.obtener_por_identificador(identificador)
+        self._validar_activo(usuario)
+
+        if not verificar_password(data.password_actual, usuario.password):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="La contraseña actual es incorrecta"
+            )
+
+        nueva_hasheada = hashear_password(data.password)
+        return await self.repo.actualizar_password(identificador, nueva_hasheada)
+
+    async def recargar_saldo(
+        self, identificador: UUID, data: UsuarioRecargarSaldo
+    ) -> Usuario:
+        usuario = await self.obtener_por_identificador(identificador)
+        self._validar_activo(usuario)
+        return await self.repo.recargar_saldo(identificador, data.monto)
+
+    async def buscar_personas(
+        self,
+        nombre: str | None = None,
+        apellido: str | None = None,
+        username: str | None = None,
+        skip: int = 0,
+        limit: int = 20,
+    ) -> list[Usuario]:
+        return await self.repo.buscar_por_filtro(
+            nombre=nombre,
+            apellido=apellido,
+            username=username,
+            skip=skip,
+            limit=limit,
+            excluir_rol=RolUsuario.ADMIN,
+            solo_activos=True,
+        )
+
+    # ------------------------------------------------------------------
+    # Exclusivo de admin: operan por PydanticObjectId. Deben protegerse
+    # en la ruta con una dependencia tipo require_admin.
+    # ------------------------------------------------------------------
+
+    async def actualizar_admin(
+        self, id: PydanticObjectId, data: UsuarioAdminUpdate
+    ) -> Usuario:
+        usuario = await self.obtener_por_id(id)
 
         if data.correo:
             existente = await self.repo.obtener_por_correo(data.correo)
@@ -98,23 +198,11 @@ class UsuarioService:
 
         return await self.repo.actualizar(id, data)
 
-    async def cambiar_password(self, id: PydanticObjectId, data: UsuarioCambiarPassword) -> Usuario:
-        usuario = await self.obtener_por_id(id)
-        self._validar_activo(usuario)
-
-        if not verificar_password(data.password_actual, usuario.password):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="La contraseña actual es incorrecta"
-            )
-
-        nueva_hasheada = hashear_password(data.password)
-        return await self.repo.actualizar_password(id, nueva_hasheada)
-
-    async def recargar_saldo(self, id: PydanticObjectId, data: UsuarioRecargarSaldo) -> Usuario:
-        usuario = await self.obtener_por_id(id)
-        self._validar_activo(usuario)
-        return await self.repo.recargar_saldo(id, data.monto)
+    async def recargar_saldo_admin(
+        self, id: PydanticObjectId, data: UsuarioRecargarSaldo
+    ) -> Usuario:
+        await self.obtener_por_id(id)
+        return await self.repo.recargar_saldo_admin(id, data.monto)
 
     async def activar(self, id: PydanticObjectId) -> Usuario:
         await self.obtener_por_id(id)
@@ -123,33 +211,6 @@ class UsuarioService:
     async def desactivar(self, id: PydanticObjectId) -> Usuario:
         await self.obtener_por_id(id)
         return await self.repo.desactivar(id)
-    
-    async def obtener_por_identificador(self, identificador: UUID) -> Usuario:
-        usuario = await self.repo.obtener_por_identificador(identificador)
-        if not usuario:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Usuario con identificador {identificador} no encontrado"
-            )
-        return usuario
-
-    async def buscar_personas(
-        self,
-        nombre: str | None = None,
-        apellido: str | None = None,
-        username: str | None = None,
-        skip: int = 0,
-        limit: int = 20,
-    ) -> list[Usuario]:
-        return await self.repo.buscar_por_filtro(
-            nombre=nombre,
-            apellido=apellido,
-            username=username,
-            skip=skip,
-            limit=limit,
-            excluir_rol=RolUsuario.ADMIN,
-            solo_activos=True,
-        )
 
     async def buscar_por_filtro(
         self,

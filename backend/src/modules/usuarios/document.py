@@ -62,7 +62,7 @@ class Usuario(Document, TimestampMixim, StatusMixin):
         description="Identificador único de cada usuario"
     )
 
-    saldo: float = Field(
+    saldo: int = Field(
         default=0,
         ge=0,
         description="Saldo del usuario",
