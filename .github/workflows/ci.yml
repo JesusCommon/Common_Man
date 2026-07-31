@@ -1,14 +1,11 @@
-name: CI / Tests E2E
-
-on:
-  push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main, develop]
-
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
+
     strategy:
       matrix:
         python-version: ["3.12"]
@@ -26,7 +23,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('backend/requirements*.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
