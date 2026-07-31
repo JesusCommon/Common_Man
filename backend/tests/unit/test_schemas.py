@@ -5,13 +5,7 @@ from src.modules.usuarios.schema import (
     UsuarioCambiarPassword, UsuarioRecargarSaldo, RolUsuario
 )
 
-
-# ============================================================
-# USUARIOCREATE
-# ============================================================
-
 class TestUsuarioCreate:
-    """Tests para creación de usuario con validaciones completas."""
 
     def test_creacion_valida_completa(self):
         user = UsuarioCreate(
@@ -250,12 +244,7 @@ class TestUsuarioCreate:
         assert "debe ser texto" in str(exc.value)
 
 
-# ============================================================
-# USUARIOUPDATE
-# ============================================================
-
 class TestUsuarioUpdate:
-    """Tests para actualización de usuario (sin password)."""
 
     def test_update_nombre_valido(self):
         update = UsuarioUpdate(nombre="  jesus manuel  ")
@@ -310,13 +299,7 @@ class TestUsuarioUpdate:
         assert update.bio is None
         assert update.avatar is None
 
-
-# ============================================================
-# USUARIOADMINUPDATE
-# ============================================================
-
 class TestUsuarioAdminUpdate:
-    """Tests para actualización admin."""
 
     def test_update_rol_admin(self):
         update = UsuarioAdminUpdate(rol=RolUsuario.ADMIN)
@@ -348,13 +331,7 @@ class TestUsuarioAdminUpdate:
         assert update.activo is True
         assert update.saldo == 5000
 
-
-# ============================================================
-# USUARIOCAMBIARPASSWORD
-# ============================================================
-
 class TestUsuarioCambiarPassword:
-    """Tests para cambio de password."""
 
     def test_cambio_password_valido(self):
         cp = UsuarioCambiarPassword(password_actual="OldPass1!", password="NewPass1!")
@@ -376,13 +353,7 @@ class TestUsuarioCambiarPassword:
             UsuarioCambiarPassword(password_actual="OldPass1!", password="NewPass123")
         assert "al menos un simbolo" in str(exc.value)
 
-
-# ============================================================
-# USUARIORECARGARSALDO
-# ============================================================
-
 class TestUsuarioRecargarSaldo:
-    """Tests para recarga de saldo."""
 
     def test_monto_entero_valido(self):
         rs = UsuarioRecargarSaldo(monto=1000)
@@ -393,8 +364,6 @@ class TestUsuarioRecargarSaldo:
         assert rs.monto == 500
 
     def test_monto_float_no_soportado_falla(self):
-        """BUG: float como 250.75 falla porque int(str(250.75)) -> int('250.75') da error.
-        Para soportar floats, cambiar a: int(float(str(v)))"""
         with pytest.raises(ValidationError) as exc:
             UsuarioRecargarSaldo(monto=250.75)
         assert "número válido" in str(exc.value)

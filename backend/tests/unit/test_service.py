@@ -5,13 +5,10 @@ from src.modules.usuarios.repo import UsuarioRepo
 from src.modules.usuarios.document import Usuario, RolUsuario
 from src.modules.usuarios.schema import UsuarioCreate, UsuarioUpdate
 
-
-# Password válido de ejemplo que cumple TODAS las reglas
 PASS_VALIDA = "Password1!"
 
 
 def _uc(nombre: str, username: str, correo: str, **kwargs) -> UsuarioCreate:
-    """Helper para crear UsuarioCreate con password válida por defecto."""
     return UsuarioCreate(
         nombre=nombre,
         username=username,
@@ -22,12 +19,7 @@ def _uc(nombre: str, username: str, correo: str, **kwargs) -> UsuarioCreate:
     )
 
 
-# ============================================================
-# BASE REPO (CRUD)
-# ============================================================
-
 class TestBaseRepoCRUD:
-    """Tests para operaciones CRUD heredadas de BaseRepo."""
 
     async def test_crear_usuario_persiste_datos(self, repo: UsuarioRepo):
         data = _uc(nombre="Ana Maria", username="ana123", correo="ana@test.com")
@@ -76,13 +68,7 @@ class TestBaseRepoCRUD:
         resultado = await repo.actualizar(fake_id, update)
         assert resultado is None
 
-
-# ============================================================
-# BASE REPO CON ESTADO
-# ============================================================
-
 class TestBaseRepoConEstado:
-    """Tests para operaciones de estado (activar/desactivar)."""
 
     async def test_listar_activos_solo_activos(self, repo: UsuarioRepo):
         activo = await repo.crear(_uc(nombre="Activo", username="activo", correo="act@test.com"))
@@ -101,7 +87,6 @@ class TestBaseRepoConEstado:
         assert resultado is not None
         assert resultado.activo is False
 
-        # Verificar persistencia
         verificado = await repo.obtener_por_id(usuario_ejemplo.id)
         assert verificado.activo is False
 
@@ -122,13 +107,7 @@ class TestBaseRepoConEstado:
         resultado = await repo.desactivar(fake_id)
         assert resultado is None
 
-
-# ============================================================
-# USUARIO REPO - BÚSQUEDAS ESPECÍFICAS
-# ============================================================
-
 class TestUsuarioRepoBusquedas:
-    """Tests para búsquedas específicas de usuario."""
 
     async def test_obtener_por_correo_existente(self, repo: UsuarioRepo, usuario_ejemplo: Usuario):
         encontrado = await repo.obtener_por_correo("jesus@example.com")
@@ -185,12 +164,7 @@ class TestUsuarioRepoBusquedas:
         assert len(inactivos) == 2
 
 
-# ============================================================
-# USUARIO REPO - OPERACIONES ESPECÍFICAS
-# ============================================================
-
 class TestUsuarioRepoOperaciones:
-    """Tests para operaciones específicas: password, saldo, etc."""
 
     async def test_actualizar_password(self, repo: UsuarioRepo, usuario_ejemplo: Usuario):
         nueva_pass = "NuevoPass1!"
@@ -199,7 +173,6 @@ class TestUsuarioRepoOperaciones:
         assert actualizado is not None
         assert actualizado.password == nueva_pass
 
-        # Verificar persistencia
         verificado = await repo.obtener_por_identificador(usuario_ejemplo.identificador)
         assert verificado.password == nueva_pass
 
@@ -247,13 +220,7 @@ class TestUsuarioRepoOperaciones:
         resultado = await repo.recargar_saldo_admin(fake_id, 100)
         assert resultado is None
 
-
-# ============================================================
-# USUARIO REPO - BÚSQUEDA POR FILTRO
-# ============================================================
-
 class TestUsuarioRepoBuscarPorFiltro:
-    """Tests para búsqueda avanzada con filtros."""
 
     async def test_buscar_por_nombre(self, repo: UsuarioRepo):
         await repo.crear(_uc(nombre="Jesus Manuel", username="jesus", correo="j@t.com"))
