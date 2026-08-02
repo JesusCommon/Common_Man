@@ -19,6 +19,16 @@ jobs:
       matrix:
         python-version: ["3.12"]
 
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+
+    env:
+      CI: true
+      MONGODB_URI: mongodb://localhost:27017
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -35,14 +45,6 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
-
-      - name: Cache MongoDB in-memory binary
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pymongo_inmemory
-          key: ${{ runner.os }}-pymongo-inmemory
-          restore-keys: |
-            ${{ runner.os }}-pymongo-inmemory
 
       - name: Install dependencies
         run: |

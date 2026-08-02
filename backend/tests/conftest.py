@@ -1,4 +1,5 @@
 from __future__ import annotations
+import os
 from collections.abc import AsyncGenerator
 from typing import Any
 from uuid import uuid4
@@ -16,18 +17,23 @@ from src.modules.usuarios.schema import UsuarioCreate
 
 @pytest_asyncio.fixture(scope="session", autouse=True)
 async def mock_db() -> AsyncGenerator[Any, None]:
-    sync_client = MongoClient()
-    sync_client.admin.command("ping")
-    port = sync_client.address[1]
-
-    async_client = AsyncMongoClient(f"mongodb://localhost:{port}")
-    db = async_client.test_db
-    await init_beanie(database=db, document_models=[Usuario])
-
-    yield db
-
-    await async_client.close()
-    sync_client.close()
+    if os.getenv("CI", "false").lower() == "true":
+        uri = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
+        client = AsyncMongoClient(uri)
+        db = client.test_db
+        await init_beanie(database=db, document_models=[Usuario])
+        yield db
+        await client.close()
+    else:
+        sync_client = MongoClient()
+        sync_client.admin.command("ping")
+        port = sync_client.address[1]
+        async_client = AsyncMongoClient(f"mongodb://localhost:{port}")
+        db = async_client.test_db
+        await init_beanie(database=db, document_models=[Usuario])
+        yield db
+        await async_client.close()
+        sync_client.close()
 
 
 @pytest_asyncio.fixture(autouse=True)
@@ -53,6 +59,13 @@ async def usuario_ejemplo(repo: UsuarioRepo) -> Usuario:
     )
     return await repo.crear(data)
 
+@pytest_asyncio.fixture
+async def client() -> AsyncGenerator[AsyncClient, None]:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        yield ac
+
+
 def _unique_user_data(**kwargs: Any) -> dict[str, Any]:
     uid_num = uuid4().int % 100_000_000_000
     uid_str = uuid4().hex[:8]
@@ -67,17 +80,10 @@ def _unique_user_data(**kwargs: Any) -> dict[str, Any]:
     base.update(kwargs)
     return base
 
-@pytest_asyncio.fixture
-async def client(mock_db: Any) -> AsyncGenerator[AsyncClient, None]:
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as ac:
-        yield ac
-
 
 @pytest_asyncio.fixture
 async def usuario_normal(client: AsyncClient, repo: UsuarioRepo) -> dict[str, Any]:
     data = _unique_user_data()
-
     response = await client.post("/usuarios/", json=data)
     assert response.status_code == 201, f"Error creando usuario: {response.text}"
 
@@ -106,7 +112,6 @@ async def usuario_normal(client: AsyncClient, repo: UsuarioRepo) -> dict[str, An
 @pytest_asyncio.fixture
 async def usuario_admin(client: AsyncClient, repo: UsuarioRepo) -> dict[str, Any]:
     data = _unique_user_data()
-
     response = await client.post("/usuarios/", json=data)
     assert response.status_code == 201, f"Error creando admin: {response.text}"
 
