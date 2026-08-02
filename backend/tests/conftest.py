@@ -8,9 +8,11 @@ from beanie import init_beanie
 from httpx import ASGITransport, AsyncClient
 from pymongo import AsyncMongoClient
 from pymongo_inmemory import MongoClient
+from src.core.security.password import hashear_password
 from src.main import app
 from src.modules.usuarios.document import Usuario, RolUsuario
 from src.modules.usuarios.repo import UsuarioRepo
+from src.modules.usuarios.schema import UsuarioCreate
 
 @pytest_asyncio.fixture(scope="session", autouse=True)
 async def mock_db() -> AsyncGenerator[Any, None]:
@@ -35,14 +37,21 @@ async def clean_collection(mock_db: Any) -> AsyncGenerator[None, None]:
     await Usuario.delete_all()
 
 @pytest_asyncio.fixture
-async def client(mock_db: Any) -> AsyncGenerator[AsyncClient, None]:
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as ac:
-        yield ac
-
-@pytest_asyncio.fixture
 async def repo() -> UsuarioRepo:
     return UsuarioRepo()
+
+@pytest_asyncio.fixture
+async def usuario_ejemplo(repo: UsuarioRepo) -> Usuario:
+    hashed_password = hashear_password("Hashed_Password_123")
+    data = UsuarioCreate(
+        nombre="Jesus Manuel",
+        apellido="Teran Vergara",
+        username="jesusteran",
+        telefono="+573122960906",
+        correo="jesus@example.com",
+        password=hashed_password,
+    )
+    return await repo.crear(data)
 
 def _unique_user_data(**kwargs: Any) -> dict[str, Any]:
     uid_num = uuid4().int % 100_000_000_000
@@ -59,8 +68,16 @@ def _unique_user_data(**kwargs: Any) -> dict[str, Any]:
     return base
 
 @pytest_asyncio.fixture
+async def client(mock_db: Any) -> AsyncGenerator[AsyncClient, None]:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        yield ac
+
+
+@pytest_asyncio.fixture
 async def usuario_normal(client: AsyncClient, repo: UsuarioRepo) -> dict[str, Any]:
     data = _unique_user_data()
+
     response = await client.post("/usuarios/", json=data)
     assert response.status_code == 201, f"Error creando usuario: {response.text}"
 

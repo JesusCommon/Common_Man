@@ -7,6 +7,7 @@ from src.core.exceptions import (
     unhandled_exception_handler,
 )
 from src.core.logging import setup_logging
+from src.core.metrics import setup_metrics
 from src.core.settings.settings import get_settings
 from src.modules.usuarios.route import router as usuarios_router
 from src.modules.auth.route import router as auth_router
@@ -32,13 +33,17 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# ✅ 2. Exception handlers
+# ✅ Métricas Prometheus (antes de los routers para capturar todo)
+setup_metrics(app)          # ← NUEVO
+
+# ✅ Exception handlers
 app.add_exception_handler(AppException, app_exception_handler)
 app.add_exception_handler(Exception, unhandled_exception_handler)
 
-# ✅ 3. Routers DESPUÉS
+# ✅ Routers
 app.include_router(usuarios_router)
 app.include_router(auth_router)
+
 
 @app.get("/")
 async def health_check():
