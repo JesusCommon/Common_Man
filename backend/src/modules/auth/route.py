@@ -1,4 +1,5 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
+from src.core.rate_limit import auth_limit
 from src.modules.auth.controller import AuthController
 from src.modules.auth.schema import LoginRequest, RefreshRequest, TokenResponse
 
@@ -6,9 +7,12 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 controller = AuthController()
 
 @router.post("/login", response_model=TokenResponse)
-async def login(data: LoginRequest):
+@auth_limit("5/minute")
+async def login(request: Request, data: LoginRequest):
     return await controller.login(data)
 
+
 @router.post("/refresh", response_model=TokenResponse)
-async def refresh(data: RefreshRequest):
+@auth_limit("10/minute")
+async def refresh(request: Request, data: RefreshRequest):
     return await controller.refrescar(data)
