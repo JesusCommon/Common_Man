@@ -10,12 +10,8 @@ interface AuthState {
   isAuthenticated: boolean;
   isAdmin: boolean;
 
-  setAuth: (payload: {
-    user: UsuarioPropioResponse;
-    accessToken: string;
-    refreshToken: string;
-  }) => void;
-
+  setTokens: (payload: { accessToken: string; refreshToken: string }) => void;
+  setUser: (user: UsuarioPropioResponse) => void;
   updateUser: (user: Partial<UsuarioPropioResponse>) => void;
   logout: () => void;
 }
@@ -28,15 +24,17 @@ export const useAuthStore = create<AuthState>()(
       refreshToken: null,
 
       get isAuthenticated() {
-        return !!get().accessToken && !!get().user;
+        return !!get().accessToken;
       },
 
       get isAdmin() {
         return get().user?.rol === "admin";
       },
 
-      setAuth: ({ user, accessToken, refreshToken }) =>
-        set({ user, accessToken, refreshToken }),
+      setTokens: ({ accessToken, refreshToken }) =>
+        set({ accessToken, refreshToken }),
+
+      setUser: (user) => set({ user }),
 
       updateUser: (partialUser) =>
         set((state) => ({
