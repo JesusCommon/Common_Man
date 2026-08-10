@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { Shield, ArrowRight, UserPlus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+// ... resto de imports igual
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -26,6 +28,7 @@ const itemVariants = {
 };
 
 export default function Home() {
+const navigate = useNavigate();
   return (
     <div className="relative min-h-screen w-full bg-slate-950 overflow-hidden flex flex-col items-center justify-center">
       {/* Grid de fondo sutil */}
@@ -39,6 +42,7 @@ export default function Home() {
           backgroundSize: '60px 60px',
           maskImage: 'radial-gradient(ellipse at center, black 30%, transparent 80%)',
           WebkitMaskImage: 'radial-gradient(ellipse at center, black 30%, transparent 80%)',
+  
         }}
       />
       
@@ -117,31 +121,30 @@ export default function Home() {
         </motion.p>
         
         {/* Botones */}
-        <motion.div 
-          variants={itemVariants}
-          className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+      <motion.div 
+        variants={itemVariants}
+        className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+      >
+        <Button 
+          variant="primary" 
+          size="lg"
+          className="group w-full sm:w-auto"
+          onClick={() => navigate("/login")}
         >
-          <Button 
-            variant="primary" 
-            size="lg"
-            className="group w-full sm:w-auto"
-            onClick={() => console.log("Ir a login")}
-          >
-            <Shield className="w-4 h-4 mr-2" />
-            Iniciar Sesión
-            <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
-          </Button>
-          
-          <Button 
-            variant="outline" 
-            size="lg"
-            className="w-full sm:w-auto"
-            onClick={() => console.log("Ir a registro")}
-          >
-            <UserPlus className="w-4 h-4 mr-2" />
-            Crear Cuenta
-          </Button>
-        </motion.div>
+          <Shield className="w-4 h-4 mr-2" />
+          Iniciar Sesión
+          <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+        </Button>
+        
+        <Button 
+          variant="outline" 
+          size="lg"
+          className="w-full sm:w-auto"
+          onClick={() => navigate("/register")}
+        >
+          <UserPlus className="w-4 h-4 mr-2" />
+          Crear Cuenta
+        </Button>
       </motion.div>
       
       {/* Footer */}
@@ -155,4 +158,4 @@ export default function Home() {
       </motion.div>
     </div>
   );
-}
+}}
