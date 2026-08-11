@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-
+from src.core.cors import setup_cors               
 from src.core.database.connection import connect_db, disconnect_db
 from src.core.exceptions import (
     AppException,
@@ -34,6 +34,7 @@ app = FastAPI(
     version=settings.app.version,
     lifespan=lifespan,
 )
+setup_cors(app)                                               
 
 if RATE_LIMIT_ENABLED:
     from slowapi.errors import RateLimitExceeded

@@ -4,15 +4,12 @@ import { useNavigate, Link } from "react-router-dom";
 import { LoginSchema } from "@/schemas";
 import type { LoginInput } from "@/schemas";
 import { useLogin } from "@/hooks";
-import { useAuthStore } from "@/store";
 import { Button } from "@/components/ui/Button";
 import { Shield, ArrowRight, AlertCircle } from "lucide-react";
-import { useEffect } from "react";
 
 export default function Login() {
   const navigate = useNavigate();
-  const setUser = useAuthStore((s) => s.setUser);
-  
+
   const {
     register,
     handleSubmit,
@@ -21,23 +18,24 @@ export default function Login() {
     resolver: zodResolver(LoginSchema),
   });
 
-  const { mutate, isPending, isError, error, data } = useLogin();
-
-  useEffect(() => {
-    if (data) {
-      // Después del login, el service ya guardó los tokens
-      // Redirigimos al dashboard (el perfil se cargará allí)
-      navigate("/dashboard", { replace: true });
-    }
-  }, [data, navigate]);
+  const { mutate, isPending, isError, error } = useLogin();
 
   const onSubmit = (values: LoginInput) => {
-    mutate(values);
+    console.log("[Login] Submit iniciado", values);
+
+    mutate(values, {
+      onSuccess: (data) => {
+        console.log("[Login] onSuccess disparado", data);
+        navigate("/dashboard", { replace: true });
+      },
+      onError: (err) => {
+        console.error("[Login] onError disparado", err);
+      },
+    });
   };
 
   return (
     <div className="w-full">
-      {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold tracking-tight text-white mb-2">
           Bienvenido de nuevo
@@ -47,11 +45,9 @@ export default function Login() {
         </p>
       </div>
 
-      {/* Card */}
       <div className="rounded-2xl border border-slate-800 bg-slate-900/50 backdrop-blur-sm p-8 shadow-xl">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           
-          {/* Identidad */}
           <div>
             <label className="block text-sm font-medium text-slate-400 mb-1.5">
               Correo o Username
@@ -68,7 +64,6 @@ export default function Login() {
             )}
           </div>
 
-          {/* Password */}
           <div>
             <label className="block text-sm font-medium text-slate-400 mb-1.5">
               Contraseña
@@ -85,7 +80,6 @@ export default function Login() {
             )}
           </div>
 
-          {/* Error global */}
           {isError && (
             <div className="flex items-start gap-2 rounded-lg bg-red-500/10 border border-red-500/20 p-3">
               <AlertCircle className="w-4 h-4 text-red-400 mt-0.5 shrink-0" />
@@ -95,7 +89,6 @@ export default function Login() {
             </div>
           )}
 
-          {/* Submit */}
           <Button
             type="submit"
             variant="primary"
@@ -119,7 +112,6 @@ export default function Login() {
         </form>
       </div>
 
-      {/* Footer */}
       <p className="text-center mt-6 text-sm text-slate-500">
         ¿No tienes cuenta?{" "}
         <Link to="/register" className="text-blue-400 hover:text-blue-300 font-medium transition-colors">

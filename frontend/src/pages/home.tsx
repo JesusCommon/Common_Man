@@ -1,8 +1,7 @@
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/Button";
 import { Shield, ArrowRight, UserPlus } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-// ... resto de imports igual
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -28,33 +27,33 @@ const itemVariants = {
 };
 
 export default function Home() {
-const navigate = useNavigate();
+  const navigate = useNavigate();
+
   return (
     <div className="relative min-h-screen w-full bg-slate-950 overflow-hidden flex flex-col items-center justify-center">
       {/* Grid de fondo sutil */}
-      <div 
+      <div
         className="absolute inset-0"
         style={{
           backgroundImage: `
             linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
             linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px)
           `,
-          backgroundSize: '60px 60px',
-          maskImage: 'radial-gradient(ellipse at center, black 30%, transparent 80%)',
-          WebkitMaskImage: 'radial-gradient(ellipse at center, black 30%, transparent 80%)',
-  
+          backgroundSize: "60px 60px",
+          maskImage: "radial-gradient(ellipse at center, black 30%, transparent 80%)",
+          WebkitMaskImage: "radial-gradient(ellipse at center, black 30%, transparent 80%)",
         }}
       />
-      
+
       {/* Glow central animado */}
-      <motion.div 
+      <motion.div
         className="absolute w-[500px] h-[500px] rounded-full pointer-events-none"
         style={{
-          background: 'radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 70%)',
-          top: '50%',
-          left: '50%',
-          x: '-50%',
-          y: '-50%',
+          background: "radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 70%)",
+          top: "50%",
+          left: "50%",
+          x: "-50%",
+          y: "-50%",
         }}
         animate={{
           scale: [1, 1.1, 1],
@@ -66,7 +65,7 @@ const navigate = useNavigate();
           ease: "easeInOut",
         }}
       />
-      
+
       {/* Partículas flotantes */}
       {[...Array(8)].map((_, i) => (
         <motion.div
@@ -74,7 +73,7 @@ const navigate = useNavigate();
           className="absolute w-1 h-1 bg-slate-400/40 rounded-full"
           style={{ left: `${10 + i * 10}%` }}
           animate={{
-            y: ['100vh', '-20px'],
+            y: ["100vh", "-20px"],
             x: [0, 30, -20, 0],
             opacity: [0, 1, 1, 0],
           }}
@@ -86,7 +85,7 @@ const navigate = useNavigate();
           }}
         />
       ))}
-      
+
       {/* Contenido principal */}
       <motion.div
         className="relative z-10 text-center px-6 max-w-2xl mx-auto"
@@ -101,9 +100,9 @@ const navigate = useNavigate();
             Plataforma profesional
           </span>
         </motion.div>
-        
+
         {/* Título */}
-        <motion.h1 
+        <motion.h1
           variants={itemVariants}
           className="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white mb-6"
         >
@@ -111,44 +110,45 @@ const navigate = useNavigate();
             Common Man
           </span>
         </motion.h1>
-        
+
         {/* Subtítulo */}
-        <motion.p 
+        <motion.p
           variants={itemVariants}
           className="text-lg sm:text-xl text-slate-500 mb-10 max-w-lg mx-auto leading-relaxed"
         >
           La solución elegante para gestionar tu mundo. Diseñada con precisión, construida para durar.
         </motion.p>
-        
+
         {/* Botones */}
-      <motion.div 
-        variants={itemVariants}
-        className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-      >
-        <Button 
-          variant="primary" 
-          size="lg"
-          className="group w-full sm:w-auto"
-          onClick={() => navigate("/login")}
+        <motion.div
+          variants={itemVariants}
+          className="flex flex-col sm:flex-row gap-4 justify-center items-center"
         >
-          <Shield className="w-4 h-4 mr-2" />
-          Iniciar Sesión
-          <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
-        </Button>
-        
-        <Button 
-          variant="outline" 
-          size="lg"
-          className="w-full sm:w-auto"
-          onClick={() => navigate("/register")}
-        >
-          <UserPlus className="w-4 h-4 mr-2" />
-          Crear Cuenta
-        </Button>
+          <Button
+            variant="primary"
+            size="lg"
+            className="group w-full sm:w-auto"
+            onClick={() => navigate("/login")}
+          >
+            <Shield className="w-4 h-4 mr-2" />
+            Iniciar Sesión
+            <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+          </Button>
+
+          <Button
+            variant="outline"
+            size="lg"
+            className="w-full sm:w-auto"
+            onClick={() => navigate("/register")}
+          >
+            <UserPlus className="w-4 h-4 mr-2" />
+            Crear Cuenta
+          </Button>
+        </motion.div>
       </motion.div>
-      
+
       {/* Footer */}
-      <motion.div 
+      <motion.div
         className="absolute bottom-6 left-0 right-0 text-center text-xs text-slate-700"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -158,4 +158,4 @@ const navigate = useNavigate();
       </motion.div>
     </div>
   );
-}}
+}

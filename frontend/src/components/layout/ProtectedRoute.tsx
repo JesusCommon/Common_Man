@@ -8,10 +8,13 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children, adminOnly }: ProtectedRouteProps) {
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const accessToken = useAuthStore((s) => s.accessToken);
+  const user = useAuthStore((s) => s.user);
   const isAdmin = useAuthStore((s) => s.isAdmin);
 
-  if (!isAuthenticated) {
+  console.log("[ProtectedRoute] accessToken:", !!accessToken, "| user:", !!user, "| admin:", isAdmin);
+
+  if (!accessToken) {
     return <Navigate to="/login" replace />;
   }
 
