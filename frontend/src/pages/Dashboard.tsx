@@ -1,7 +1,7 @@
 import { useAuthStore } from "@/store";
 import { usePerfil } from "@/hooks";
 import { Button } from "@/components/ui/Button";
-import { LogOut, User, Wallet, Shield } from "lucide-react";
+import { LogOut, User, Wallet, Shield, RefreshCw, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
@@ -10,8 +10,7 @@ export default function Dashboard() {
   const user = useAuthStore((s) => s.user);
   const isAdmin = useAuthStore((s) => s.isAdmin);
   
-  // Si el user no está en store (recarga de página), lo cargamos
-  const { isLoading } = usePerfil();
+  const { isLoading, isError } = usePerfil();
 
   const handleLogout = () => {
     logout();
@@ -26,9 +25,20 @@ export default function Dashboard() {
     );
   }
 
+  if (isError && !user) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400">
+        Error al cargar el perfil.{" "}
+        <button onClick={handleLogout} className="text-blue-400 ml-2 hover:underline">
+          Volver al inicio
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200">
-      {/* Navbar simple */}
+      {/* Navbar */}
       <nav className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-sm">
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
           <h1 className="text-lg font-bold text-white tracking-tight">Common Man</h1>
@@ -53,11 +63,11 @@ export default function Dashboard() {
           <h2 className="text-2xl font-bold text-white mb-1">
             Hola, {user?.nombre || "Usuario"}
           </h2>
-          <p className="text-slate-500">Este es tu panel de control.</p>
+          <p className="text-slate-500">@{user?.username || "..."}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Card Perfil */}
+          {/* Perfil */}
           <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6">
             <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center mb-4">
               <User className="w-5 h-5 text-blue-400" />
@@ -65,10 +75,11 @@ export default function Dashboard() {
             <h3 className="font-semibold text-white mb-1">Perfil</h3>
             <p className="text-sm text-slate-500">{user?.correo}</p>
             <p className="text-sm text-slate-500">@{user?.username}</p>
+            <p className="text-sm text-slate-500 capitalize mt-1">Rol: {user?.rol}</p>
           </div>
 
-          {/* Card Saldo */}
-          <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6">
+          {/* Saldo + Recargar */}
+          <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6 flex flex-col">
             <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-4">
               <Wallet className="w-5 h-5 text-emerald-400" />
             </div>
@@ -76,15 +87,28 @@ export default function Dashboard() {
             <p className="text-2xl font-bold text-emerald-400">
               ${user?.saldo?.toLocaleString() || "0"}
             </p>
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-4 w-full"
+              onClick={() => navigate("/recargar")}
+            >
+              <RefreshCw className="w-3.5 h-3.5 mr-2" />
+              Recargar saldo
+              <ArrowRight className="w-3.5 h-3.5 ml-auto" />
+            </Button>
           </div>
 
-          {/* Card Rol */}
+          {/* Rol */}
           <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6">
             <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center mb-4">
               <Shield className="w-5 h-5 text-purple-400" />
             </div>
             <h3 className="font-semibold text-white mb-1">Rol</h3>
-            <p className="text-sm text-slate-500 capitalize">{user?.rol}</p>
+            <p className="text-sm text-slate-500 capitalize">{user?.rol || "—"}</p>
+            <p className="text-xs text-slate-600 mt-2">
+              {user?.activo ? "Cuenta activa" : "Cuenta inactiva"}
+            </p>
           </div>
         </div>
       </main>

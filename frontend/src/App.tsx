@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ProtectedRoute from "./components/layout/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
+import RecargarSaldo from "./pages/RecargarSaldo";
 
 function App() {
   return (
@@ -21,6 +22,15 @@ function App() {
         element={
           <ProtectedRoute>
             <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route
+        path="/recargar"
+        element={
+          <ProtectedRoute>
+            <RecargarSaldo />
           </ProtectedRoute>
         }
       />

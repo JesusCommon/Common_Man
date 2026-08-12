@@ -21,7 +21,7 @@ const itemVariants = {
     y: 0,
     transition: {
       duration: 0.8,
-      ease: [0.22, 1, 0.36, 1],
+      ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
     },
   },
 };
@@ -47,7 +47,7 @@ export default function Home() {
 
       {/* Glow central animado */}
       <motion.div
-        className="absolute w-[500px] h-[500px] rounded-full pointer-events-none"
+        className="absolute w-125 h-125 rounded-full pointer-events-none"
         style={{
           background: "radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 70%)",
           top: "50%",
@@ -106,7 +106,7 @@ export default function Home() {
           variants={itemVariants}
           className="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white mb-6"
         >
-          <span className="bg-gradient-to-br from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
+          <span className="bg-linear-to-br from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
             Common Man
           </span>
         </motion.h1>
