@@ -4,6 +4,7 @@ export { QueryProvider } from "./providers/QueryProvider";
 // Auth
 export { useLogin } from "./auth/useLogin";
 export { useRefresh } from "./auth/useRefresh";
+export { useAuthInit } from "./auth/useAuthInit"
 
 // Usuarios
 export { useRegistro } from "./usuarios/useRegistro";

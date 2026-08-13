@@ -1,20 +1,22 @@
 import { useEffect } from "react";
 import { useAuthStore } from "@/store";
-import { usePerfil } from "../usuarios/usePerfil";
+import { miPerfil } from "@/services";
 
 export function useAuthInit() {
   const accessToken = useAuthStore((s) => s.accessToken);
+  const user = useAuthStore((s) => s.user);
   const setUser = useAuthStore((s) => s.setUser);
-  const refreshToken = useAuthStore((s) => s.refreshToken);
-  const { data, isSuccess, isError } = usePerfil();
+  const logout = useAuthStore((s) => s.logout);
 
   useEffect(() => {
-    if (isSuccess && data && accessToken && refreshToken) {
-      setUser(data);
+    if (accessToken && !user) {
+      miPerfil().then((result) => {
+        if (result.success) {
+          setUser(result.data);
+        } else {
+          logout();
+        }
+      });
     }
-
-    if (isError) {
-      useAuthStore.getState().logout();
-    }
-  }, [isSuccess, isError, data, accessToken, refreshToken, setUser]);
+  }, [accessToken, user, setUser, logout]);
 }

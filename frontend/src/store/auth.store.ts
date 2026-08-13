@@ -6,10 +6,8 @@ interface AuthState {
   user: UsuarioPropioResponse | null;
   accessToken: string | null;
   refreshToken: string | null;
-
   isAuthenticated: boolean;
   isAdmin: boolean;
-
   setTokens: (payload: { accessToken: string; refreshToken: string }) => void;
   setUser: (user: UsuarioPropioResponse) => void;
   updateUser: (user: Partial<UsuarioPropioResponse>) => void;

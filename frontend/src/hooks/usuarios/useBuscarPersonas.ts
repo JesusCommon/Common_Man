@@ -15,6 +15,6 @@ export function useBuscarPersonas(params?: {
       if (!result.success) throw result.error;
       return result.data;
     },
-    enabled: !!params, // Solo ejecuta si hay params (ajusta a tu gusto)
+    enabled: !!params && Object.values(params).some((v) => v !== undefined && v !== ""),
   });
 }

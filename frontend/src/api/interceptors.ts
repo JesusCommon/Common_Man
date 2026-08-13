@@ -6,15 +6,12 @@ export function setupRequestInterceptor(client: AxiosInstance): void {
   client.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
       const token = useAuthStore.getState().accessToken;
-
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
       }
-
       if (import.meta.env.DEV) {
         console.log(`[API] ${config.method?.toUpperCase()} ${config.url}`);
       }
-
       return config;
     },
     (error: AxiosError) => Promise.reject(error)
@@ -32,11 +29,7 @@ export function setupResponseInterceptor(client: AxiosInstance): void {
           url: error.config?.url,
         });
       }
-
-      if (error.response?.status === 401) {
-        useAuthStore.getState().logout();
-      }
-
+      // ❌ Eliminado: logout automático en 401
       return Promise.reject(error);
     }
   );
