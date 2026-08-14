@@ -6,8 +6,7 @@ import { Search, Wallet, User, Lock, Shield } from "lucide-react";
 export default function Dashboard() {
   const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
-  const isAdmin = useAuthStore((s) => s.isAdmin);
-
+  const isAdmin = user?.rol === "admin";
   // Mantiene el perfil fresco (refetch automático cada 30s por el layout)
   const { isLoading } = usePerfil();
 

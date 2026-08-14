@@ -6,12 +6,12 @@ interface AuthState {
   user: UsuarioPropioResponse | null;
   accessToken: string | null;
   refreshToken: string | null;
-  isAuthenticated: boolean;
-  isAdmin: boolean;
+  hasHydrated: boolean;
   setTokens: (payload: { accessToken: string; refreshToken: string }) => void;
   setUser: (user: UsuarioPropioResponse) => void;
   updateUser: (user: Partial<UsuarioPropioResponse>) => void;
   logout: () => void;
+  setHasHydrated: (state: boolean) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -20,14 +20,7 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       accessToken: null,
       refreshToken: null,
-
-      get isAuthenticated() {
-        return !!get().accessToken;
-      },
-
-      get isAdmin() {
-        return get().user?.rol === "admin";
-      },
+      hasHydrated: false,
 
       setTokens: ({ accessToken, refreshToken }) =>
         set({ accessToken, refreshToken }),
@@ -40,7 +33,9 @@ export const useAuthStore = create<AuthState>()(
         })),
 
       logout: () =>
-        set({ user: null, accessToken: null, refreshToken: null }),
+        set({ user: null, accessToken: null, refreshToken: null, hasHydrated: true }),
+
+      setHasHydrated: (state) => set({ hasHydrated: state }),
     }),
     {
       name: "common-man-auth",
@@ -48,6 +43,12 @@ export const useAuthStore = create<AuthState>()(
         accessToken: state.accessToken,
         refreshToken: state.refreshToken,
       }),
+      onRehydrateStorage: () => (state, error) => {
+        if (error) {
+          // Silencioso en producción
+        }
+        useAuthStore.getState().setHasHydrated(true);
+      },
     }
   )
 );

@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate, Link } from "react-router-dom";
+import { useEffect } from "react";
 import { LoginSchema } from "@/schemas";
 import type { LoginInput } from "@/schemas";
 import { useLogin } from "@/hooks";
@@ -18,20 +19,16 @@ export default function Login() {
     resolver: zodResolver(LoginSchema),
   });
 
-  const { mutate, isPending, isError, error } = useLogin();
+  const { mutate, isPending, isError, error, isSuccess, data } = useLogin();
+
+  useEffect(() => {
+    if (isSuccess && data) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [isSuccess, data, navigate]);
 
   const onSubmit = (values: LoginInput) => {
-    console.log("[Login] Submit iniciado", values);
-
-    mutate(values, {
-      onSuccess: (data) => {
-        console.log("[Login] onSuccess disparado", data);
-        navigate("/dashboard", { replace: true });
-      },
-      onError: (err) => {
-        console.error("[Login] onError disparado", err);
-      },
-    });
+    mutate(values);
   };
 
   return (

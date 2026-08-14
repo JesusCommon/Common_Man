@@ -10,6 +10,7 @@ export default function MainLayout() {
   const navigate = useNavigate();
   const logout = useAuthStore((s) => s.logout);
   const user = useAuthStore((s) => s.user);
+  const isAdmin = user?.rol === "admin";
   const [searchQuery, setSearchQuery] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
