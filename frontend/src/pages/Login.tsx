@@ -1,12 +1,12 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate, Link } from "react-router-dom";
-import { useEffect } from "react";
 import { LoginSchema } from "@/schemas";
 import type { LoginInput } from "@/schemas";
 import { useLogin } from "@/hooks";
 import { Button } from "@/components/ui/Button";
 import { Shield, ArrowRight, AlertCircle } from "lucide-react";
+import { useAuthStore } from "@/store";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -19,16 +19,19 @@ export default function Login() {
     resolver: zodResolver(LoginSchema),
   });
 
-  const { mutate, isPending, isError, error, isSuccess, data } = useLogin();
-
-  useEffect(() => {
-    if (isSuccess && data) {
-      navigate("/dashboard", { replace: true });
-    }
-  }, [isSuccess, data, navigate]);
+  const { mutate, isPending, isError, error } = useLogin();
 
   const onSubmit = (values: LoginInput) => {
-    mutate(values);
+    mutate(values, {
+      onSuccess: () => {
+        const rol = useAuthStore.getState().user?.rol;
+        if (rol === "admin") {
+          navigate("/admin", { replace: true });
+        } else {
+          navigate("/dashboard", { replace: true });
+        }
+      },
+    });
   };
 
   return (

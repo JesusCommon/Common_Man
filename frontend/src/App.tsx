@@ -8,11 +8,13 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ProtectedRoute from "./components/layout/ProtectedRoute";
 import MainLayout from "./components/layout/MainLayout";
+import AdminLayout from "./components/layout/AdminLayout";
 import Dashboard from "./pages/Dashboard";
 import Perfil from "./pages/Perfil";
 import Password from "./pages/Password";
 import Buscar from "./pages/Buscar";
 import RecargarSaldo from "./pages/RecargarSaldo";
+import Admin from "./pages/Admin";
 
 function AppContent() {
   const hasHydrated = useAuthStore((s) => s.hasHydrated);
@@ -44,6 +46,7 @@ function AppContent() {
         <Route path="/register" element={<Register />} />
       </Route>
 
+      {/* Usuario normal */}
       <Route
         element={
           <ProtectedRoute>
@@ -56,6 +59,17 @@ function AppContent() {
         <Route path="/password" element={<Password />} />
         <Route path="/buscar" element={<Buscar />} />
         <Route path="/recargar" element={<RecargarSaldo />} />
+      </Route>
+
+      {/* Admin */}
+      <Route
+        element={
+          <ProtectedRoute adminOnly>
+            <AdminLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="/admin" element={<Admin />} />
       </Route>
     </Routes>
   );
