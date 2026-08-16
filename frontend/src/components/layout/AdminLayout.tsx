@@ -1,6 +1,6 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store";
-import { Users, LogOut, Shield } from "lucide-react";
+import { Users, Search, LogOut, Shield } from "lucide-react";
 
 export default function AdminLayout() {
   const navigate = useNavigate();
@@ -14,7 +14,6 @@ export default function AdminLayout() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 flex">
-      {/* Sidebar */}
       <aside className="w-64 border-r border-slate-800 bg-slate-900/50 flex flex-col sticky top-0 h-screen">
         <div className="p-6 border-b border-slate-800">
           <h1 className="text-lg font-bold text-white tracking-tight">Common Man</h1>
@@ -24,7 +23,7 @@ export default function AdminLayout() {
           </p>
         </div>
 
-        <nav className="flex-1 p-4">
+        <nav className="flex-1 p-4 space-y-1">
           <NavLink
             to="/admin"
             end
@@ -38,6 +37,20 @@ export default function AdminLayout() {
           >
             <Users className="w-4 h-4" />
             Usuarios
+          </NavLink>
+
+          <NavLink
+            to="/admin/buscar"
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                isActive
+                  ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                  : "text-slate-400 hover:bg-slate-800/50 hover:text-slate-200"
+              }`
+            }
+          >
+            <Search className="w-4 h-4" />
+            Buscar por ID
           </NavLink>
         </nav>
 
@@ -61,7 +74,6 @@ export default function AdminLayout() {
         </div>
       </aside>
 
-      {/* Main */}
       <main className="flex-1 p-8 overflow-auto">
         <Outlet />
       </main>
