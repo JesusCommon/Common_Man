@@ -1,6 +1,6 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store";
-import { Users, Search, LogOut, Shield } from "lucide-react";
+import { Users, Search, Wallet, LogOut, Shield } from "lucide-react";
 
 export default function AdminLayout() {
   const navigate = useNavigate();
@@ -51,6 +51,20 @@ export default function AdminLayout() {
           >
             <Search className="w-4 h-4" />
             Buscar por ID
+          </NavLink>
+
+          <NavLink
+            to="/admin/recargas"
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                isActive
+                  ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                  : "text-slate-400 hover:bg-slate-800/50 hover:text-slate-200"
+              }`
+            }
+          >
+            <Wallet className="w-4 h-4" />
+            Recargas
           </NavLink>
         </nav>
 

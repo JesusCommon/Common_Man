@@ -16,6 +16,7 @@ import Buscar from "./pages/Buscar";
 import RecargarSaldo from "./pages/RecargarSaldo";
 import Admin from "./pages/Admin";
 import AdminBuscar from "./pages/AdminBuscar";
+import AdminRecargar from "./pages/AdminRecargar";
 
 function AppContent() {
   const hasHydrated = useAuthStore((s) => s.hasHydrated);
@@ -72,6 +73,7 @@ function AppContent() {
       >
         <Route path="/admin" element={<Admin />} />
         <Route path="/admin/buscar" element={<AdminBuscar />} />
+        <Route path="/admin/recargas" element={<AdminRecargar />} />
       </Route>
     </Routes>
   );
