@@ -10,6 +10,7 @@ import type {
   UsuarioRecargarSaldo,
   UsuarioUpdate,
 } from "../types";
+import type { Paginado } from "@/api/types";
 
 export async function crearUsuario(data: UsuarioCreate) {
   const { data: response } = await apiClient.post<
@@ -58,21 +59,27 @@ export async function recargarMiSaldo(data: UsuarioRecargarSaldo) {
   return response;
 }
 
-export async function listarUsuarios() {
-  const { data } = await apiClient.get<UsuarioAdminResponse[]>("/usuarios/all");
-  return data;
-}
-
-export async function listarInactivos(params?: { skip?: number; limit?: number }) {
-  const { data } = await apiClient.get<UsuarioAdminResponse[]>(
-    "/usuarios/inactivos",
-    { params }
+export async function listarUsuarios(skip = 0, limit = 20) {
+  const { data } = await apiClient.get<Paginado<UsuarioAdminResponse>>(
+    "/usuarios/all",
+    { params: { skip, limit } }
   );
   return data;
 }
 
-export async function listarActivos() {
-  const { data } = await apiClient.get<UsuarioAdminResponse[]>("/usuarios/activos");
+export async function listarInactivos(skip = 0, limit = 20) {
+  const { data } = await apiClient.get<Paginado<UsuarioAdminResponse>>(
+    "/usuarios/inactivos",
+    { params: { skip, limit } }
+  );
+  return data;
+}
+
+export async function listarActivos(skip = 0, limit = 20) {
+  const { data } = await apiClient.get<Paginado<UsuarioAdminResponse>>(
+    "/usuarios/activos",
+    { params: { skip, limit } }
+  );
   return data;
 }
 
@@ -109,10 +116,17 @@ export async function actualizarAdmin(id: string, data: UsuarioAdminUpdate) {
   return response;
 }
 
-export async function recargarSaldoAdmin(id: string, data: UsuarioRecargarSaldo) {
+export async function recargarSaldoAdmin(identificador: string, data: UsuarioRecargarSaldo) {
   const { data: response } = await apiClient.patch<
     RespuestaConMensaje<UsuarioAdminResponse>
-  >(`/usuarios/${id}/saldo`, data);
+  >(`/usuarios/${identificador}/saldo`, data);
+  return response;
+}
+
+export async function restarSaldoAdmin(identificador: string, data: UsuarioRecargarSaldo) {
+  const { data: response } = await apiClient.patch<
+    RespuestaConMensaje<UsuarioAdminResponse>
+  >(`/usuarios/${identificador}/saldo/restar`, data);
   return response;
 }
 

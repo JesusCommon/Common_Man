@@ -1,0 +1,31 @@
+export interface SegmentedOption<T extends string> {
+  key: T;
+  label: string;
+}
+
+interface SegmentedControlProps<T extends string> {
+  options: SegmentedOption<T>[];
+  value: T;
+  onChange: (value: T) => void;
+}
+
+export function SegmentedControl<T extends string>({ options, value, onChange }: SegmentedControlProps<T>) {
+  return (
+    <div className="flex gap-3 text-xs">
+      {options.map((opt) => (
+        <button
+          key={opt.key}
+          type="button"
+          onClick={() => onChange(opt.key)}
+          className={`px-3 py-1.5 rounded-lg border transition-colors ${
+            value === opt.key
+              ? "border-blue-500/30 bg-blue-500/10 text-blue-400"
+              : "border-slate-800 bg-slate-900 text-slate-500 hover:text-slate-300"
+          }`}
+        >
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  );
+}

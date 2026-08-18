@@ -54,17 +54,16 @@ class UsuarioService:
     # Lectura / listados (uso administrativo)
     # ------------------------------------------------------------------
 
-    async def listar(self) -> list[Usuario]:
-        return await self.repo.listar()
+    async def listar(self, skip: int = 0, limit: int = 20) -> tuple[list[Usuario], int]:
+        return await self.repo.listar(skip=skip, limit=limit)
 
-    async def listar_activos(self) -> list[Usuario]:
-        return await self.repo.listar_activos()
-
-    async def listar_inactivos(self, skip: int = 0, limit: int = 20) -> list[Usuario]:
+    async def listar_activos(self, skip: int = 0, limit: int = 20) -> tuple[list[Usuario], int]:
+        return await self.repo.listar_activos(skip=skip, limit=limit)
+    
+    async def listar_inactivos(self, skip: int = 0, limit: int = 20) -> tuple[list[Usuario], int]:
         return await self.repo.listar_inactivos(skip=skip, limit=limit)
 
     async def obtener_por_id(self, id: PydanticObjectId) -> Usuario:
-        """Uso exclusivo de rutas de admin."""
         usuario = await self.repo.obtener_por_id(id)
         if not usuario:
             raise HTTPException(
@@ -74,7 +73,6 @@ class UsuarioService:
         return usuario
 
     async def obtener_por_identificador(self, identificador: UUID) -> Usuario:
-        """Uso público / self-service."""
         usuario = await self.repo.obtener_por_identificador(identificador)
         if not usuario:
             raise HTTPException(
@@ -199,10 +197,43 @@ class UsuarioService:
         return await self.repo.actualizar(id, data)
 
     async def recargar_saldo_admin(
-        self, id: PydanticObjectId, data: UsuarioRecargarSaldo
+        self, identificador: PydanticObjectId | UUID, data: UsuarioRecargarSaldo
     ) -> Usuario:
-        await self.obtener_por_id(id)
-        return await self.repo.recargar_saldo_admin(id, data.monto)
+        if isinstance(identificador, PydanticObjectId):
+            usuario = await self.obtener_por_id(identificador)
+            filtro = {Usuario.id: identificador}
+        else:
+            usuario = await self.obtener_por_identificador(identificador)
+            filtro = {Usuario.identificador: identificador}
+
+        self._validar_activo(usuario)
+
+        return await self.repo.recargar_saldo_admin(filtro, data.monto)
+
+    async def restar_saldo_admin(
+        self, identificador: PydanticObjectId | UUID, data: UsuarioRecargarSaldo) -> Usuario:
+        if isinstance(identificador, PydanticObjectId):
+            usuario = await self.obtener_por_id(identificador)
+            filtro = {Usuario.id: identificador}
+        else:
+            usuario = await self.obtener_por_identificador(identificador)
+            filtro = {Usuario.identificador: identificador}
+
+        self._validar_activo(usuario)
+
+        if usuario.saldo < data.monto:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Saldo insuficiente para realizar esta operación",
+            )
+
+        resultado = await self.repo.restar_saldo_admin(filtro, data.monto)
+        if resultado is None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="El saldo cambió antes de completar la operación, intenta de nuevo",
+            )
+        return resultado
 
     async def activar(self, id: PydanticObjectId) -> Usuario:
         await self.obtener_por_id(id)

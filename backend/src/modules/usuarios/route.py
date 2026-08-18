@@ -14,7 +14,8 @@ from src.modules.usuarios.schema import (
     UsuarioRecargarSaldo,
     UsuarioUpdate,
 )
-from src.shared.common_schema import RespuestaConMensaje
+from src.shared.common_schema import RespuestaConMensaje, Paginado
+from src.utils.indetificadores import resolver_identificador
 
 router = APIRouter(prefix="/usuarios", tags=["Usuarios"])
 controller = UsuarioController()
@@ -65,20 +66,20 @@ async def recargar_mi_saldo(
     usuario = await controller.recargar_saldo(usuario_actual.identificador, data)
     return RespuestaConMensaje(mensaje="Saldo recargado con éxito", data=usuario)
 
-@router.get("/all", response_model=list[UsuarioAdminResponse], dependencies=[Depends(obtener_usuario_admin)])
-async def listar():
-    return await controller.listar()
+@router.get("/all", response_model=Paginado[UsuarioAdminResponse], dependencies=[Depends(obtener_usuario_admin)])
+async def listar(skip: int = 0, limit: int = 20):
+    usuarios, total = await controller.listar(skip=skip, limit=limit)
+    return Paginado(items=usuarios, total=total, skip=skip, limit=limit)
 
-@router.get("/inactivos", response_model=list[UsuarioAdminResponse], dependencies=[Depends(obtener_usuario_admin)])
-async def listar_inactivos(
-    skip: int = Query(default=0, ge=0),
-    limit: int = Query(default=20, ge=1, le=100),
-):
-    return await controller.listar_inactivos(skip=skip, limit=limit)
+@router.get("/inactivos", response_model=Paginado[UsuarioAdminResponse], dependencies=[Depends(obtener_usuario_admin)])
+async def listar_inactivos(skip: int = 0, limit: int = 20):
+    usuarios, total = await controller.listar_inactivos(skip=skip, limit=limit)
+    return Paginado(items=usuarios, total=total, skip=skip, limit=limit)
 
-@router.get("/activos", response_model=list[UsuarioAdminResponse], dependencies=[Depends(obtener_usuario_admin)])
-async def listar_activos():
-    return await controller.listar_activos()
+@router.get("/activos", response_model=Paginado[UsuarioAdminResponse], dependencies=[Depends(obtener_usuario_admin)])
+async def listar_activos(skip: int = 0, limit: int = 20):
+    usuarios, total = await controller.listar_activos(skip=skip, limit=limit)
+    return Paginado(items=usuarios, total=total, skip=skip, limit=limit)
 
 @router.get(
     "/admin/buscar",
@@ -118,13 +119,28 @@ async def actualizar_admin(id: PydanticObjectId, data: UsuarioAdminUpdate):
     return RespuestaConMensaje(mensaje="Usuario actualizado correctamente", data=usuario)
 
 @router.patch(
-    "/{id}/saldo",
+    "/{identificador}/saldo",
     response_model=RespuestaConMensaje[UsuarioAdminResponse],
     dependencies=[Depends(obtener_usuario_admin)],
 )
-async def recargar_saldo_admin(id: PydanticObjectId, data: UsuarioRecargarSaldo):
-    usuario = await controller.recargar_saldo_admin(id, data)
+async def recargar_saldo_admin(
+    data: UsuarioRecargarSaldo,
+    identificador: PydanticObjectId | UUID = Depends(resolver_identificador),
+):
+    usuario = await controller.recargar_saldo_admin(identificador, data)
     return RespuestaConMensaje(mensaje="Saldo recargado con éxito", data=usuario)
+
+@router.patch(
+    "/{identificador}/saldo/restar",
+    response_model=RespuestaConMensaje[UsuarioAdminResponse],
+    dependencies=[Depends(obtener_usuario_admin)],
+)
+async def restar_saldo_admin(
+    data: UsuarioRecargarSaldo,
+    identificador: PydanticObjectId | UUID = Depends(resolver_identificador),
+):
+    usuario = await controller.restar_saldo_admin(identificador, data)
+    return RespuestaConMensaje(mensaje="Saldo restado con éxito", data=usuario)
 
 @router.patch(
     "/{id}/activar",

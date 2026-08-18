@@ -15,8 +15,11 @@ class BaseRepo(Generic[T, C, U]):
         await documento.insert()
         return documento
 
-    async def listar(self) -> list[T]:
-        return await self.model.find_all().to_list()
+    async def listar(self, skip: int = 0, limit: int = 20) -> tuple[list[T], int]:
+        query = self.model.find_all()
+        total = await query.count()
+        documento = await query.sort(-self.model.id).skip(skip).limit(limit).to_list()
+        return documento, total
 
     async def obtener_por_id(self, id: PydanticObjectId) -> T | None:
         return await self.model.get(id)
@@ -34,8 +37,17 @@ class BaseRepo(Generic[T, C, U]):
         return documento
 
 class BaseRepoConEstado(BaseRepo[T, C, U]):
-    async def listar_activos(self) -> list[T]:
-        return await self.model.find(self.model.activo == True).to_list()
+    async def listar_activos(self, skip: int = 0, limit: int = 20) -> tuple[list[T], int]:
+        query = self.model.find(self.model.activo == True)
+        total = await query.count()
+        documento = await query.sort(-self.model.id).skip(skip).limit(limit).to_list()
+        return documento, total
+
+    async def listar_inactivos(self, skip: int = 0, limit: int = 20) -> tuple[list[T], int]:
+        query = self.model.find(self.model.activo == False)
+        total = await query.count()
+        documento = await query.sort(-self.model.id).skip(skip).limit(limit).to_list()
+        return documento, total
 
     async def activar(self, id: PydanticObjectId) -> T | None:
         documento = await self.obtener_por_id(id)

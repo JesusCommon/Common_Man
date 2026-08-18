@@ -52,14 +52,16 @@ class UsuarioController:
 #-------------- exclusivo admin --------------------#
 
     async def actualizar_admin(
-        self, id: PydanticObjectId, data: UsuarioAdminUpdate
-    ) -> Usuario:
+        self, id: PydanticObjectId, data: UsuarioAdminUpdate) -> Usuario:
         return await self.service.actualizar_admin(id, data)
 
     async def recargar_saldo_admin(
-        self, id: PydanticObjectId, data: UsuarioRecargarSaldo
-    ) -> Usuario:
-        return await self.service.recargar_saldo_admin(id, data)
+        self, identificador: PydanticObjectId | UUID, data: UsuarioRecargarSaldo) -> Usuario:
+        return await self.service.recargar_saldo_admin(identificador, data)
+
+    async def restar_saldo_admin(
+        self, identificador: PydanticObjectId | UUID, data: UsuarioRecargarSaldo) -> Usuario:
+        return await self.service.restar_saldo_admin(identificador, data)
 
     async def activar(self, id: PydanticObjectId) -> Usuario:
         return await self.service.activar(id)
@@ -83,13 +85,13 @@ class UsuarioController:
             limit=limit,
         )
     
-    async def listar(self) -> list[Usuario]:
-        return await self.service.listar()
+    async def listar(self, skip: int = 0, limit: int = 20) -> tuple[list[Usuario], int]:
+        return await self.service.listar(skip=skip, limit=limit)
+    
+    async def listar_activos(self, skip: int = 0, limit: int = 20) -> tuple[list[Usuario], int]:
+        return await self.service.listar_activos(skip=skip, limit=limit)
 
-    async def listar_activos(self) -> list[Usuario]:
-        return await self.service.listar_activos()
-
-    async def listar_inactivos(self, skip: int = 0, limit: int = 20) -> list[Usuario]:
+    async def listar_inactivos(self, skip: int = 0, limit: int = 20) -> tuple[list[Usuario], int]:
         return await self.service.listar_inactivos(skip=skip, limit=limit)
 
     async def obtener_id(self, id: PydanticObjectId) -> Usuario:

@@ -112,3 +112,10 @@ export interface PaginatedResponse<T> {
     hasPrevPage: boolean;
   };
 }
+
+export type Paginado<T> = {
+  items: T[];
+  total: number;
+  skip: number;
+  limit: number;
+};

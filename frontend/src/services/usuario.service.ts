@@ -23,6 +23,7 @@ import {
   recargarSaldoAdmin,
   activarUsuario,
   desactivarUsuario,
+  restarSaldoAdmin,
 } from "@/api/endpoints/usuarios";
 import type {
   UsuarioPropioResponse,
@@ -103,27 +104,27 @@ export async function recargarSaldo(payload: unknown): Promise<ServiceResult<Res
   }
 }
 
-export async function listarTodos(): Promise<ServiceResult<UsuarioAdminResponse[]>> {
+export async function listarTodos(skip = 0, limit = 20) {
   try {
-    const data = await listarUsuarios();
+    const data = await listarUsuarios(skip, limit);
     return { success: true, data };
   } catch (err) {
     return { success: false, error: networkError(err as AxiosError) };
   }
 }
 
-export async function listarUsuariosInactivos(params?: { skip?: number; limit?: number }): Promise<ServiceResult<UsuarioAdminResponse[]>> {
+export async function listarUsuariosInactivos(skip = 0, limit = 20) {
   try {
-    const data = await listarInactivos(params);
+    const data = await listarInactivos(skip, limit);
     return { success: true, data };
   } catch (err) {
     return { success: false, error: networkError(err as AxiosError) };
   }
 }
 
-export async function listarUsuariosActivos(): Promise<ServiceResult<UsuarioAdminResponse[]>> {
+export async function listarUsuariosActivos(skip = 0, limit = 20) {
   try {
-    const data = await listarActivos();
+    const data = await listarActivos(skip, limit);
     return { success: true, data };
   } catch (err) {
     return { success: false, error: networkError(err as AxiosError) };
@@ -178,6 +179,18 @@ export async function recargarSaldoAdministrador(id: string, payload: unknown): 
 
   try {
     const data = await recargarSaldoAdmin(id, parsed.data);
+    return { success: true, data };
+  } catch (err) {
+    return { success: false, error: networkError(err as AxiosError) };
+  }
+}
+
+export async function restarSaldoAdministrador(id: string, payload: unknown): Promise<ServiceResult<RespuestaConMensaje<UsuarioAdminResponse>>> {
+  const parsed = UsuarioRecargarSaldoSchema.safeParse(payload);
+  if (!parsed.success) return { success: false, error: validationError(parsed.error) };
+
+  try {
+    const data = await restarSaldoAdmin(id, parsed.data);
     return { success: true, data };
   } catch (err) {
     return { success: false, error: networkError(err as AxiosError) };

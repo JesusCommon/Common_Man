@@ -7,26 +7,33 @@ from uuid import UUID
 
 MAX_LIMIT = 100
 
-
 class UsuarioRepo(BaseRepoConEstado[Usuario, UsuarioCreate, UsuarioUpdate]):
     def __init__(self):
         super().__init__(Usuario)
 
     async def obtener_por_correo(self, correo: str) -> Usuario | None:
-        return await Usuario.find_one(Usuario.correo == correo)
+        return await self.model.find_one(self.model.correo == correo)
 
     async def obtener_por_username(self, username: str) -> Usuario | None:
-        return await Usuario.find_one(Usuario.username == username)
+        return await self.model.find_one(self.model.username == username)
 
     async def obtener_por_identificador(self, identificador: UUID) -> Usuario | None:
-        return await Usuario.find_one(Usuario.identificador == identificador)
+        return await self.model.find_one(self.model.identificador == identificador)
 
     async def obtener_por_telefono(self, telefono: str) -> Usuario | None:
-        return await Usuario.find_one(Usuario.telefono == telefono)
+        return await self.model.find_one(self.model.telefono == telefono)
 
-    async def listar_inactivos(self, skip: int = 0, limit: int = 20) -> list[Usuario]:
-        limit = min(limit, MAX_LIMIT)
-        return await Usuario.find(Usuario.activo == False).skip(skip).limit(limit).to_list()
+    async def listar_activos(self, skip: int = 0, limit: int = 20) -> tuple[list[Usuario], int]:
+        query = self.model.find(self.model.activo == True)
+        total = await query.count()
+        usuarios = await query.sort(-self.model.id).skip(skip).limit(limit).to_list()
+        return usuarios, total
+
+    async def listar_inactivos(self, skip: int = 0, limit: int = 20) -> tuple[list[Usuario], int]:
+        query = self.model.find(self.model.activo == False)
+        total = await query.count()
+        usuarios = await query.sort(-self.model.id).skip(skip).limit(limit).to_list()
+        return usuarios, total
 
     async def actualizar_password(
         self, identificador: UUID, password_hasheada: str
@@ -43,9 +50,9 @@ class UsuarioRepo(BaseRepoConEstado[Usuario, UsuarioCreate, UsuarioUpdate]):
         self, identificador: UUID, monto: int
     ) -> Usuario | None:
 
-        resultado = await Usuario.find_one(
-            Usuario.identificador == identificador
-        ).update({"$inc": {Usuario.saldo: monto}})
+        resultado = await self.model.find_one(
+            self.model.identificador == identificador
+        ).update({"$inc": {self.model.saldo: monto}})
 
         if resultado.modified_count == 0:
             return None
@@ -63,17 +70,19 @@ class UsuarioRepo(BaseRepoConEstado[Usuario, UsuarioCreate, UsuarioUpdate]):
         await documento.save()
         return documento
 
-    async def recargar_saldo_admin(
-        self, id: PydanticObjectId, monto: int
-    ) -> Usuario | None:
-        resultado = await Usuario.find_one(Usuario.id == id).update(
-            {"$inc": {Usuario.saldo: monto}}
+    async def recargar_saldo_admin(self, filtro: dict, monto: int) -> Usuario:
+        await self.model.find_one(filtro).update({"$inc": {self.model.saldo: monto}})
+        return await self.model.find_one(filtro)
+    
+    async def restar_saldo_admin(self, filtro: dict, monto: int) -> Usuario | None:
+        filtro_con_saldo = {**filtro, self.model.saldo: {"$gte": monto}}
+        resultado = await self.model.find_one(filtro_con_saldo).update(
+            {"$inc": {self.model.saldo: -monto}}
         )
-
         if resultado.modified_count == 0:
             return None
+        return await self.model.find_one(filtro)
 
-        return await self.obtener_por_id(id)
 
     async def buscar_por_filtro(
         self,
@@ -99,4 +108,4 @@ class UsuarioRepo(BaseRepoConEstado[Usuario, UsuarioCreate, UsuarioUpdate]):
         if solo_activos:
             query["activo"] = True
 
-        return await Usuario.find(query).skip(skip).limit(limit).to_list()
+        return await self.model.find(query).skip(skip).limit(limit).to_list()

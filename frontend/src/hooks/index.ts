@@ -25,3 +25,4 @@ export { useActualizarAdmin } from "./usuarios/admin/useActualizarAdmin";
 export { useRecargarSaldoAdmin } from "./usuarios/admin/useRecargarSaldoAdmin";
 export { useActivarUsuario } from "./usuarios/admin/useActivarUsuario";
 export { useDesactivarUsuario } from "./usuarios/admin/useDesactivarUsuario";
+export { useRestarSaldoAdmin } from "./usuarios/admin/useRestarSaldoAdmin"
