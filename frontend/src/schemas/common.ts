@@ -19,13 +19,14 @@ export const NombreSchema = z
   .transform((v) => v.trim().replace(/\s+/g, " "))
   .transform((v) => v.charAt(0).toUpperCase() + v.slice(1));
 
-export const ApellidoSchema = z
-  .string({ message: "El apellido es obligatorio" })
-  .min(2, { message: "El apellido debe tener al menos 2 caracteres" })
-  .max(50, { message: "El apellido no puede exceder 50 caracteres" })
-  .regex(REGEX.SOLO_LETRAS, { message: "El apellido solo puede contener letras" })
-  .transform((v) => v.trim().replace(/\s+/g, " "))
-  .transform((v) => v.charAt(0).toUpperCase() + v.slice(1));
+ export const ApellidoSchema = z
+  .string()
+  .optional()
+  .or(z.literal(""))
+  .transform((v) => (v ? v.trim().replace(/\s+/g, " ") : undefined))
+  .refine((v) => !v || v.length >= 2, { message: "Mínimo 2 caracteres" })
+  .refine((v) => !v || /^[a-zA-ZÀ-ÿ\s]+$/.test(v), { message: "Solo letras" });
+
 
 export const UsernameSchema = z
   .string({ message: "El username es obligatorio" })
@@ -35,10 +36,11 @@ export const UsernameSchema = z
   .transform((v) => v.trim().toLowerCase());
 
 export const TelefonoSchema = z
-  .string({ message: "El teléfono debe ser texto" })
-  .regex(REGEX.TELEFONO, { message: "Número telefónico inválido" })
-  .transform((v) => v.trim())
-  .optional();
+  .string()
+  .optional()
+  .or(z.literal(""))
+  .transform((v) => (v ? v.trim() : undefined))
+  .refine((v) => !v || /^\+?[0-9\s\-()]{7,15}$/.test(v), { message: "Número inválido" });
 
 export const CorreoSchema = z
   .string({ message: "El correo es obligatorio" })

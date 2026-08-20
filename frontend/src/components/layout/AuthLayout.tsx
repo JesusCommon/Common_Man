@@ -19,7 +19,7 @@ export default function AuthLayout() {
       
       {/* Glow sutil */}
       <div
-        className="absolute w-[400px] h-[400px] rounded-full pointer-events-none opacity-40"
+        className="absolute w-100 h-100 rounded-full pointer-events-none opacity-40"
         style={{
           background: "radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%)",
           top: "50%",

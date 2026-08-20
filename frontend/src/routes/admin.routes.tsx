@@ -3,6 +3,7 @@ import ProtectedRoute from "@/components/layout/ProtectedRoute";
 import AdminLayout from "@/components/layout/AdminLayout";
 import Admin from "@/pages/Admin";
 import AdminBuscar from "@/pages/AdminBuscar";
+import AdminBuscarPorNombre from "@/pages/AdminBuscarNombre";
 import AdminRecargar from "@/pages/AdminRecargar";
 
 export const adminRoutes: RouteObject[] = [
@@ -16,6 +17,7 @@ export const adminRoutes: RouteObject[] = [
       { path: "/admin", element: <Admin /> },
       { path: "/admin/buscar", element: <AdminBuscar /> },
       { path: "/admin/recargas", element: <AdminRecargar /> },
+      { path: "/admin/buscar/usuarios", element: <AdminBuscarPorNombre /> },
     ],
   },
 ];

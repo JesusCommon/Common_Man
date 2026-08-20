@@ -78,7 +78,7 @@ export default function MainLayout() {
                 onClick={() => setMenuOpen(!menuOpen)}
                 className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-slate-800/50 transition-colors"
               >
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold overflow-hidden">
+                <div className="w-8 h-8 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold overflow-hidden">
                   {user?.avatar ? (
                     <img src={user.avatar} alt="Avatar" className="w-full h-full object-cover" />
                   ) : (

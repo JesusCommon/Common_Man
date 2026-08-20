@@ -93,7 +93,7 @@ export default function Buscar() {
                   className="w-10 h-10 rounded-full object-cover"
                 />
               ) : (
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center text-white font-bold">
+                <div className="w-10 h-10 rounded-full bg-linear-to-br from-slate-600 to-slate-700 flex items-center justify-center text-white font-bold">
                   {persona.nombre.charAt(0).toUpperCase()}
                 </div>
               )}

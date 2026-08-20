@@ -1,12 +1,16 @@
 import { useForm } from "react-hook-form";
+import type { Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate, Link } from "react-router-dom";
 import { LoginSchema } from "@/schemas";
 import type { LoginInput } from "@/schemas";
 import { useLogin } from "@/hooks";
-import { Button } from "@/components/ui/Button";
-import { Shield, ArrowRight, AlertCircle } from "lucide-react";
 import { useAuthStore } from "@/store";
+import { Button } from "@/components/ui/Button";
+import { ErrorAlert } from "@/components/ui/ErrorAlert";
+import { AuthSplitLayout } from "@/components/auth/AuthSplitLayout";
+import { AuthInput } from "@/components/auth/AuthInput";
+import { Mail, Lock, ArrowRight } from "lucide-react";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -16,7 +20,8 @@ export default function Login() {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginInput>({
-    resolver: zodResolver(LoginSchema),
+    resolver: zodResolver(LoginSchema) as Resolver<LoginInput>,
+    mode: "onBlur",
   });
 
   const { mutate, isPending, isError, error } = useLogin();
@@ -25,75 +30,46 @@ export default function Login() {
     mutate(values, {
       onSuccess: () => {
         const rol = useAuthStore.getState().user?.rol;
-        if (rol === "admin") {
-          navigate("/admin", { replace: true });
-        } else {
-          navigate("/dashboard", { replace: true });
-        }
+        navigate(rol === "admin" ? "/admin" : "/dashboard", { replace: true });
       },
     });
   };
 
   return (
-    <div className="w-full">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-white mb-2">
-          Bienvenido de nuevo
-        </h1>
-        <p className="text-slate-500 text-sm">
-          Ingresa tus credenciales para acceder a <span className="text-slate-300 font-medium">Common Man</span>
-        </p>
-      </div>
+    <AuthSplitLayout isRegister={false}>
+      <div className="space-y-4">
+        <div className="space-y-0.5">
+          <h1 className="text-xl font-bold tracking-tight text-white">Bienvenido de nuevo</h1>
+          <p className="text-slate-400 text-xs">Ingresa tus credenciales para acceder</p>
+        </div>
 
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/50 backdrop-blur-sm p-8 shadow-xl">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          
-          <div>
-            <label className="block text-sm font-medium text-slate-400 mb-1.5">
-              Correo o Username
-            </label>
-            <input
-              {...register("identidad")}
-              type="text"
-              autoComplete="username"
-              placeholder="jesus@ejemplo.com"
-              className="w-full h-11 px-4 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/50 transition-all"
-            />
-            {errors.identidad && (
-              <p className="mt-1.5 text-xs text-red-400">{errors.identidad.message}</p>
-            )}
-          </div>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+          <AuthInput
+            label="Correo o Username"
+            icon={Mail}
+            type="text"
+            autoComplete="username"
+            placeholder="jesus@ejemplo.com"
+            error={errors.identidad?.message}
+            {...register("identidad")}
+          />
+          <AuthInput
+            label="Contraseña"
+            icon={Lock}
+            type="password"
+            autoComplete="current-password"
+            placeholder="••••••••"
+            error={errors.password?.message}
+            {...register("password")}
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-slate-400 mb-1.5">
-              Contraseña
-            </label>
-            <input
-              {...register("password")}
-              type="password"
-              autoComplete="current-password"
-              placeholder="••••••••"
-              className="w-full h-11 px-4 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/50 transition-all"
-            />
-            {errors.password && (
-              <p className="mt-1.5 text-xs text-red-400">{errors.password.message}</p>
-            )}
-          </div>
-
-          {isError && (
-            <div className="flex items-start gap-2 rounded-lg bg-red-500/10 border border-red-500/20 p-3">
-              <AlertCircle className="w-4 h-4 text-red-400 mt-0.5 shrink-0" />
-              <p className="text-sm text-red-300">
-                {(error as Error)?.message || "Error al iniciar sesión"}
-              </p>
-            </div>
-          )}
+          {isError && <ErrorAlert error={error} fallback="Error al iniciar sesión" />}
 
           <Button
             type="submit"
             variant="primary"
             size="lg"
-            className="w-full group"
+            className="w-full group mt-1 h-10"
             disabled={isPending}
           >
             {isPending ? (
@@ -103,21 +79,25 @@ export default function Login() {
               </span>
             ) : (
               <>
-                <Shield className="w-4 h-4 mr-2" />
                 Iniciar Sesión
                 <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
               </>
             )}
           </Button>
         </form>
-      </div>
 
-      <p className="text-center mt-6 text-sm text-slate-500">
-        ¿No tienes cuenta?{" "}
-        <Link to="/register" className="text-blue-400 hover:text-blue-300 font-medium transition-colors">
-          Crear cuenta
-        </Link>
-      </p>
-    </div>
+        <div className="text-center">
+          <p className="text-xs text-slate-500">
+            ¿No tienes cuenta?{" "}
+            <Link
+              to="/register"
+              className="text-blue-400 hover:text-blue-300 font-medium transition-colors hover:underline"
+            >
+              Crear cuenta
+            </Link>
+          </p>
+        </div>
+      </div>
+    </AuthSplitLayout>
   );
 }

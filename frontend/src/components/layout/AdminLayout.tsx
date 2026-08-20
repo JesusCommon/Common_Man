@@ -50,7 +50,21 @@ export default function AdminLayout() {
             }
           >
             <Search className="w-4 h-4" />
-            Buscar por ID
+            Buscar por ID o UUID
+          </NavLink>
+
+          <NavLink 
+           to="/admin/buscar/usuarios"
+           className={({ isActive }) =>
+              `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              isActive
+                ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                : "text-slate-400 hover:bg-slate-800/50 hover:text-slate-200"
+              }`
+            }
+          >
+            <Search className="w-4 h-4" />
+            Buscar por nombres
           </NavLink>
 
           <NavLink
@@ -70,7 +84,7 @@ export default function AdminLayout() {
 
         <div className="p-4 border-t border-slate-800">
           <div className="flex items-center gap-3 mb-4 px-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold">
+            <div className="w-8 h-8 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold">
               {user?.nombre?.charAt(0).toUpperCase() || "A"}
             </div>
             <div className="overflow-hidden">
