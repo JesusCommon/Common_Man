@@ -35,6 +35,19 @@ export const UsuarioUpdateSchema = z.object({
 
 export type UsuarioUpdateInput = z.infer<typeof UsuarioUpdateSchema>;
 
+export const ObtenerPerfilPublico = z.object({
+  identificador: z.string().uuid(),
+  nombre: z.string(),
+  apellido: z.string().nullable().optional(),
+  username: z.string(),
+  bio: z.string().nullable().optional(),
+  avatar: z.string().url().nullable().optional(),
+  activo: z.boolean(),
+  fecha_creacion: z.string().datetime(),
+});
+
+export type UsuarioPublicResponse = z.infer<typeof ObtenerPerfilPublico>;
+
 export const UsuarioAdminUpdateSchema = UsuarioUpdateSchema.extend({
   rol: RolUsuarioSchema.optional(),
   activo: z.boolean().optional(),

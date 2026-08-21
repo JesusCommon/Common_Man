@@ -48,6 +48,9 @@ class UsuarioController:
             skip=skip,
             limit=limit,
         )
+    
+    async def obtener_perfil_publico(self, username: str) -> Usuario:
+        return await self.service.obtener_perfil_publico(username)
 
 #-------------- exclusivo admin --------------------#
 

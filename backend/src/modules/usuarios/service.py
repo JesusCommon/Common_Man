@@ -160,6 +160,15 @@ class UsuarioService:
             solo_activos=True,
         )
 
+    async def obtener_perfil_publico(self, username: str) -> Usuario:
+        usuario = await self.repo.obtener_por_username(username)
+        if not usuario:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Usuario no encontrado"
+            )
+        return usuario
+
     # ------------------------------------------------------------------
     # Exclusivo de admin: operan por PydanticObjectId. Deben protegerse
     # en la ruta con una dependencia tipo require_admin.

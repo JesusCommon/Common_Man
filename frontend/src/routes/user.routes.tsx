@@ -6,6 +6,7 @@ import Perfil from "@/pages/Perfil";
 import Password from "@/pages/Password";
 import Buscar from "@/pages/Buscar";
 import RecargarSaldo from "@/pages/RecargarSaldo";
+import PerfilPublico from "@/pages/PerfilPublico";
 
 export const userRoutes: RouteObject[] = [
   {
@@ -20,6 +21,7 @@ export const userRoutes: RouteObject[] = [
       { path: "/password", element: <Password /> },
       { path: "/buscar", element: <Buscar /> },
       { path: "/recargar", element: <RecargarSaldo /> },
+      { path: "/perfil/:username", element: <PerfilPublico/>}
     ],
   },
 ];

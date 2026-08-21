@@ -24,6 +24,7 @@ import {
   activarUsuario,
   desactivarUsuario,
   restarSaldoAdmin,
+  ObtenerPerfilPublicoApi,
 } from "@/api/endpoints/usuarios";
 import type {
   UsuarioPropioResponse,
@@ -53,6 +54,15 @@ export async function buscarPersonasService(params: unknown): Promise<ServiceRes
 
   try {
     const data = await buscarPersonas(parsed.data);
+    return { success: true, data };
+  } catch (err) {
+    return { success: false, error: networkError(err as AxiosError) };
+  }
+}
+
+export async function obtenerPerfilPublico(username: string): Promise<ServiceResult<UsuarioPublicResponse>> {
+  try {
+    const data = await ObtenerPerfilPublicoApi(username);
     return { success: true, data };
   } catch (err) {
     return { success: false, error: networkError(err as AxiosError) };

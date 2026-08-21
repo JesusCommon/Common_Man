@@ -17,5 +17,6 @@ export {
   recargarSaldoAdministrador,
   activarCuenta,
   desactivarCuenta,
-  restarSaldoAdministrador
+  restarSaldoAdministrador,
+  obtenerPerfilPublico
 } from "./usuario.service";

@@ -22,9 +22,11 @@ export {
   UsuarioRecargarSaldoSchema,
   BuscarPersonasSchema,
   BuscarUsuariosAdminSchema,
+  ObtenerPerfilPublico,
 } from "./usuarios";
 
 export type {
+  UsuarioPublicResponse,
   UsuarioCreateInput,
   UsuarioUpdateInput,
   UsuarioAdminUpdateInput,

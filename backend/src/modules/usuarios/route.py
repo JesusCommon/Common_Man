@@ -97,6 +97,10 @@ async def buscar_por_filtro(
         nombre=nombre, apellido=apellido, username=username, skip=skip, limit=limit
     )
 
+@router.get("/perfil/{username}", response_model=UsuarioPublicResponse)
+async def obtener_perfil_publico(username: str):
+    return await controller.obtener_perfil_publico(username)
+
 @router.get(
     "/identificador/{identificador}",
     response_model=UsuarioAdminResponse,

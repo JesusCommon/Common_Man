@@ -38,6 +38,13 @@ export async function obtenerPerfilPropio() {
   return data;
 }
 
+export async function ObtenerPerfilPublicoApi(username: string){
+  const { data } = await apiClient.get<UsuarioPublicResponse>(
+    `/usuarios/perfil/${username}`
+  );
+  return data;
+}
+
 export async function actualizarMiPerfil(data: UsuarioUpdate) {
   const { data: response } = await apiClient.put<
     RespuestaConMensaje<UsuarioPropioResponse>

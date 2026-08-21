@@ -13,6 +13,7 @@ export { useActualizarPerfil } from "./usuarios/useActualizarPerfil";
 export { useCambiarPassword } from "./usuarios/useCambiarPassword";
 export { useRecargarSaldo } from "./usuarios/useRecargarSaldo";
 export { useBuscarPersonas } from "./usuarios/useBuscarPersonas";
+export { useObtenerPerfilPublico } from "./usuarios/useObtenerPerfilPublico";
 
 // Admin
 export { useListarUsuarios } from "./usuarios/admin/useListarUsuarios";
@@ -25,4 +26,4 @@ export { useActualizarAdmin } from "./usuarios/admin/useActualizarAdmin";
 export { useRecargarSaldoAdmin } from "./usuarios/admin/useRecargarSaldoAdmin";
 export { useActivarUsuario } from "./usuarios/admin/useActivarUsuario";
 export { useDesactivarUsuario } from "./usuarios/admin/useDesactivarUsuario";
-export { useRestarSaldoAdmin } from "./usuarios/admin/useRestarSaldoAdmin"
+export { useRestarSaldoAdmin } from "./usuarios/admin/useRestarSaldoAdmin";
