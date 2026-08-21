@@ -1,39 +1,3 @@
-export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
-
-export interface RequestConfig {
-  timeout?: number;
-  headers?: Record<string, string>;
-  signal?: AbortSignal;
-  skipErrorHandler?: boolean;
-}
-
-export interface ApiErrorResponse {
-  message: string;
-  code?: string;
-  errors?: Record<string, string[]>;
-  timestamp: string;
-}
-
-export interface RespuestaConMensaje<T = unknown> {
-  mensaje: string;
-  data: T;
-}
-
-export interface LoginRequest {
-  identidad: string;
-  password: string;
-}
-
-export interface RefreshRequest {
-  refresh_token: string;
-}
-
-export interface TokenResponse {
-  access_token: string;
-  refresh_token: string;
-  token_type: string;
-}
-
 export type RolUsuario = "usuario" | "admin" | string;
 
 export interface UsuarioCreate {
@@ -92,30 +56,3 @@ export interface UsuarioPropioResponse extends UsuarioPublicResponse {
 export interface UsuarioAdminResponse extends UsuarioPropioResponse {
   id: string;
 }
-
-export interface PaginatedRequest {
-  page?: number;
-  limit?: number;
-  sortBy?: string;
-  sortOrder?: "asc" | "desc";
-  search?: string;
-}
-
-export interface PaginatedResponse<T> {
-  data: T[];
-  meta: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-    hasNextPage: boolean;
-    hasPrevPage: boolean;
-  };
-}
-
-export type Paginado<T> = {
-  items: T[];
-  total: number;
-  skip: number;
-  limit: number;
-};

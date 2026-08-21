@@ -1,4 +1,5 @@
-import { useForm } from "react-hook-form";
+import { useEffect } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import { UsuarioUpdateSchema } from "@/schemas";
@@ -7,7 +8,6 @@ import { usePerfil, useActualizarPerfil } from "@/hooks";
 import { useAuthStore } from "@/store";
 import { Button } from "@/components/ui/Button";
 import { ArrowLeft, AlertCircle, CheckCircle2 } from "lucide-react";
-import { useEffect } from "react";
 
 export default function Perfil() {
   const navigate = useNavigate();
@@ -19,15 +19,14 @@ export default function Perfil() {
   const {
     register,
     handleSubmit,
+    control,
     reset,
-    watch,
     formState: { errors },
   } = useForm<UsuarioUpdateInput>({
     resolver: zodResolver(UsuarioUpdateSchema),
   });
 
-  // Preview de avatar en tiempo real
-  const avatarUrl = watch("avatar");
+  const avatarUrl = useWatch({ control, name: "avatar" });
 
   useEffect(() => {
     if (perfil) {
@@ -66,7 +65,7 @@ export default function Perfil() {
   }
 
   return (
-    <div className="max-w-lg mx-auto">
+    <div className="max-w-lg mx-auto p-6">
       <button
         onClick={() => navigate("/dashboard")}
         className="flex items-center text-sm text-slate-400 hover:text-white transition-colors mb-6"
@@ -76,7 +75,7 @@ export default function Perfil() {
       </button>
 
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg overflow-hidden">
+        <div className="w-12 h-12 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg overflow-hidden shrink-0">
           {avatarUrl ? (
             <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
           ) : (
@@ -98,7 +97,6 @@ export default function Perfil() {
       ) : (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           
-          {/* Avatar URL */}
           <div>
             <label className="block text-sm font-medium text-slate-400 mb-1.5">URL del avatar</label>
             <input
@@ -111,7 +109,7 @@ export default function Perfil() {
             <p className="mt-1 text-xs text-slate-600">Pega el enlace directo de tu imagen.</p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-400 mb-1.5">Nombre</label>
               <input {...register("nombre")} className="w-full h-11 px-4 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/50" />
@@ -137,13 +135,13 @@ export default function Perfil() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-400 mb-1.5">Teléfono</label>
+            <label className="block text-sm font-medium text-slate-400 mb-1.5">Teléfono <span className="text-slate-600 font-normal">(opcional)</span></label>
             <input {...register("telefono")} placeholder="+584121234567" className="w-full h-11 px-4 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/50" />
             {errors.telefono && <p className="mt-1 text-xs text-red-400">{errors.telefono.message}</p>}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-400 mb-1.5">Bio</label>
+            <label className="block text-sm font-medium text-slate-400 mb-1.5">Bio <span className="text-slate-600 font-normal">(opcional)</span></label>
             <textarea {...register("bio")} rows={3} maxLength={280} className="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/50 resize-none" />
             {errors.bio && <p className="mt-1 text-xs text-red-400">{errors.bio.message}</p>}
           </div>
@@ -151,7 +149,8 @@ export default function Perfil() {
           {isError && (
             <div className="flex items-start gap-2 rounded-lg bg-red-500/10 border border-red-500/20 p-3">
               <AlertCircle className="w-4 h-4 text-red-400 mt-0.5 shrink-0" />
-              <p className="text-sm text-red-300">{(error as Error)?.message || "Error al actualizar"}</p>
+              {/* ✅ FIX: Usamos el mensaje del ServiceError directamente, sin 'as Error' */}
+              <p className="text-sm text-red-300">{error?.message || "Error al actualizar"}</p>
             </div>
           )}
 

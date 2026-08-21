@@ -1,4 +1,4 @@
-import type { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from "axios";
+import type { AxiosInstance, InternalAxiosRequestConfig, AxiosError } from "axios";
 import { useAuthStore } from "@/store";
 import type { ApiErrorResponse } from "./types";
 
@@ -17,7 +17,9 @@ export function setupRequestInterceptor(client: AxiosInstance): void {
 
 export function setupResponseInterceptor(client: AxiosInstance): void {
   client.interceptors.response.use(
-    (response: AxiosResponse) => response,
-    (error: AxiosError<ApiErrorResponse>) => Promise.reject(error)
+    (response) => response,
+    (error: AxiosError<ApiErrorResponse>) => {
+      return Promise.reject(error);
+    }
   );
 }

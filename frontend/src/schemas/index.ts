@@ -35,3 +35,14 @@ export type {
   BuscarPersonasInput,
   BuscarUsuariosAdminInput,
 } from "./usuarios";
+
+
+export {
+  FollowCreateSchema,
+  FollowPublicResponseSchema,
+} from "./follow";
+
+export type {
+  FollowCreateInput,
+  FollowPublicResponse,
+} from "./follow";

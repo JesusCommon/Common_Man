@@ -1,5 +1,4 @@
 import { API_CONFIG } from "./config";
-import type { ApiErrorResponse } from "./types";
 
 export function buildUrl(path: string): string {
   const cleanPath = path.startsWith("/") ? path : `/${path}`;
@@ -8,7 +7,7 @@ export function buildUrl(path: string): string {
 }
 
 export function buildQueryString(
-  params: Record<string, string | number | boolean | string[] | undefined>
+  params: Record<string, string | number | boolean | string[] | null | undefined>
 ): string {
   const searchParams = new URLSearchParams();
 
@@ -26,30 +25,13 @@ export function buildQueryString(
   return query ? `?${query}` : "";
 }
 
-export async function parseApiError(response: Response): Promise<ApiErrorResponse> {
-  try {
-    const data = await response.json();
-    return {
-      message: data.message || "Error desconocido del servidor",
-      code: data.code,
-      errors: data.errors,
-      timestamp: data.timestamp || new Date().toISOString(),
-    };
-  } catch {
-    return {
-      message: `Error HTTP ${response.status}: ${response.statusText}`,
-      timestamp: new Date().toISOString(),
-    };
-  }
-}
-
-export function interpolatePath<T extends Record<string, string>>(
+export function interpolatePath<T extends Record<string, string | number>>(
   path: string,
   params: T
 ): string {
-  return path.replace(/:([a-zA-Z]+)/g, (_, key) => {
+  return path.replace(/:([a-zA-Z0-9_]+)/g, (_, key) => {
     const value = params[key];
-    if (!value) throw new Error(`Missing path param: ${key}`);
-    return encodeURIComponent(value);
+    if (value === undefined) throw new Error(`Missing path param: ${key}`);
+    return encodeURIComponent(String(value));
   });
 }

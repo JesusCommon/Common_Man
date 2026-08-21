@@ -6,31 +6,13 @@ import {
   UsuarioRecargarSaldoSchema,
   BuscarPersonasSchema,
 } from "@/schemas";
-import {
-  crearUsuario,
-  buscarPersonas,
-  obtenerPerfilPropio,
-  actualizarMiPerfil,
-  cambiarMiPassword,
-  recargarMiSaldo,
-  listarUsuarios,
-  listarInactivos,
-  listarActivos,
-  buscarUsuariosAdmin,
-  obtenerPorIdentificador,
-  obtenerPorId,
-  actualizarAdmin,
-  recargarSaldoAdmin,
-  activarUsuario,
-  desactivarUsuario,
-  restarSaldoAdmin,
-  ObtenerPerfilPublicoApi,
-} from "@/api/endpoints/usuarios";
+import { usersApi } from "@/api"; // Usando el namespace centralizado
 import type {
   UsuarioPropioResponse,
   UsuarioPublicResponse,
   UsuarioAdminResponse,
   RespuestaConMensaje,
+  Paginado,
 } from "@/api/types";
 import type { ServiceResult } from "./types";
 import { validationError, networkError } from "./types";
@@ -41,7 +23,7 @@ export async function registrarUsuario(payload: unknown): Promise<ServiceResult<
   if (!parsed.success) return { success: false, error: validationError(parsed.error) };
 
   try {
-    const data = await crearUsuario(parsed.data);
+    const data = await usersApi.crearUsuario(parsed.data);
     return { success: true, data };
   } catch (err) {
     return { success: false, error: networkError(err as AxiosError) };
@@ -53,16 +35,16 @@ export async function buscarPersonasService(params: unknown): Promise<ServiceRes
   if (!parsed.success) return { success: false, error: validationError(parsed.error) };
 
   try {
-    const data = await buscarPersonas(parsed.data);
+    const data = await usersApi.buscarPersonas(parsed.data);
     return { success: true, data };
   } catch (err) {
     return { success: false, error: networkError(err as AxiosError) };
   }
 }
 
-export async function obtenerPerfilPublico(username: string): Promise<ServiceResult<UsuarioPublicResponse>> {
+export async function obtenerPerfilPublicoService(username: string): Promise<ServiceResult<UsuarioPublicResponse>> {
   try {
-    const data = await ObtenerPerfilPublicoApi(username);
+    const data = await usersApi.obtenerPerfilPublico(username);
     return { success: true, data };
   } catch (err) {
     return { success: false, error: networkError(err as AxiosError) };
@@ -71,7 +53,7 @@ export async function obtenerPerfilPublico(username: string): Promise<ServiceRes
 
 export async function miPerfil(): Promise<ServiceResult<UsuarioPropioResponse>> {
   try {
-    const data = await obtenerPerfilPropio();
+    const data = await usersApi.obtenerPerfilPropio();
     return { success: true, data };
   } catch (err) {
     return { success: false, error: networkError(err as AxiosError) };
@@ -83,7 +65,7 @@ export async function actualizarPerfil(payload: unknown): Promise<ServiceResult<
   if (!parsed.success) return { success: false, error: validationError(parsed.error) };
 
   try {
-    const data = await actualizarMiPerfil(parsed.data);
+    const data = await usersApi.actualizarMiPerfil(parsed.data);
     return { success: true, data };
   } catch (err) {
     return { success: false, error: networkError(err as AxiosError) };
@@ -95,7 +77,7 @@ export async function cambiarPassword(payload: unknown): Promise<ServiceResult<R
   if (!parsed.success) return { success: false, error: validationError(parsed.error) };
 
   try {
-    const data = await cambiarMiPassword(parsed.data);
+    const data = await usersApi.cambiarMiPassword(parsed.data);
     return { success: true, data };
   } catch (err) {
     return { success: false, error: networkError(err as AxiosError) };
@@ -107,34 +89,36 @@ export async function recargarSaldo(payload: unknown): Promise<ServiceResult<Res
   if (!parsed.success) return { success: false, error: validationError(parsed.error) };
 
   try {
-    const data = await recargarMiSaldo(parsed.data);
+    const data = await usersApi.recargarMiSaldo(parsed.data);
     return { success: true, data };
   } catch (err) {
     return { success: false, error: networkError(err as AxiosError) };
   }
 }
 
-export async function listarTodos(skip = 0, limit = 20) {
+// --- Funciones de Admin (Tipos de retorno agregados para consistencia) ---
+
+export async function listarTodos(skip = 0, limit = 20): Promise<ServiceResult<Paginado<UsuarioAdminResponse>>> {
   try {
-    const data = await listarUsuarios(skip, limit);
+    const data = await usersApi.listarUsuarios(skip, limit);
     return { success: true, data };
   } catch (err) {
     return { success: false, error: networkError(err as AxiosError) };
   }
 }
 
-export async function listarUsuariosInactivos(skip = 0, limit = 20) {
+export async function listarUsuariosInactivos(skip = 0, limit = 20): Promise<ServiceResult<Paginado<UsuarioAdminResponse>>> {
   try {
-    const data = await listarInactivos(skip, limit);
+    const data = await usersApi.listarInactivos(skip, limit);
     return { success: true, data };
   } catch (err) {
     return { success: false, error: networkError(err as AxiosError) };
   }
 }
 
-export async function listarUsuariosActivos(skip = 0, limit = 20) {
+export async function listarUsuariosActivos(skip = 0, limit = 20): Promise<ServiceResult<Paginado<UsuarioAdminResponse>>> {
   try {
-    const data = await listarActivos(skip, limit);
+    const data = await usersApi.listarActivos(skip, limit);
     return { success: true, data };
   } catch (err) {
     return { success: false, error: networkError(err as AxiosError) };
@@ -146,7 +130,7 @@ export async function buscarAdmin(params: unknown): Promise<ServiceResult<Usuari
   if (!parsed.success) return { success: false, error: validationError(parsed.error) };
 
   try {
-    const data = await buscarUsuariosAdmin(parsed.data);
+    const data = await usersApi.buscarUsuariosAdmin(parsed.data);
     return { success: true, data };
   } catch (err) {
     return { success: false, error: networkError(err as AxiosError) };
@@ -155,7 +139,7 @@ export async function buscarAdmin(params: unknown): Promise<ServiceResult<Usuari
 
 export async function obtenerPorUUID(identificador: string): Promise<ServiceResult<UsuarioAdminResponse>> {
   try {
-    const data = await obtenerPorIdentificador(identificador);
+    const data = await usersApi.obtenerPorIdentificador(identificador);
     return { success: true, data };
   } catch (err) {
     return { success: false, error: networkError(err as AxiosError) };
@@ -164,7 +148,7 @@ export async function obtenerPorUUID(identificador: string): Promise<ServiceResu
 
 export async function obtenerPorObjectId(id: string): Promise<ServiceResult<UsuarioAdminResponse>> {
   try {
-    const data = await obtenerPorId(id);
+    const data = await usersApi.obtenerPorId(id);
     return { success: true, data };
   } catch (err) {
     return { success: false, error: networkError(err as AxiosError) };
@@ -176,7 +160,7 @@ export async function actualizarUsuarioAdmin(id: string, payload: unknown): Prom
   if (!parsed.success) return { success: false, error: validationError(parsed.error) };
 
   try {
-    const data = await actualizarAdmin(id, parsed.data);
+    const data = await usersApi.actualizarAdmin(id, parsed.data);
     return { success: true, data };
   } catch (err) {
     return { success: false, error: networkError(err as AxiosError) };
@@ -188,7 +172,7 @@ export async function recargarSaldoAdministrador(id: string, payload: unknown): 
   if (!parsed.success) return { success: false, error: validationError(parsed.error) };
 
   try {
-    const data = await recargarSaldoAdmin(id, parsed.data);
+    const data = await usersApi.recargarSaldoAdmin(id, parsed.data);
     return { success: true, data };
   } catch (err) {
     return { success: false, error: networkError(err as AxiosError) };
@@ -200,7 +184,7 @@ export async function restarSaldoAdministrador(id: string, payload: unknown): Pr
   if (!parsed.success) return { success: false, error: validationError(parsed.error) };
 
   try {
-    const data = await restarSaldoAdmin(id, parsed.data);
+    const data = await usersApi.restarSaldoAdmin(id, parsed.data);
     return { success: true, data };
   } catch (err) {
     return { success: false, error: networkError(err as AxiosError) };
@@ -209,7 +193,7 @@ export async function restarSaldoAdministrador(id: string, payload: unknown): Pr
 
 export async function activarCuenta(id: string): Promise<ServiceResult<RespuestaConMensaje<UsuarioAdminResponse>>> {
   try {
-    const data = await activarUsuario(id);
+    const data = await usersApi.activarUsuario(id);
     return { success: true, data };
   } catch (err) {
     return { success: false, error: networkError(err as AxiosError) };
@@ -218,7 +202,7 @@ export async function activarCuenta(id: string): Promise<ServiceResult<Respuesta
 
 export async function desactivarCuenta(id: string): Promise<ServiceResult<RespuestaConMensaje<UsuarioAdminResponse>>> {
   try {
-    const data = await desactivarUsuario(id);
+    const data = await usersApi.desactivarUsuario(id);
     return { success: true, data };
   } catch (err) {
     return { success: false, error: networkError(err as AxiosError) };

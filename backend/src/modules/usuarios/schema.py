@@ -160,7 +160,6 @@ class UsuarioRecargarSaldo(BaseModel):
         return monto
 
 class UsuarioPublicResponse(BaseModel):
-    identificador: UUID
     nombre: str
     apellido: str | None = None
     username: str

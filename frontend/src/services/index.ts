@@ -1,5 +1,9 @@
 export type { ServiceResult, ServiceError } from "./types";
+
+// Auth
 export { iniciarSesion, refrescarToken } from "./auth.service";
+
+// Usuarios
 export {
   registrarUsuario,
   buscarPersonasService,
@@ -15,8 +19,19 @@ export {
   obtenerPorObjectId,
   actualizarUsuarioAdmin,
   recargarSaldoAdministrador,
+  restarSaldoAdministrador,
   activarCuenta,
   desactivarCuenta,
-  restarSaldoAdministrador,
-  obtenerPerfilPublico
+  obtenerPerfilPublicoService,
 } from "./usuario.service";
+
+// Follows
+export {
+  seguirUsuario,
+  dejarDeSeguirUsuario,
+  obtenerMisSeguidores,
+  obtenerMisSeguidos,
+  verificarSiSigueA,
+  obtenerSeguidoresDe,
+  obtenerSeguidosDe,
+} from "./follow.service";

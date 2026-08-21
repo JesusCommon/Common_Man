@@ -25,12 +25,12 @@ export type UsuarioCreateInput = z.infer<typeof UsuarioCreateSchema>;
 
 export const UsuarioUpdateSchema = z.object({
   nombre: NombreSchema.optional(),
-  apellido: ApellidoSchema.optional().or(z.literal("").transform(() => undefined)),
+  apellido: ApellidoSchema.optional(),
   username: UsernameSchema.optional(),
-  telefono: TelefonoSchema,
   correo: CorreoSchema.optional(),
-  bio: BioSchema,
-  avatar: AvatarSchema,
+  telefono: TelefonoSchema.optional(),
+  bio: BioSchema.optional(),
+  avatar: AvatarSchema.optional(),
 });
 
 export type UsuarioUpdateInput = z.infer<typeof UsuarioUpdateSchema>;
