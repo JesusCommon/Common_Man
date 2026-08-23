@@ -1,7 +1,6 @@
 import re
 from pydantic import field_validator, BaseModel, Field, EmailStr, HttpUrl, ConfigDict
 from beanie import PydanticObjectId
-from uuid import UUID
 from src.modules.usuarios.document import RolUsuario
 from datetime import datetime
 
