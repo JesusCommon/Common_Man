@@ -28,7 +28,7 @@ export { useActivarUsuario } from "./usuarios/admin/useActivarUsuario";
 export { useDesactivarUsuario } from "./usuarios/admin/useDesactivarUsuario";
 export { useRestarSaldoAdmin } from "./usuarios/admin/useRestarSaldoAdmin";
 
-// Follows (NUEVO)
+// Follows
 export { useSeguir } from "./follow/useSeguir";
 export { useDejarDeSeguir } from "./follow/useDejarDeSeguir";
 export { useMisSeguidores } from "./follow/useMisSeguidores";
@@ -36,3 +36,15 @@ export { useMisSeguidos } from "./follow/useMisSeguidos";
 export { useVerificarSiSigue } from "./follow/useVerificarSiSigue";
 export { useSeguidoresDe } from "./follow/useSeguidoresDe";
 export { useSeguidosDe } from "./follow/useSeguidosDe";
+
+
+// Categorías Productos
+export { useCrearCategoria } from "./categoriasProductos/useCrearCategoria";
+export { useListarCategoriasPublicas } from "./categoriasProductos/useListarCategoriasPublicas";
+export { useListarTodasLasCategorias } from "./categoriasProductos/useListarTodasLasCategorias";
+export { useListarCategoriasActivas } from "./categoriasProductos/useListarCategoriasActivas";
+export { useListarCategoriasInactivas } from "./categoriasProductos/useListarCategoriasInactivas";
+export { useObtenerCategoriaPorId } from "./categoriasProductos/useObtenerCategoriaPorId";
+export { useActualizarCategoria } from "./categoriasProductos/useActualizarCategoria";
+export { useActivarCategoria } from "./categoriasProductos/useActivarCategoria";
+export { useDesactivarCategoria } from "./categoriasProductos/useDesactivarCategoria";

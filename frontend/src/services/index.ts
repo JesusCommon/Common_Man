@@ -35,3 +35,16 @@ export {
   obtenerSeguidoresDe,
   obtenerSeguidosDe,
 } from "./follow.service";
+
+//Categorias Productos
+export {
+  crearCategoriaService,
+  activarCategoriaService,
+  actualizarCategoriaService,
+  desactivarCategoriaService,
+  obtenerCategoriaPorIdService,
+  listarCategoriasActivasService,
+  listarCategoriasPublicasService,
+  listarTodasLasCategoriasService,
+  listarCategoriasInactivasService
+} from "./categoriasProductos.service";

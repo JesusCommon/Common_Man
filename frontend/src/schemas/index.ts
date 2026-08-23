@@ -46,3 +46,19 @@ export type {
   FollowCreateInput,
   FollowPublicResponse,
 } from "./follow";
+
+export {
+  CategoriaCreateSchema,
+  CategoriaUpdateSchema,
+  CategoriaResponseSchema,
+  CategoriaPublicaResponseSchema,
+  ListarCategoriasSchema
+} from "./categoriasProductos";
+
+export type {
+  CategoriaCreateInput,
+  CategoriaUpdateInput,
+  CategoriaResponseOutput,
+  CategoriaPublicaResponseOutput,
+  ListarCategoriasInput
+} from "./categoriasProductos"

@@ -1,5 +1,6 @@
 import re
 from pydantic import field_validator, BaseModel, Field, EmailStr, HttpUrl, ConfigDict
+from uuid import UUID
 from beanie import PydanticObjectId
 from src.modules.usuarios.document import RolUsuario
 from datetime import datetime
@@ -171,6 +172,7 @@ class UsuarioPublicResponse(BaseModel):
 
 
 class UsuarioPropioResponse(UsuarioPublicResponse):
+    identificador: UUID
     correo: EmailStr
     telefono: str | None = None
     saldo: int
