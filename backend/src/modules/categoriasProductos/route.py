@@ -14,7 +14,7 @@ router = APIRouter(prefix="/categorias/productos", tags=["Categorias Productos"]
 controller = CategoriaController()
 
 
-@router.post("/", response_model=RespuestaConMensaje[CategoriaResponse], status_code=201)
+@router.post("/", response_model=RespuestaConMensaje[CategoriaResponse], status_code=201, dependencies=[Depends(obtener_usuario_admin)])
 async def crear(data: CategoriaCreate):
     categoria = await controller.crear(data)
     return RespuestaConMensaje(mensaje="Categoria creada satisfactoriamente", data=categoria)
