@@ -28,11 +28,39 @@ export function validationError(zodError: ZodError): ServiceError {
   };
 }
 
+interface ApiErrorData {
+  detail?: string | Array<{ msg: string; loc?: string[] }>;
+  message?: string;
+  error?: string;
+}
+
 export function networkError(axError?: AxiosError): ServiceError {
+  const data = axError?.response?.data as ApiErrorData | undefined;
   const status = axError?.response?.status;
 
+  if (data?.detail) {
+    const message = typeof data.detail === "string" 
+      ? data.detail 
+      : Array.isArray(data.detail) 
+        ? data.detail.map((d) => d.msg).join(", ")
+        : "Error en los datos enviados";
+
+    let code: ServiceError["code"] = "UNKNOWN";
+    if (status === 401) code = "AUTH";
+    else if (status === 403) code = "FORBIDDEN";
+    else if (status === 404) code = "NOT_FOUND";
+    else if (status === 409) code = "CONFLICT";
+    else if (status === 422) code = "VALIDATION";
+
+    return { 
+      code, 
+      message, 
+      details: JSON.stringify(data)
+    };
+  }
+
   if (status === 401) {
-    return { code: "AUTH", message: "Sesión expirada. Inicia sesión de nuevo." };
+    return { code: "AUTH", message: "Credenciales incorrectas o sesión expirada." };
   }
   if (status === 403) {
     return { code: "FORBIDDEN", message: "No tienes permisos para realizar esta acción." };
@@ -46,13 +74,17 @@ export function networkError(axError?: AxiosError): ServiceError {
   if (status === 422) {
     return { code: "VALIDATION", message: "Los datos enviados no cumplen las reglas del servidor." };
   }
+  
   if (!axError?.response) {
-    return { code: "NETWORK", message: "Error de conexión. Verifica tu internet." };
+    return { 
+      code: "NETWORK", 
+      message: "Error de conexión. Verifica tu internet o que el servidor esté activo." 
+    };
   }
 
   return {
     code: "UNKNOWN",
     message: "Ocurrió un error inesperado. Intenta más tarde.",
-    details: axError.message,
+    details: axError?.message,
   };
 }

@@ -43,23 +43,25 @@ export default function Register() {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 backdrop-blur-sm p-6 text-center"
+          // CAMBIO: Colores de éxito adaptados a fondo claro
+          className="rounded-xl border border-emerald-200 bg-emerald-50 backdrop-blur-sm p-6 text-center"
         >
-          <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto mb-3" />
-          <h2 className="text-lg font-bold text-white mb-1">¡Cuenta creada!</h2>
-          <p className="text-slate-400 text-sm mb-0.5">{data?.mensaje}</p>
-          <p className="text-slate-500 text-xs">Redirigiendo al login...</p>
+          <CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto mb-3" />
+          <h2 className="text-lg font-bold text-[#18181B] mb-1">¡Cuenta creada!</h2>
+          <p className="text-[#52525B] text-sm mb-0.5">{data?.mensaje}</p>
+          <p className="text-[#A1A19A] text-xs">Redirigiendo al login...</p>
         </motion.div>
       ) : (
-        <div className="space-y-3">
-          <div className="space-y-0.5">
-            <h1 className="text-xl font-bold tracking-tight text-white">Crear cuenta</h1>
-            <p className="text-slate-400 text-xs">Únete a Common Man hoy mismo</p>
+        <div className="space-y-4">
+          <div className="space-y-1">
+            {/* CAMBIO: Textos adaptados a la paleta clara */}
+            <h1 className="text-2xl font-bold tracking-tight text-[#18181B]">Crear cuenta</h1>
+            <p className="text-[#52525B] text-sm">Únete a Common Man hoy mismo</p>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
             {/* Fila 1 */}
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-3">
               <AuthInput
                 label="Nombre"
                 icon={User}
@@ -78,7 +80,7 @@ export default function Register() {
             </div>
 
             {/* Fila 2 */}
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-3">
               <AuthInput
                 label="Username"
                 icon={User}
@@ -119,16 +121,16 @@ export default function Register() {
 
             {isError && <ErrorAlert error={error} fallback="Error al crear la cuenta" />}
 
+            {/* CAMBIO: Botón negro con letras blancas, spinner blanco */}
             <Button
               type="submit"
-              variant="primary"
               size="lg"
-              className="w-full group mt-1 h-10"
+              className="w-full group mt-2 h-11 bg-[#18181B] text-[#FAFAF8] hover:bg-[#18181B]/90 border-0 shadow-sm"
               disabled={isPending}
             >
               {isPending ? (
                 <span className="flex items-center gap-2">
-                  <span className="w-4 h-4 border-2 border-slate-400/30 border-t-slate-900 rounded-full animate-spin" />
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   Creando...
                 </span>
               ) : (
@@ -140,12 +142,12 @@ export default function Register() {
             </Button>
           </form>
 
-          <div className="text-center">
-            <p className="text-xs text-slate-500">
+          <div className="text-center pt-2">
+            <p className="text-sm text-[#52525B]">
               ¿Ya tienes cuenta?{" "}
               <Link
                 to="/login"
-                className="text-blue-400 hover:text-blue-300 font-medium transition-colors hover:underline"
+                className="text-[#2563EB] hover:text-[#1D4ED8] font-semibold transition-colors underline underline-offset-4 decoration-[#2563EB]/30 hover:decoration-[#1D4ED8]"
               >
                 Iniciar sesión
               </Link>

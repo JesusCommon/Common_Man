@@ -2,7 +2,7 @@ import {
   LayoutDashboard, 
   Users, 
   Folder, 
-  Package, 
+  Plus, 
   Settings 
 } from "lucide-react";
 import type { ComponentType } from "react";
@@ -11,7 +11,6 @@ export interface ToolbarAction {
   label: string;
   icon?: ComponentType<{ className?: string }>;
   onClick: () => void;
-  // Ajustado a los variantes que tu componente Button soporta realmente
   variant?: "primary" | "ghost" | "outline"; 
 }
 
@@ -59,8 +58,8 @@ export const navigationConfig: NavModule[] = [
         toolbarActions: [
           { 
             label: "Nuevo Producto", 
-            icon: Package, 
-            onClick: () => console.log("Crear producto"), 
+            icon: Plus, 
+            onClick: () => window.location.href = "/admin/productos/nuevo", 
             variant: "primary" 
           }
         ]

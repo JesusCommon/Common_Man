@@ -48,3 +48,21 @@ export { useObtenerCategoriaPorId } from "./categoriasProductos/useObtenerCatego
 export { useActualizarCategoria } from "./categoriasProductos/useActualizarCategoria";
 export { useActivarCategoria } from "./categoriasProductos/useActivarCategoria";
 export { useDesactivarCategoria } from "./categoriasProductos/useDesactivarCategoria";
+
+//Productos
+export { useBuscarProductos } from "./productos/useBuscarProductos";
+export { useListarPorCategoria } from "./productos/useListarPorCategorias";
+export { useListarProductos } from "./productos/useListarProductos";
+export { useObtenerProductoPorSlug } from "./productos/useObtenerProductosPorSlug";
+export { useObtenerProductosRecientes } from "./productos/useObtenerProductosRecientes";
+export { useActivarProducto } from "./productos/admin/useActivarProducto";
+export { useActualizarProducto } from "./productos/admin/useActualizarProducto";
+export { useActualizarStock } from "./productos/admin/useActualizarStock";
+export { useCrearProducto } from "./productos/admin/useCrearProducto";
+export { useDesactivarProducto } from "./productos/admin/useDesactivarProducto";
+export { useDescontarStock } from "./productos/admin/useDescontarStock";
+export { useEstablecerStock } from "./productos/admin/useEstablecerStock";
+export { useListarProductosActivosAdmin } from "./productos/admin/useListarProductosActivosAdmin";
+export { useListarProductosInactivosAdmin } from "./productos/admin/useListarProductosInactivosAdmin";
+export { useListarTodosProductosAdmin } from "./productos/admin/useListarTodosLosProductosAdmin";
+export { useObtenerProductoPorIdAdmin } from "./productos/admin/useObtenerProductoPorId";

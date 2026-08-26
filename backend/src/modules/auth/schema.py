@@ -5,7 +5,6 @@ class LoginRequest(BaseModel):
     identidad: str = Field(
         ...,
         description="Correo electrónico o username del usuario",
-        examples=["jesusteran", "example@gmail.com"]
     )
     password: str = Field(...)
 

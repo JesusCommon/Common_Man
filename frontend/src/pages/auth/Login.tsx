@@ -37,13 +37,14 @@ export default function Login() {
 
   return (
     <AuthSplitLayout isRegister={false}>
-      <div className="space-y-4">
-        <div className="space-y-0.5">
-          <h1 className="text-xl font-bold tracking-tight text-white">Bienvenido de nuevo</h1>
-          <p className="text-slate-400 text-xs">Ingresa tus credenciales para acceder</p>
+      <div className="space-y-5">
+        <div className="space-y-1">
+          {/* CAMBIO: Textos adaptados a la paleta clara */}
+          <h1 className="text-2xl font-bold tracking-tight text-[#18181B]">Bienvenido de nuevo</h1>
+          <p className="text-[#52525B] text-sm">Ingresa tus credenciales para acceder</p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <AuthInput
             label="Correo o Username"
             icon={Mail}
@@ -65,16 +66,16 @@ export default function Login() {
 
           {isError && <ErrorAlert error={error} fallback="Error al iniciar sesión" />}
 
+          {/* CAMBIO: Botón negro con letras blancas, spinner blanco */}
           <Button
             type="submit"
-            variant="primary"
             size="lg"
-            className="w-full group mt-1 h-10"
+            className="w-full group mt-2 h-11 bg-[#18181B] text-[#FAFAF8] hover:bg-[#18181B]/90 border-0 shadow-sm"
             disabled={isPending}
           >
             {isPending ? (
               <span className="flex items-center gap-2">
-                <span className="w-4 h-4 border-2 border-slate-400/30 border-t-slate-900 rounded-full animate-spin" />
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 Entrando...
               </span>
             ) : (
@@ -86,12 +87,12 @@ export default function Login() {
           </Button>
         </form>
 
-        <div className="text-center">
-          <p className="text-xs text-slate-500">
+        <div className="text-center pt-2">
+          <p className="text-sm text-[#52525B]">
             ¿No tienes cuenta?{" "}
             <Link
               to="/register"
-              className="text-blue-400 hover:text-blue-300 font-medium transition-colors hover:underline"
+              className="text-[#2563EB] hover:text-[#1D4ED8] font-semibold transition-colors underline underline-offset-4 decoration-[#2563EB]/30 hover:decoration-[#1D4ED8]"
             >
               Crear cuenta
             </Link>

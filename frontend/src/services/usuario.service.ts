@@ -6,7 +6,7 @@ import {
   UsuarioRecargarSaldoSchema,
   BuscarPersonasSchema,
 } from "@/schemas";
-import { usersApi } from "@/api"; // Usando el namespace centralizado
+import { usersApi } from "@/api";
 import type {
   UsuarioPropioResponse,
   UsuarioPublicResponse,

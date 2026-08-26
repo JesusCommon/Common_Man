@@ -29,6 +29,7 @@ export interface ProductoPublicResponse {
   nombre: string;
   slug: string;
   descripcion_breve?: string;
+  descripcion?: string;
   precio: number;
   stock: number;
   imagen?: string;

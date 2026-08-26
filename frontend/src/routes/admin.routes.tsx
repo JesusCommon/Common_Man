@@ -7,6 +7,8 @@ import AdminBuscar from "@/pages/admin/usuarios/AdminBuscar";
 import AdminBuscarPorNombre from "@/pages/admin/usuarios/AdminBuscarNombre";
 import AdminRecargar from "@/pages/admin/usuarios/AdminRecargar";
 import CategoriasProductos from "@/pages/admin/categoriasProductos/AdminCategoriasProductos";
+import AdminProductos from "@/pages/admin/productos/AdminProductos";
+import AdminProductoForm from "@/pages/admin/productos/AdminProductoForm";
 
 export const adminRoutes: RouteObject[] = [
   {
@@ -23,6 +25,9 @@ export const adminRoutes: RouteObject[] = [
       { path: "/admin/recargas", element: <AdminRecargar /> },
       { path: "/admin/buscar/usuarios", element: <AdminBuscarPorNombre /> },
       { path: "/admin/categoriasProductos", element: <CategoriasProductos /> },
+      { path: "/admin/productos", element: <AdminProductos /> },
+      { path: "/admin/productos/nuevo", element: <AdminProductoForm /> },
+      { path: "/admin/productos/editar/:id", element: <AdminProductoForm /> },
     ],
   },
 ];

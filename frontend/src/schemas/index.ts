@@ -75,7 +75,7 @@ export {
   ProductoPublicResponseSchema
 } from "./productos";
 
-export {
+export type {
   ProductoCreateInput,
   ProductoUpdateInput,
   BuscarProductosInput,
