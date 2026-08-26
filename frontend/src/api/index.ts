@@ -8,3 +8,4 @@ export * as authApi from "./endpoints/auth";
 export * as usersApi from "./endpoints/usuarios";
 export * as followsApi from "./endpoints/follow";
 export * as categoriasApi from "./endpoints/categoriasProductos";
+export * as productosApi from "./endpoints/productos";

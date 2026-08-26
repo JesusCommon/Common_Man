@@ -48,3 +48,23 @@ export {
   listarTodasLasCategoriasService,
   listarCategoriasInactivasService
 } from "./categoriasProductos.service";
+
+//Productos
+export {
+  crearProductoService,
+  actualizarProductoService,
+  listarProductosService,
+  listarProductosActivosAdminService,
+  listarProductosInactivosAdminService,
+  listarPorCategoriaService,
+  listarTodosProductosAdminService,
+  buscarProductosService,
+  obtenerProductoPorIdAdminService,
+  obtenerProductoPorSlugService,
+  obtenerProductosRecientesService,
+  actualizarStockService,
+  descontarStockService,
+  establecerStockService,
+  activarProductoService,
+  desactivarProductoService
+} from "./productos.service";

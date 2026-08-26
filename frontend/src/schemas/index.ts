@@ -62,3 +62,27 @@ export type {
   CategoriaPublicaResponseOutput,
   ListarCategoriasInput
 } from "./categoriasProductos"
+
+export {
+  ProductoCreateSchema,
+  ProductoUpdateSchema,
+  BuscarProductosSchema,
+  ObtenerRecientesSchema,
+  ListarProductosSchema,
+  ListarPorCategoriaSchema,
+  ProductoStockUpdateSchema,
+  ProductoAdminResponseSchema,
+  ProductoPublicResponseSchema
+} from "./productos";
+
+export {
+  ProductoCreateInput,
+  ProductoUpdateInput,
+  BuscarProductosInput,
+  ObtenerRecientesInput,
+  ListarProductosInput,
+  ListarPorCategoriaInput,
+  ProductoStockUpdateInput,
+  ProductoPublicResponseOutput,
+  ProductoAdminResponseOutput
+} from "./productos";
