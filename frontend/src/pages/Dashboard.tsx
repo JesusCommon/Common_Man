@@ -2,14 +2,15 @@ import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store";
 import { usePerfil } from "@/hooks";
 import { useEffect } from "react";
-import { Search, Wallet, User, Lock, Shield } from "lucide-react";
+import { ExternalLink, Shield, TrendingUp, Users } from "lucide-react";
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/Button";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
   const isAdmin = user?.rol === "admin";
 
-  // Admin va directo a su panel
   useEffect(() => {
     if (isAdmin) {
       navigate("/admin", { replace: true });
@@ -21,96 +22,108 @@ export default function Dashboard() {
   if (isLoading && !user) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-2 border-slate-700 border-t-blue-500 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#E4E4E1] border-t-[#18181B] rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold text-white mb-2">
-          Hola, {user?.nombre || "Usuario"}
-        </h1>
-        <p className="text-slate-500">Este es tu centro de control. ¿Qué quieres hacer hoy?</p>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        
-        <button
-          onClick={() => navigate("/buscar")}
-          className="group text-left rounded-xl border border-slate-800 bg-slate-900/50 p-6 hover:border-blue-500/30 hover:bg-slate-800/30 transition-all"
+    <div className="grid lg:grid-cols-[300px_1fr] gap-6">
+      
+      {/* PANEL LATERAL IZQUIERDO - Tarjeta de perfil */}
+      <aside className="space-y-4">
+        <motion.div
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          className="bg-white rounded-2xl border border-[#E4E4E1] p-5 shadow-sm"
         >
-          <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center mb-4 group-hover:bg-blue-500/20 transition-colors">
-            <Search className="w-5 h-5 text-blue-400" />
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-14 h-14 rounded-xl bg-linear-to-br from-[#2563EB] to-[#1D4ED8] flex items-center justify-center text-xl font-bold text-white shrink-0">
+              {user?.nombre?.charAt(0).toUpperCase() || "U"}
+            </div>
+            <div className="min-w-0">
+              <h3 className="text-base font-bold text-[#18181B] truncate">
+                {user?.nombre || "Usuario"}
+              </h3>
+              <p className="text-xs text-[#A1A19A] truncate">@{user?.username}</p>
+            </div>
           </div>
-          <h3 className="font-semibold text-white mb-1">Buscar personas</h3>
-          <p className="text-sm text-slate-500">Encuentra otros usuarios por nombre o username.</p>
-        </button>
 
-        {/* Recargar saldo: SOLO para usuarios normales */}
-        {!isAdmin && (
-          <button
-            onClick={() => navigate("/recargar")}
-            className="group text-left rounded-xl border border-slate-800 bg-slate-900/50 p-6 hover:border-emerald-500/30 hover:bg-slate-800/30 transition-all"
+          <div className="space-y-2.5 text-sm">
+            <div className="flex items-center justify-between py-1.5 border-b border-[#F4F4F5]">
+              <span className="text-[#A1A19A]">Correo</span>
+              <span className="text-[#18181B] font-medium truncate ml-2 text-xs">{user?.correo}</span>
+            </div>
+            <div className="flex items-center justify-between py-1.5 border-b border-[#F4F4F5]">
+              <span className="text-[#A1A19A]">Rol</span>
+              <span className="text-[#18181B] font-medium capitalize flex items-center gap-1 text-xs">
+                {isAdmin && <Shield className="w-3 h-3 text-[#2563EB]" />}
+                {user?.rol || "—"}
+              </span>
+            </div>
+            {!isAdmin && (
+              <div className="flex items-center justify-between py-1.5">
+                <span className="text-[#A1A19A]">Saldo</span>
+                <span className="text-emerald-600 font-bold text-xs">
+                  ${user?.saldo?.toLocaleString() || "0"}
+                </span>
+              </div>
+            )}
+          </div>
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full mt-4 bg-[#FAFAF8] text-[#18181B] border-[#E4E4E1] hover:bg-[#F4F4F5] text-xs"
+            onClick={() => navigate(`/perfil/${user?.username}`)}
           >
-            <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-4 group-hover:bg-emerald-500/20 transition-colors">
-              <Wallet className="w-5 h-5 text-emerald-400" />
-            </div>
-            <h3 className="font-semibold text-white mb-1">Recargar saldo</h3>
-            <p className="text-sm text-slate-500">Añade fondos a tu cuenta.</p>
-          </button>
-        )}
+            <ExternalLink className="w-3.5 h-3.5 mr-2" />
+            Ver perfil público
+          </Button>
+        </motion.div>
 
-        <button
-          onClick={() => navigate("/perfil")}
-          className="group text-left rounded-xl border border-slate-800 bg-slate-900/50 p-6 hover:border-purple-500/30 hover:bg-slate-800/30 transition-all"
+        {/* Stats rápidas */}
+        <motion.div
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+          className="bg-white rounded-2xl border border-[#E4E4E1] p-5 shadow-sm"
         >
-          <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center mb-4 group-hover:bg-purple-500/20 transition-colors">
-            <User className="w-5 h-5 text-purple-400" />
-          </div>
-          <h3 className="font-semibold text-white mb-1">Editar perfil</h3>
-          <p className="text-sm text-slate-500">Actualiza tus datos personales.</p>
-        </button>
-
-        <button
-          onClick={() => navigate("/password")}
-          className="group text-left rounded-xl border border-slate-800 bg-slate-900/50 p-6 hover:border-orange-500/30 hover:bg-slate-800/30 transition-all"
-        >
-          <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center mb-4 group-hover:bg-orange-500/20 transition-colors">
-            <Lock className="w-5 h-5 text-orange-400" />
-          </div>
-          <h3 className="font-semibold text-white mb-1">Seguridad</h3>
-          <p className="text-sm text-slate-500">Cambia tu contraseña.</p>
-        </button>
-      </div>
-
-      <div className="rounded-xl border border-slate-800 bg-slate-900/30 p-6">
-        <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Tu cuenta</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-          <div>
-            <p className="text-slate-600 mb-1">Usuario</p>
-            <p className="text-white font-medium">@{user?.username}</p>
-          </div>
-          <div>
-            <p className="text-slate-600 mb-1">Correo</p>
-            <p className="text-white font-medium">{user?.correo}</p>
-          </div>
-          {!isAdmin && (
-            <div>
-              <p className="text-slate-600 mb-1">Saldo</p>
-              <p className="text-emerald-400 font-semibold">${user?.saldo?.toLocaleString() || "0"}</p>
+          <h4 className="text-xs font-semibold text-[#A1A19A] uppercase tracking-wider mb-3">
+            Resumen
+          </h4>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="p-3 rounded-xl bg-[#EFF4FE] border border-[#BFDBFE]">
+              <Users className="w-4 h-4 text-[#2563EB] mb-1" />
+              <p className="text-lg font-bold text-[#18181B]">—</p>
+              <p className="text-[10px] text-[#52525B]">Seguidores</p>
             </div>
-          )}
-          <div>
-            <p className="text-slate-600 mb-1">Rol</p>
-            <p className="text-white font-medium capitalize flex items-center gap-1.5">
-              {isAdmin && <Shield className="w-3 h-3 text-blue-400" />}
-              {user?.rol || "—"}
-            </p>
+            <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-100">
+              <TrendingUp className="w-4 h-4 text-emerald-600 mb-1" />
+              <p className="text-lg font-bold text-[#18181B]">—</p>
+              <p className="text-[10px] text-[#52525B]">Actividad</p>
+            </div>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </aside>
+
+      {/* CONTENIDO PRINCIPAL DERECHO */}
+      <main className="min-w-0">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          className="bg-white rounded-2xl border border-[#E4E4E1] p-8 shadow-sm"
+        >
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#18181B] tracking-tight mb-2">
+            Hola, {user?.nombre || "Usuario"} 👋
+          </h1>
+          <p className="text-sm text-[#52525B] max-w-md">
+            Este es tu centro de control. Usa la barra de navegación superior para explorar las diferentes secciones.
+          </p>
+        </motion.div>
+      </main>
     </div>
   );
 }
