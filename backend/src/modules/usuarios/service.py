@@ -50,10 +50,6 @@ class UsuarioService:
         await documento.insert()
         return documento
 
-    # ------------------------------------------------------------------
-    # Lectura / listados (uso administrativo)
-    # ------------------------------------------------------------------
-
     async def listar(self, skip: int = 0, limit: int = 20) -> tuple[list[Usuario], int]:
         return await self.repo.listar(skip=skip, limit=limit)
 
@@ -80,12 +76,6 @@ class UsuarioService:
                 detail="Usuario no encontrado"
             )
         return usuario
-
-    # ------------------------------------------------------------------
-    # Self-service: el propio usuario opera sobre sí mismo vía UUID.
-    # El identificador debe salir del token/sesión autenticada en la ruta,
-    # nunca de un parámetro libre en la URL.
-    # ------------------------------------------------------------------
 
     async def _validar_conflictos(
         self, data: UsuarioUpdate, identificador_actual: UUID
@@ -168,11 +158,6 @@ class UsuarioService:
                 detail="Usuario no encontrado"
             )
         return usuario
-
-    # ------------------------------------------------------------------
-    # Exclusivo de admin: operan por PydanticObjectId. Deben protegerse
-    # en la ruta con una dependencia tipo require_admin.
-    # ------------------------------------------------------------------
 
     async def actualizar_admin(
         self, id: PydanticObjectId, data: UsuarioAdminUpdate

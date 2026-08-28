@@ -15,16 +15,18 @@ from src.modules.usuarios.route import router as usuarios_router
 from src.modules.auth.route import router as auth_router
 from src.modules.follow.route import router as follow_route
 from src.modules.categoriasProductos.route import router as categoriaProducto_route
-from src.modules.productos.route import router as productos_router
+from src.modules.productos.route import router as productos_route
+from src.modules.compra.route import router as compra_route
 from src.modules.usuarios.document import Usuario
 from src.modules.follow.document import Follow
 from src.modules.categoriasProductos.document import Categorias
 from src.modules.productos.document import Productos
+from src.modules.compra.document import Compras
 
 settings = get_settings()
 setup_logging(environment=settings.app.environment, debug=settings.app.debug)
 
-document_models = [Usuario, Follow, Categorias, Productos]
+document_models = [Usuario, Follow, Categorias, Productos, Compras]
 
 
 @asynccontextmanager
@@ -68,7 +70,8 @@ app.include_router(usuarios_router)
 app.include_router(auth_router)
 app.include_router(follow_route)
 app.include_router(categoriaProducto_route)
-app.include_router(productos_router)
+app.include_router(productos_route)
+app.include_router(compra_route)
 
 @app.get("/")
 async def health_check():

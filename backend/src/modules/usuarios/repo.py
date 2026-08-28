@@ -23,18 +23,6 @@ class UsuarioRepo(BaseRepoConEstado[Usuario, UsuarioCreate, UsuarioUpdate]):
     async def obtener_por_telefono(self, telefono: str) -> Usuario | None:
         return await self.model.find_one(self.model.telefono == telefono)
 
-    async def listar_activos(self, skip: int = 0, limit: int = 20) -> tuple[list[Usuario], int]:
-        query = self.model.find(self.model.activo == True)
-        total = await query.count()
-        usuarios = await query.sort(-self.model.id).skip(skip).limit(limit).to_list()
-        return usuarios, total
-
-    async def listar_inactivos(self, skip: int = 0, limit: int = 20) -> tuple[list[Usuario], int]:
-        query = self.model.find(self.model.activo == False)
-        total = await query.count()
-        usuarios = await query.sort(-self.model.id).skip(skip).limit(limit).to_list()
-        return usuarios, total
-
     async def actualizar_password(
         self, identificador: UUID, password_hasheada: str
     ) -> Usuario | None:
