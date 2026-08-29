@@ -4,7 +4,7 @@ from uuid import UUID
 from beanie import PydanticObjectId
 from src.modules.usuarios.document import RolUsuario
 from datetime import datetime
-
+from decimal import Decimal
 
 class UsuarioValidaciones:
     @field_validator("nombre", mode="before", check_fields=False)
@@ -135,7 +135,7 @@ class UsuarioUpdate(UsuarioValidaciones, BaseModel):
 class UsuarioAdminUpdate(UsuarioUpdate):
     rol: RolUsuario | None = Field(default=None)
     activo: bool | None = Field(default=None)
-    saldo: int | None = Field(default=None, ge=0)
+    saldo: Decimal | None = Field(default=None, ge=0)
 
 
 class UsuarioCambiarPassword(PasswordValidacion, BaseModel):
@@ -144,20 +144,14 @@ class UsuarioCambiarPassword(PasswordValidacion, BaseModel):
 
 
 class UsuarioRecargarSaldo(BaseModel):
-    monto: int = Field(...)
+    monto: Decimal = Field(...)
 
     @field_validator("monto", mode="before")
     @classmethod
     def validar_monto(cls, v):
-        if not isinstance(v, (int, float, str)):
-            raise ValueError("El monto debe ser un número")
-        try:
-            monto = int(str(v))
-        except Exception:
-            raise ValueError("El monto debe ser un número válido")
-        if monto <= 0:
-            raise ValueError("El monto debe ser mayor a 0")
-        return monto
+        if v is None:
+            raise ValueError("El monto es obligatorio")
+        return Decimal(str(v)).quantize(Decimal("0.01"))
 
 class UsuarioPublicResponse(BaseModel):
     nombre: str
@@ -175,7 +169,7 @@ class UsuarioPropioResponse(UsuarioPublicResponse):
     identificador: UUID
     correo: EmailStr
     telefono: str | None = None
-    saldo: int
+    saldo: Decimal
     rol: RolUsuario
     fecha_actualizacion: datetime
 

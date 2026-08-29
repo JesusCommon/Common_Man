@@ -1,15 +1,15 @@
 from beanie import Document
-from pydantic import Field, EmailStr, HttpUrl
+from pydantic import Field, EmailStr, HttpUrl, model_validator
+from bson import Decimal128
+from decimal import Decimal
 from pymongo import IndexModel, ASCENDING
 from uuid import UUID, uuid4
 from enum import Enum
 from src.shared.mixins import TimestampMixim, StatusMixin
 
-
 class RolUsuario(str, Enum):
     USUARIO = "usuario"
     ADMIN = "admin"
-
 
 class Usuario(Document, TimestampMixim, StatusMixin):
     nombre: str = Field(
@@ -62,7 +62,7 @@ class Usuario(Document, TimestampMixim, StatusMixin):
         description="Identificador único de cada usuario"
     )
 
-    saldo: int = Field(
+    saldo: Decimal = Field(
         default=0,
         ge=0,
         description="Saldo del usuario",
@@ -95,6 +95,14 @@ class Usuario(Document, TimestampMixim, StatusMixin):
         ge=0,
         description="Cantidad de usuarios a los que sigue"
     )
+
+    @model_validator(mode="before")
+    @classmethod
+    def convertir_decimals(cls, data: dict) -> dict:
+        if isinstance(data, dict):
+            if "saldo" in data and isinstance(data["saldo"], Decimal128):
+                data["saldo"] = data["saldo"].to_decimal()
+        return data
 
     class Settings:
         name = "usuarios"

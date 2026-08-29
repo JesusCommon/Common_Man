@@ -17,16 +17,21 @@ from src.modules.follow.route import router as follow_route
 from src.modules.categoriasProductos.route import router as categoriaProducto_route
 from src.modules.productos.route import router as productos_route
 from src.modules.compra.route import router as compra_route
+from src.modules.pagos.route import router as pago_route
+from src.modules.config_finanzas.route import router as wallet_route
 from src.modules.usuarios.document import Usuario
 from src.modules.follow.document import Follow
 from src.modules.categoriasProductos.document import Categorias
 from src.modules.productos.document import Productos
 from src.modules.compra.document import Compras
+from src.modules.pagos.document import MovimientoSaldo
+from src.modules.config_finanzas.document import ConfiguracionSistema
+
 
 settings = get_settings()
 setup_logging(environment=settings.app.environment, debug=settings.app.debug)
 
-document_models = [Usuario, Follow, Categorias, Productos, Compras]
+document_models = [Usuario, Follow, Categorias, Productos, Compras, MovimientoSaldo, ConfiguracionSistema]
 
 
 @asynccontextmanager
@@ -72,6 +77,8 @@ app.include_router(follow_route)
 app.include_router(categoriaProducto_route)
 app.include_router(productos_route)
 app.include_router(compra_route)
+app.include_router(pago_route)
+app.include_router(wallet_route)
 
 @app.get("/")
 async def health_check():
