@@ -68,3 +68,29 @@ export {
   activarProductoService,
   desactivarProductoService
 } from "./productos.service";
+
+//Compras
+export {
+  crearCompraService,
+  listarMisComprasService,
+  obtenerCompraPorIdService,
+  obtenerCompraPorNumeroOrdenService,
+  listarTodasComprasAdminService,
+  listarComprasPorEstadoAdminService,
+  obtenerCompraAdminService,
+  actualizarEstadoCompraAdminService,
+} from "./compras.service";
+
+//Pagos
+export {
+  procesarPagoService,
+  cancelarCompraService,
+  obtenerMovimientoDeCompraService,
+  listarHistorialMovimientosService,
+} from "./pagos.service";
+
+//Configuración Finanzas
+export {
+  obtenerWalletService,
+  listarHistorialFinancieroService,
+} from "./configFinanzas.service";

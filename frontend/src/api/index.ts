@@ -9,3 +9,6 @@ export * as usersApi from "./endpoints/usuarios";
 export * as followsApi from "./endpoints/follow";
 export * as categoriasApi from "./endpoints/categoriasProductos";
 export * as productosApi from "./endpoints/productos";
+export * as comprasApi from "./endpoints/compras";
+export * as pagosApi from "./endpoints/pagos";
+export * as configFinanzasApi from "./endpoints/configFinanzas";

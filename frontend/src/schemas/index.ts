@@ -86,3 +86,59 @@ export type {
   ProductoPublicResponseOutput,
   ProductoAdminResponseOutput
 } from "./productos";
+
+export {
+  CompraItemCreateSchema,
+  CompraCreateSchema,
+  CompraUpdateSchema,
+  CompraEstadoUpdateSchema,
+  CompraItemResponseSchema,
+  CompraResponseSchema,
+  CompraAdminResponseSchema,
+  ListarComprasSchema,
+  ListarComprasPorEstadoSchema,
+} from "./compras";
+
+export type {
+  CompraItemCreateInput,
+  CompraCreateInput,
+  CompraUpdateInput,
+  CompraEstadoUpdateInput,
+  CompraItemResponseOutput,
+  CompraResponseOutput,
+  CompraAdminResponseOutput,
+  ListarComprasInput,
+  ListarComprasPorEstadoInput
+} from "./compras";
+
+export {
+  TipoMovimientoEnumSchema,
+  EstadoMovimientoEnumSchema,
+  ProcesarPagoSchema,
+  CancelarCompraSchema,
+  ObtenerMovimientoSchema,
+  ListarHistorialSchema,
+  MovimientoSaldoResponseSchema,
+} from "./pagos";
+
+export type {
+  TipoMovimientoEnum,
+  EstadoMovimientoEnum,
+  ProcesarPagoInput,
+  CancelarCompraInput,
+  ObtenerMovimientoInput,
+  ListarHistorialInput,
+  MovimientoSaldoResponseOutput,
+} from "./pagos";
+
+export {
+  WalletResponseSchema,
+  HistorialItemResponseSchema,
+  ListarHistorialFinancieroSchema,
+} from "./configFinanzas";
+
+export type {
+  WalletResponseOutput,
+  HistorialItemResponseOutput,
+  ListarHistorialFinancieroInput,
+} from "./configFinanzas";

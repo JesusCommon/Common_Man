@@ -1,6 +1,6 @@
 import { FollowCreateSchema } from "@/schemas";
 import { followsApi } from "@/api";
-import type { FollowPublicResponse } from "@/schemas"; // FollowCreateInput eliminado
+import type { FollowPublicResponse } from "@/schemas";
 import type { RespuestaConMensaje, Paginado } from "@/api/types";
 import type { ServiceResult } from "./types";
 import { validationError, networkError } from "./types";
@@ -11,7 +11,6 @@ export async function seguirUsuario(payload: unknown): Promise<ServiceResult<Res
   if (!parsed.success) return { success: false, error: validationError(parsed.error) };
 
   try {
-    // parsed.data ya tiene el tipo FollowCreateInput inferido por Zod
     const data = await followsApi.seguir(parsed.data);
     return { success: true, data };
   } catch (err) {

@@ -66,3 +66,23 @@ export { useListarProductosActivosAdmin } from "./productos/admin/useListarProdu
 export { useListarProductosInactivosAdmin } from "./productos/admin/useListarProductosInactivosAdmin";
 export { useListarTodosProductosAdmin } from "./productos/admin/useListarTodosLosProductosAdmin";
 export { useObtenerProductoPorIdAdmin } from "./productos/admin/useObtenerProductoPorId";
+
+//Compras
+export { useCrearCompra } from "./compras/useCrearCompra";
+export { useActualizarEstadoCompraAdmin } from "./compras/useActualizarEstadoCompraAdmin";
+export { useListarMisCompras } from "./compras/useListarMisCompras";
+export { useObtenerCompraPorId } from "./compras/useObtenerComprasPorId";
+export { useObtenerCompraPorNumeroOrden } from "./compras/useObtenerCompraPorNumeroOrden";
+export { useListarTodasComprasAdmin } from "./compras/useListarTodasComprasAdmin";
+export { useListarComprasPorEstadoAdmin } from "./compras/useListarComprasPorEstadoAdmin";
+export { useObtenerCompraAdmin } from "./compras/useObtenerCompraAdmin";
+
+//Pagos
+export { useProcesarPago } from "./pagos/useProcesarPago";
+export { useCancelarCompra } from "./pagos/useCancelarCompra";
+export { useObtenerMovimientoDeCompra } from "./pagos/useObtenerMovimientoDeCompra";
+export { useListarHistorialMovimientos } from "./pagos/useListarHistorialMovimientos";
+
+//COnfiguración Finanzas
+export { useObtenerWallet } from "./configFinanzas/useObtenerWallet";
+export { useListarHistorialFinanciero } from "./configFinanzas/useListarHistorialFinanciero";
