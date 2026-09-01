@@ -19,8 +19,8 @@ export function SegmentedControl<T extends string>({ options, value, onChange }:
           onClick={() => onChange(opt.key)}
           className={`px-3 py-1.5 rounded-lg border transition-colors ${
             value === opt.key
-              ? "border-blue-500/30 bg-blue-500/10 text-blue-400"
-              : "border-slate-800 bg-slate-900 text-slate-500 hover:text-slate-300"
+              ? "border-blue-200 bg-blue-50 text-blue-700"
+              : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900"
           }`}
         >
           {opt.label}

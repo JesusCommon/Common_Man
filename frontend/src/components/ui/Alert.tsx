@@ -18,21 +18,21 @@ interface VariantStyles {
 
 const styles: Record<AlertVariant, VariantStyles> = {
   error: {
-    container: "bg-red-500/5 border-red-500/20",
-    icon: "text-red-400",
-    text: "text-red-300",
+    container: "bg-red-50 border-red-200",
+    icon: "text-red-500",
+    text: "text-red-700",
     iconComponent: AlertCircle,
   },
   warning: {
-    container: "bg-amber-500/10 border-amber-500/20",
-    icon: "text-amber-400",
-    text: "text-amber-300",
+    container: "bg-amber-50 border-amber-200",
+    icon: "text-amber-500",
+    text: "text-amber-700",
     iconComponent: AlertCircle,
   },
   success: {
-    container: "bg-emerald-500/5 border-emerald-500/20",
-    icon: "text-emerald-400",
-    text: "text-emerald-400",
+    container: "bg-emerald-50 border-emerald-200",
+    icon: "text-emerald-500",
+    text: "text-emerald-700",
     iconComponent: CheckCircle2,
   },
 };
@@ -46,7 +46,7 @@ export function Alert({ message, variant = "error", description }: AlertProps) {
       <Icon className={`w-5 h-5 shrink-0 mt-0.5 ${s.icon}`} />
       <div>
         <p className={`text-sm font-medium ${s.text}`}>{message}</p>
-        {description && <p className="text-xs text-slate-500 mt-1">{description}</p>}
+        {description && <p className="text-xs text-slate-600 mt-1">{description}</p>}
       </div>
     </div>
   );

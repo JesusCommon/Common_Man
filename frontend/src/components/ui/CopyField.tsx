@@ -27,7 +27,7 @@ export function CopyField({ label, value, icon: Icon = Fingerprint }: CopyFieldP
   };
 
   return (
-    <div className="rounded-lg bg-slate-950 border border-slate-800 p-4">
+    <div className="rounded-lg bg-slate-50 border border-slate-200 p-4">
       <div className="flex items-center justify-between mb-2">
         <span className="text-xs text-slate-500 uppercase tracking-wider font-medium flex items-center gap-1.5">
           <Icon className="w-3.5 h-3.5" />
@@ -35,13 +35,13 @@ export function CopyField({ label, value, icon: Icon = Fingerprint }: CopyFieldP
         </span>
         <button
           onClick={handleCopy}
-          className="flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300 transition-colors"
+          className="flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-700 transition-colors"
         >
           <Copy className="w-3.5 h-3.5" />
           {copied ? "¡Copiado!" : "Copiar"}
         </button>
       </div>
-      <code className="text-sm text-slate-300 font-mono break-all">{value}</code>
+      <code className="text-sm text-slate-700 font-mono break-all">{value}</code>
     </div>
   );
 }

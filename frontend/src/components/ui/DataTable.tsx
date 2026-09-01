@@ -13,6 +13,7 @@ interface DataTableProps<T> {
   getRowKey: (item: T) => string;
   onRowClick?: (item: T) => void;
   emptyMessage?: string;
+  rowClassName?: string;
 }
 
 export function DataTable<T>({
@@ -21,12 +22,13 @@ export function DataTable<T>({
   getRowKey,
   onRowClick,
   emptyMessage = "No hay datos disponibles.",
+  rowClassName,
 }: DataTableProps<T>) {
   return (
-    <div className="rounded-xl border border-slate-800 bg-slate-900/30 overflow-hidden">
+    <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm">
       <div className="overflow-x-auto">
         <table className="w-full text-sm text-left">
-          <thead className="text-xs text-slate-500 uppercase bg-slate-900/50">
+          <thead className="text-xs text-gray-500 uppercase bg-gray-50 border-b border-gray-200">
             <tr>
               {columns.map((col, i) => (
                 <th key={i} className={`px-6 py-3 font-medium ${col.headerClassName ?? ""}`}>
@@ -35,10 +37,10 @@ export function DataTable<T>({
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800">
+          <tbody className="divide-y divide-gray-100">
             {data.length === 0 ? (
               <tr>
-                <td colSpan={columns.length} className="px-6 py-12 text-center text-slate-500 text-sm">
+                <td colSpan={columns.length} className="px-6 py-12 text-center text-gray-500 text-sm">
                   {emptyMessage}
                 </td>
               </tr>
@@ -46,11 +48,13 @@ export function DataTable<T>({
               data.map((item) => (
                 <tr
                   key={getRowKey(item)}
-                  className={`hover:bg-slate-800/20 transition-colors ${onRowClick ? "cursor-pointer" : ""}`}
+                  className={`hover:bg-blue-50/60 transition-colors ${
+                    onRowClick ? "cursor-pointer" : ""
+                  } ${rowClassName ?? ""}`}
                   onClick={() => onRowClick?.(item)}
                 >
                   {columns.map((col, i) => (
-                    <td key={i} className={`px-6 py-4 ${col.cellClassName ?? ""}`}>
+                    <td key={i} className={`px-6 py-4 text-gray-700 ${col.cellClassName ?? ""}`}>
                       {col.render(item)}
                     </td>
                   ))}

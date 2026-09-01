@@ -2,8 +2,8 @@ import {
   LayoutDashboard, 
   Users, 
   Folder, 
-  Plus, 
-  Settings 
+  Package, 
+  Wallet, 
 } from "lucide-react";
 import type { ComponentType } from "react";
 
@@ -33,7 +33,7 @@ export const navigationConfig: NavModule[] = [
     id: "dashboard",
     label: "Dashboard",
     icon: LayoutDashboard,
-    route: "/admin/dashboard",
+    route: "/admin",
   },
   {
     id: "usuarios",
@@ -47,31 +47,27 @@ export const navigationConfig: NavModule[] = [
     ],
   },
   {
-    id: "catalogo",
-    label: "Catálogo",
+    id: "categorias",
+    label: "Categorías",
     icon: Folder,
     children: [
-      { label: "Categorías", route: "/admin/categoriasProductos" },
-      { 
-        label: "Productos", 
-        route: "/admin/productos",
-        toolbarActions: [
-          { 
-            label: "Nuevo Producto", 
-            icon: Plus, 
-            onClick: () => window.location.href = "/admin/productos/nuevo", 
-            variant: "primary" 
-          }
-        ]
-      },
+      { label: "Listado de Categorias", route: "/admin/categorias"}
     ],
   },
   {
-    id: "configuracion",
-    label: "Configuración",
-    icon: Settings,
+    id: "productos",
+    label: "Productos",
+    icon: Package,
     children: [
-      { label: "General", route: "/admin/configuracion" },
+      { label: "Listado de Productos", route: "/admin/productos"}
+    ],   
+  },
+  {
+    id: "finanzas",
+    label: "Finanzas",
+    icon: Wallet,
+    children: [
+      { label: "Estado de Finanzas", route: "/admin/finanzas"}
     ],
   },
 ];
