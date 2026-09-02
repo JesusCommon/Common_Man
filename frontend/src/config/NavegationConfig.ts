@@ -51,7 +51,9 @@ export const navigationConfig: NavModule[] = [
     label: "Categorías",
     icon: Folder,
     children: [
-      { label: "Listado de Categorias", route: "/admin/categorias"}
+      { label: "Listado de Categorías", route: "/admin/categoriasProductos" },
+      { label: "Buscar por ID", route: "/admin/categoriasProductos/buscar" },
+      { label: "Nueva Categoría", route: "/admin/categoriasProductos/nueva" },
     ],
   },
   {
@@ -59,15 +61,16 @@ export const navigationConfig: NavModule[] = [
     label: "Productos",
     icon: Package,
     children: [
-      { label: "Listado de Productos", route: "/admin/productos"}
-    ],   
+      { label: "Listado de Productos", route: "/admin/productos" },
+      { label: "Nuevo Producto", route: "/admin/productos/nuevo" },
+    ],
   },
   {
     id: "finanzas",
     label: "Finanzas",
     icon: Wallet,
     children: [
-      { label: "Estado de Finanzas", route: "/admin/finanzas"}
+      { label: "Estado de Finanzas", route: "/admin/finanzas" },
     ],
   },
 ];
