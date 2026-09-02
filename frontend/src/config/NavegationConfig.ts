@@ -62,6 +62,7 @@ export const navigationConfig: NavModule[] = [
     icon: Package,
     children: [
       { label: "Listado de Productos", route: "/admin/productos" },
+      { label: "Buscar Productos", route: "/admin/productos/buscar" },
       { label: "Nuevo Producto", route: "/admin/productos/nuevo" },
     ],
   },

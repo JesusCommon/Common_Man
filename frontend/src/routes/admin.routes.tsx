@@ -11,6 +11,7 @@ import AdminCategoriaForm from "@/pages/admin/categoriasProductos/AdminCategoria
 import AdminBuscarCategoria from "@/pages/admin/categoriasProductos/AdminBuscarCategoria";
 import AdminProductos from "@/pages/admin/productos/AdminProductos";
 import AdminProductoForm from "@/pages/admin/productos/AdminProductoForm";
+import AdminBuscarProducto from "@/pages/admin/productos/AdminBuscarProductos";
 import AdminFinanzas from "@/pages/admin/AdminFinanzas";
 
 export const adminRoutes: RouteObject[] = [
@@ -40,6 +41,7 @@ export const adminRoutes: RouteObject[] = [
       { path: "/admin/productos", element: <AdminProductos /> },
       { path: "/admin/productos/nuevo", element: <AdminProductoForm /> },
       { path: "/admin/productos/editar/:id", element: <AdminProductoForm /> },
+      { path: "/admin/productos/buscar", element: <AdminBuscarProducto /> },
       
       // Finanzas
       { path: "/admin/finanzas", element: <AdminFinanzas /> },

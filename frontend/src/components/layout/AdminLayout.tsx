@@ -4,7 +4,7 @@ import { AdminToolbar } from "./AdminToolbar";
 
 export default function AdminLayout() {
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 flex">
+    <div className="h-screen overflow-hidden bg-gray-50 text-gray-900 flex">
       <AdminSidebar />
       <div className="flex-1 flex flex-col min-w-0">
         <AdminToolbar />
