@@ -1,44 +1,73 @@
 import { Outlet, Link } from "react-router-dom";
-import { ShoppingCart, User } from "lucide-react";
+import { ShoppingCart, User, Package } from "lucide-react";
+import { useState } from "react";
+import { useCartStore, selectCartCount } from "@/store/useCartStore";
+import { CartDrawer } from "@/components/store/CarritoWidgets";
 
 export default function StoreLayout() {
+  const [cartOpen, setCartOpen] = useState(false);
+  const cartCount = useCartStore(selectCartCount);
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 flex flex-col">
-      {/* Header Público */}
-      <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-sm sticky top-0 z-50">
+    <div className="min-h-screen bg-gray-50 text-gray-900 flex flex-col">
+      <header className="border-b border-gray-200 bg-white sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link to="/tienda" className="text-xl font-bold text-white tracking-tight">
-            Common Man <span className="text-blue-400">Store</span>
+          <Link to="/tienda" className="text-xl font-bold text-gray-900 tracking-tight">
+            Common Man <span className="text-blue-600">Store</span>
           </Link>
-          
-          <nav className="flex items-center gap-6">
-            <Link to="/tienda" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">
+
+          <nav className="flex items-center gap-5">
+            <Link
+              to="/tienda"
+              className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+            >
               Tienda
             </Link>
-            {/* Enlaces a login/registro o carrito irían aquí */}
-            <Link to="/dashboard" className="flex items-center gap-2 text-sm font-medium text-slate-300 hover:text-white transition-colors">
-              <User className="w-4 h-4" />
-              Mi Cuenta
+
+            <Link
+              to="/tienda/mis-compras"
+              className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              <Package className="w-4 h-4" />
+              <span className="hidden sm:inline">Mis Compras</span>
             </Link>
-            <button className="relative p-2 text-slate-300 hover:text-white transition-colors">
+
+            <Link
+              to="/dashboard"
+              className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              <User className="w-4 h-4" />
+              <span className="hidden sm:inline">Mi Cuenta</span>
+            </Link>
+
+            <button
+              type="button"
+              onClick={() => setCartOpen(true)}
+              className="relative p-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+              title="Carrito"
+            >
               <ShoppingCart className="w-5 h-5" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-blue-500 rounded-full" />
+              {cartCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 bg-blue-600 text-white text-[10px] font-bold rounded-full min-w-4.5 h-4.5 px-1 flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
             </button>
           </nav>
         </div>
       </header>
 
-      {/* Contenido de la Tienda */}
       <main className="flex-1">
         <Outlet />
       </main>
 
-      {/* Footer Público */}
-      <footer className="border-t border-slate-800 bg-slate-900/30 py-8">
-        <div className="max-w-7xl mx-auto px-4 text-center text-sm text-slate-500">
+      <footer className="border-t border-gray-200 bg-white py-8">
+        <div className="max-w-7xl mx-auto px-4 text-center text-sm text-gray-500">
           <p>© {new Date().getFullYear()} Common Man. Todos los derechos reservados.</p>
         </div>
       </footer>
+
+      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
     </div>
   );
 }

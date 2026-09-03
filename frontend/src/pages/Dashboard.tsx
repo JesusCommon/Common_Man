@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store";
 import { usePerfil } from "@/hooks";
 import { useEffect } from "react";
-import { ExternalLink, Shield, TrendingUp, Users } from "lucide-react";
+import { ExternalLink, Shield, Users, Store } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 
@@ -10,14 +10,14 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
   const isAdmin = user?.rol === "admin";
+  const { data: perfil, isLoading } = usePerfil();
+  const saldo = perfil?.saldo ?? user?.saldo ?? 0;
 
   useEffect(() => {
     if (isAdmin) {
       navigate("/admin", { replace: true });
     }
   }, [isAdmin, navigate]);
-
-  const { isLoading } = usePerfil();
 
   if (isLoading && !user) {
     return (
@@ -29,8 +29,6 @@ export default function Dashboard() {
 
   return (
     <div className="grid lg:grid-cols-[300px_1fr] gap-6">
-      
-      {/* PANEL LATERAL IZQUIERDO - Tarjeta de perfil */}
       <aside className="space-y-4">
         <motion.div
           initial={{ opacity: 0, x: -10 }}
@@ -66,7 +64,7 @@ export default function Dashboard() {
               <div className="flex items-center justify-between py-1.5">
                 <span className="text-[#A1A19A]">Saldo</span>
                 <span className="text-emerald-600 font-bold text-xs">
-                  ${user?.saldo?.toLocaleString() || "0"}
+                  ${saldo.toLocaleString()}
                 </span>
               </div>
             )}
@@ -83,7 +81,6 @@ export default function Dashboard() {
           </Button>
         </motion.div>
 
-        {/* Stats rápidas */}
         <motion.div
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
@@ -99,16 +96,20 @@ export default function Dashboard() {
               <p className="text-lg font-bold text-[#18181B]">—</p>
               <p className="text-[10px] text-[#52525B]">Seguidores</p>
             </div>
-            <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-100">
-              <TrendingUp className="w-4 h-4 text-emerald-600 mb-1" />
-              <p className="text-lg font-bold text-[#18181B]">—</p>
-              <p className="text-[10px] text-[#52525B]">Actividad</p>
-            </div>
+
+            <button
+              type="button"
+              onClick={() => navigate("/tienda")}
+              className="p-3 rounded-xl bg-[#2563EB] border border-[#1D4ED8] hover:bg-[#1D4ED8] transition-colors text-left"
+            >
+              <Store className="w-4 h-4 text-white mb-1" />
+              <p className="text-sm font-bold text-white">Ir a la Tienda</p>
+              <p className="text-[10px] text-blue-100">Explorar productos</p>
+            </button>
           </div>
         </motion.div>
       </aside>
 
-      {/* CONTENIDO PRINCIPAL DERECHO */}
       <main className="min-w-0">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -117,7 +118,7 @@ export default function Dashboard() {
           className="bg-white rounded-2xl border border-[#E4E4E1] p-8 shadow-sm"
         >
           <h1 className="text-2xl sm:text-3xl font-bold text-[#18181B] tracking-tight mb-2">
-            Hola, {user?.nombre || "Usuario"} 👋
+            Hola, {user?.nombre || "Usuario"}
           </h1>
           <p className="text-sm text-[#52525B] max-w-md">
             Este es tu centro de control. Usa la barra de navegación superior para explorar las diferentes secciones.
