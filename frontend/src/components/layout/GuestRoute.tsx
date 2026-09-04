@@ -3,14 +3,16 @@ import { useAuthStore } from "@/store";
 
 interface Props {
   children: React.ReactNode;
-  adminOnly?: boolean;
+  redirectTo?: string;
 }
 
-export default function ProtectedRoute({ children, adminOnly = false }: Props) {
+export default function GuestRoute({ children, redirectTo = "/dashboard" }: Props) {
   const location = useLocation();
   const user = useAuthStore((s) => s.user);
   const accessToken = useAuthStore((s) => s.accessToken);
   const hasHydrated = useAuthStore((s) => s.hasHydrated);
+
+  console.log("GuestRoute:", { hasHydrated, user: !!user, accessToken: !!accessToken, path: location.pathname });
 
   if (!hasHydrated) {
     return (
@@ -20,12 +22,9 @@ export default function ProtectedRoute({ children, adminOnly = false }: Props) {
     );
   }
 
-  if (!user || !accessToken) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
-
-  if (adminOnly && user.rol !== "admin") {
-    return <Navigate to="/dashboard" replace />;
+  if (user && accessToken) {
+    console.log("Usuario autenticado, redirigiendo a", redirectTo);
+    return <Navigate to={redirectTo} replace />;
   }
 
   return <>{children}</>;

@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import type { CompraResponse } from "@/api/types";
+import { extraerMensajeError } from "@/lib/errors";
 
 const formatPrecio = (precio: number): string =>
   new Intl.NumberFormat("es-CO", {
@@ -43,13 +44,6 @@ const estadoStyles: Record<CompraResponse["estado"], string> = {
   entregado: "bg-emerald-50 text-emerald-600 border-emerald-200",
   cancelado: "bg-red-50 text-red-600 border-red-200",
 };
-
-const mensajeError = (err: unknown): string =>
-  typeof err === "string"
-    ? err
-    : err instanceof Error
-    ? err.message
-    : "No se pudo completar la acción.";
 
 export default function CompraDetalle() {
   const { orden } = useParams<{ orden: string }>();
@@ -176,7 +170,7 @@ export default function CompraDetalle() {
         <div className="space-y-4">
           {errorAccion && (
             <ErrorAlert
-              error={new Error(mensajeError(errorAccion))}
+              error={new Error(extraerMensajeError(errorAccion))}
               fallback="No se pudo completar la acción."
             />
           )}
