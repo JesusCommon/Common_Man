@@ -6,7 +6,7 @@ import type { UsuarioRecargarSaldoInput } from "@/schemas";
 import { useRecargarSaldo } from "@/hooks";
 import { useAuthStore } from "@/store";
 import { Button } from "@/components/ui/Button";
-import { Wallet, ArrowLeft, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Wallet, AlertCircle, CheckCircle2 } from "lucide-react";
 import { useEffect } from "react";
 
 type FormValues = {
@@ -22,7 +22,7 @@ export default function RecargarSaldo() {
     handleSubmit,
     formState: { errors },
   } = useForm<FormValues>({
-    resolver: zodResolver(UsuarioRecargarSaldoSchema) as unknown as Resolver<FormValues, any, UsuarioRecargarSaldoInput>,
+    resolver: zodResolver(UsuarioRecargarSaldoSchema) as unknown as Resolver<FormValues, UsuarioRecargarSaldoInput>,
   });
 
   const { mutate, isPending, isError, error, isSuccess, data } = useRecargarSaldo();
@@ -43,14 +43,6 @@ export default function RecargarSaldo() {
 
   return (
     <div className="min-h-screen bg-[#FAFAF8] text-[#18181B]">
-      <nav className="border-b border-[#E4E4E1] bg-white/80 backdrop-blur-md sticky top-0 z-10">
-        <div className="max-w-2xl mx-auto px-6 h-16 flex items-center">
-          <button onClick={() => navigate("/dashboard")} className="flex items-center text-sm text-[#52525B] hover:text-[#18181B] transition-colors">
-            <ArrowLeft className="w-4 h-4 mr-2" /> Volver al dashboard
-          </button>
-        </div>
-      </nav>
-
       <main className="max-w-md mx-auto px-6 py-12">
         <div className="text-center mb-8">
           <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center mx-auto mb-4">

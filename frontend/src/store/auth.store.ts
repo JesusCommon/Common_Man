@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
 import axios from "axios";
 import { API_CONFIG } from "@/api/config";
 import type { UsuarioPropioResponse } from "@/api/types";
@@ -10,7 +10,6 @@ interface AuthState {
   refreshToken: string | null;
   hasHydrated: boolean;
   isRefreshing: boolean;
-
   setTokens: (payload: { accessToken: string; refreshToken: string }) => void;
   setUser: (user: UsuarioPropioResponse) => void;
   updateUser: (user: Partial<UsuarioPropioResponse>) => void;
@@ -59,18 +58,14 @@ export const useAuthStore = create<AuthState>()(
             }
           );
 
-          const newAccess = response.data.access_token;
-          const newRefresh = response.data.refresh_token;
-
           set({
-            accessToken: newAccess,
-            refreshToken: newRefresh,
+            accessToken: response.data.access_token,
+            refreshToken: response.data.refresh_token,
             isRefreshing: false,
           });
 
           return true;
-        } catch (error) {
-          console.error("Error refrescando token:", error);
+        } catch {
           set({
             user: null,
             accessToken: null,
@@ -93,16 +88,21 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: "common-man-auth",
+      storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
+        user: state.user,
         accessToken: state.accessToken,
         refreshToken: state.refreshToken,
-        user: state.user,
       }),
-      onRehydrateStorage: () => (state, error) => {
-        if (error) {
-          console.error("Error rehidratando auth:", error);
+
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.setHasHydrated(true);
+          console.log("✅ Auth rehidratado:", {
+            hasUser: !!state.user,
+            hasAccess: !!state.accessToken,
+          });
         }
-        useAuthStore.getState().setHasHydrated(true);
       },
     }
   )

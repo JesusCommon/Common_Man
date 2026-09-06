@@ -5,7 +5,7 @@ import { UsuarioCambiarPasswordSchema } from "@/schemas";
 import type { UsuarioCambiarPasswordInput } from "@/schemas";
 import { useCambiarPassword } from "@/hooks";
 import { Button } from "@/components/ui/Button";
-import { ArrowLeft, Lock, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Lock, AlertCircle, CheckCircle2 } from "lucide-react";
 import { useEffect } from "react";
 
 export default function Password() {
@@ -28,10 +28,6 @@ export default function Password() {
 
   return (
     <div className="max-w-lg mx-auto p-4 sm:p-6">
-      <button onClick={() => navigate("/dashboard")} className="flex items-center text-sm text-[#52525B] hover:text-[#18181B] transition-colors mb-6">
-        <ArrowLeft className="w-4 h-4 mr-2" /> Volver al dashboard
-      </button>
-
       <div className="flex items-center gap-3 mb-6">
         <div className="w-12 h-12 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center">
           <Lock className="w-6 h-6 text-amber-600" />
