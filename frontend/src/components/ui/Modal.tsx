@@ -34,16 +34,20 @@ export function Modal({ title, isOpen = true, onClose, children, size = "md" }: 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className={`relative w-full ${sizeClasses[size]} bg-white rounded-xl border border-gray-200 shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200`}>
+
+      <div
+        className={`relative w-full ${sizeClasses[size]} bg-white rounded-xl border border-gray-200 shadow-xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200`}
+      >
         {title && (
-          <div className="flex items-center justify-between px-6 py-4 bg-gray-50 border-b border-gray-200">
+          <div className="flex items-center justify-between px-6 py-4 bg-gray-50 border-b border-gray-200 shrink-0">
             <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
             <Button variant="ghost" size="sm" onClick={onClose} className="text-gray-400 hover:text-gray-600 hover:bg-gray-100">
               <X className="w-5 h-5" />
             </Button>
           </div>
         )}
-        <div className="p-6">
+
+        <div className="p-6 overflow-y-auto flex-1">
           {children}
         </div>
       </div>

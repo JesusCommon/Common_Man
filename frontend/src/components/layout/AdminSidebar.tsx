@@ -1,13 +1,20 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { ChevronDown, ChevronRight, LogOut } from "lucide-react";
 import { useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/ui/Avatar";
 import { navigationConfig } from "@/config/NavegationConfig";
+import { useAuthStore } from "@/store"; 
 
 export function AdminSidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const logout = useAuthStore((s) => s.logout);
   const [manualExpanded, setManualExpanded] = useState<string | null>(null);
+  const handleLogout = () => {
+    logout();
+    navigate("/", { replace: true });
+  };
 
   const autoExpanded = useMemo(() => {
     const currentPath = location.pathname;
@@ -129,7 +136,10 @@ export function AdminSidebar() {
       </nav>
 
       <div className="p-4 border-t border-gray-200">
-        <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors">
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+        >
           <LogOut className="w-4 h-4" />
           Cerrar Sesión
         </button>

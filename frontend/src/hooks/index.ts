@@ -83,6 +83,25 @@ export { useCancelarCompra } from "./pagos/useCancelarCompra";
 export { useObtenerMovimientoDeCompra } from "./pagos/useObtenerMovimientoDeCompra";
 export { useListarHistorialMovimientos } from "./pagos/useListarHistorialMovimientos";
 
-//COnfiguración Finanzas
+//Configuración Finanzas
 export { useObtenerWallet } from "./configFinanzas/useObtenerWallet";
 export { useListarHistorialFinanciero } from "./configFinanzas/useListarHistorialFinanciero";
+
+//Direciones
+export { useCrearDireccion } from "./direcciones/useCrearDireccion";
+export { useListarMisDirecciones } from "./direcciones/useListarMisDirecciones";
+export { useObtenerDireccion } from "./direcciones/useObtenerDireccion";
+export { useActualizarDireccion } from "./direcciones/useActualizarDireccion";
+export { useMarcarDireccionPredeterminada } from "./direcciones/useMarcarDireccionPredeterminada";
+export { useEliminarDireccion } from "./direcciones/useEliminarDireccion";
+export { useListarDireccionesDeUsuarioAdmin } from "./direcciones/useListarDireccionesDeUsuariosAdmin";
+
+//Envios
+export { useListarMisEnvios } from "./envios/useListarMisEnvios";
+export { useObtenerEnvio } from "./envios/useObtenerEnvio";
+export { useCrearEnvioAdmin } from "./envios/admin/useCrearEnvioAdmin";
+export { useListarTodosLosEnviosAdmin } from "./envios/admin/useListarTodosLosEnviosAdmin";
+export { useListarEnviosPorEstadoAdmin } from "./envios/admin/useListarEnviosPorEstadoAdmin";
+export { useObtenerEnvioPorCompraAdmin } from "./envios/admin/useObtenerEnvioPorCompraAdmin";
+export { useActualizarEnvioAdmin } from "./envios/admin/useActualizarEnvioAdmin";
+export { useActualizarEstadoEnvioAdmin } from "./envios/admin/useActualizarEstadoEnvioAdmin";

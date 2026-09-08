@@ -13,6 +13,7 @@ import AdminProductos from "@/pages/admin/productos/AdminProductos";
 import AdminProductoForm from "@/pages/admin/productos/AdminProductoForm";
 import AdminBuscarProducto from "@/pages/admin/productos/AdminBuscarProductos";
 import AdminFinanzas from "@/pages/admin/AdminFinanzas";
+import AdminEnvios from "@/pages/admin/envios/EnviosAdmin";
 
 export const adminRoutes: RouteObject[] = [
   {
@@ -45,6 +46,9 @@ export const adminRoutes: RouteObject[] = [
       
       // Finanzas
       { path: "/admin/finanzas", element: <AdminFinanzas /> },
+
+      // Envios
+      { path: "/admin/envios", element: <AdminEnvios /> },
     ],
   },
 ];

@@ -3,7 +3,8 @@ import {
   Users, 
   Folder, 
   Package, 
-  Wallet, 
+  Wallet,
+  Truck 
 } from "lucide-react";
 import type { ComponentType } from "react";
 
@@ -72,6 +73,14 @@ export const navigationConfig: NavModule[] = [
     icon: Wallet,
     children: [
       { label: "Estado de Finanzas", route: "/admin/finanzas" },
+    ],
+  },
+  {
+    id: "envios",
+    label: "Envíos",
+    icon: Truck,
+    children: [
+      { label: "Gestión de Envíos", route: "/admin/envios" },
     ],
   },
 ];

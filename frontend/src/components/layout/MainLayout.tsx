@@ -3,9 +3,9 @@ import { useAuthStore } from "@/store";
 import { usePerfil } from "@/hooks";
 import { useAuthInit } from "@/hooks";
 import { useState, useRef, useEffect } from "react";
-import { Search, LogOut, User, Wallet, Shield, ChevronDown, Bell, TrendingUp, Lock } from "lucide-react";
+import { Search, LogOut, User, Wallet, Shield, ChevronDown, Bell, TrendingUp, Lock, LocationEdit, Truck} from "lucide-react";
 
-type NavKey = "/dashboard" | "/buscar" | "/recargar" | "/perfil" | "/password";
+type NavKey = "/dashboard" | "/buscar" | "/recargar" | "/perfil" | "/password" | "/direcciones" | "/envios";
 
 interface NavItem {
   key: NavKey;
@@ -47,13 +47,14 @@ export default function MainLayout() {
     { key: "/recargar", label: "Recargar", icon: Wallet },
     { key: "/perfil", label: "Perfil", icon: User },
     { key: "/password", label: "Seguridad", icon: Lock },
+    { key: "/direcciones", label: "Mis Direcciones", icon: LocationEdit },
+    { key: "/envios", label: "Mis Envios", icon: Truck }
   ];
 
   const isActive = (path: NavKey) => location.pathname === path;
 
   return (
     <div className="min-h-screen bg-[#FAFAF8] text-[#18181B]">
-      {/* NAVBAR ÚNICA */}
       <nav className="sticky top-0 z-50 border-b border-[#E4E4E1] bg-white/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="h-16 flex items-center justify-between gap-4">

@@ -94,3 +94,26 @@ export {
   obtenerWalletService,
   listarHistorialFinancieroService,
 } from "./configFinanzas.service";
+
+//Direcciones
+export {
+  crearDireccionService,
+  actualizarDireccionService,
+  eliminarDireccionService,
+  obtenerDireccionService,
+  listarMisDireccionesService,
+  marcarDireccionPredeterminadaService,
+  listarDireccionesDeUsuarioAdminService
+} from "./direcciones.service"
+
+//Envios
+export {
+  crearEnvioAdminService,
+  actualizarEnvioAdminService,
+  listarMisEnviosService,
+  listarTodosLosEnviosAdminService,
+  listarEnviosPorEstadoAdminService,
+  obtenerEnvioService,
+  actualizarEstadoEnvioAdminService,
+  obtenerEnvioPorCompraAdminService
+} from "./envios.service";

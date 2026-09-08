@@ -142,3 +142,41 @@ export type {
   HistorialItemResponseOutput,
   ListarHistorialFinancieroInput,
 } from "./configFinanzas";
+
+export {
+  DireccionCreateSchema,
+  DireccionUpdateSchema,
+  DireccionResponseSchema,
+  ListarDireccionesSchema,
+  DireccionAdminResponseSchema
+} from "./direcciones";
+
+export type {
+  DireccionCreateInput,
+  DireccionUpdateInput,
+  DireccionResponseOutput,
+  ListarDireccionesInput,
+  DireccionAdminResponseOutput
+} from "./direcciones";
+
+export {
+  EnvioCreateSchema,
+  EnvioUpdateSchema,
+  EnvioEstadoUpdateSchema,
+  EventoEnvioSchema,
+  EstadoEnvioSchema,
+  EnvioResponseSchema,
+  EnvioAdminResponseSchema,
+  ListarEnviosSchema
+} from "./envios";
+
+export type {
+  EnvioCreateInput,
+  EnvioUpdateInput,
+  EnvioEstadoUpdateInput,
+  EventoEnvioOutput,
+  EstadoEnvio,
+  EnvioResponseOutput,
+  EnvioAdminResponseOutput,
+  ListarEnviosInput
+} from "./envios";

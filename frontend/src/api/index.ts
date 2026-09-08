@@ -12,3 +12,5 @@ export * as productosApi from "./endpoints/productos";
 export * as comprasApi from "./endpoints/compras";
 export * as pagosApi from "./endpoints/pagos";
 export * as configFinanzasApi from "./endpoints/configFinanzas";
+export * as direccionesApi from "./endpoints/direcciones";
+export * as enviosApi from "./endpoints/envios";

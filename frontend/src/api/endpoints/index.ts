@@ -6,3 +6,5 @@ export * from "./productos";
 export * from "./compras";
 export * from "./pagos";
 export * from "./configFinanzas";
+export * from "./direcciones";
+export * from "./envios";
