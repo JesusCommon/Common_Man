@@ -14,6 +14,11 @@ class CompraCreate(BaseModel):
     descuento: Decimal | None = Field(default=Decimal("0.00"), ge=0)
     impuestos: Decimal | None = Field(default=Decimal("0.00"), ge=0)
 
+    direccion_id: PydanticObjectId | None = Field(
+        default=None,
+        description="Dirección de entrega elegida por el usuario"
+    )
+
     @field_validator("descuento", "impuestos", mode="before")
     @classmethod
     def validar_decimales(cls, v):
@@ -52,11 +57,11 @@ class CompraResponse(BaseModel):
     total: Decimal
     estado: EstadoCompraEnum
     notas: str | None
+    direccion_id: PydanticObjectId | None
     fecha_creacion: datetime
     fecha_actualizacion: datetime
 
     model_config = ConfigDict(from_attributes=True)
-
 
 class CompraAdminResponse(CompraResponse):
     usuario_id: PydanticObjectId

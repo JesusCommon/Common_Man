@@ -38,6 +38,7 @@ export const CompraCreateSchema = z.object({
   notas: NotasSchema.optional(),
   descuento: DescuentoSchema.default(0),
   impuestos: ImpuestosSchema.default(0),
+  direccion_id: z.string().min(1).optional()
 });
 
 export type CompraCreateInput = z.infer<typeof CompraCreateSchema>;

@@ -1,10 +1,11 @@
 import { useNavigate } from "react-router-dom";
-import { useCrearCompra, useProcesarPago } from "@/hooks";
+import { useCrearCompra, useProcesarPago, useListarMisDirecciones } from "@/hooks";
+import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
 import { ErrorAlert } from "@/components/ui/ErrorAlert";
 import { useCartStore, selectCartTotal } from "@/store/useCartStore";
 import { extraerMensajeError } from "@/lib/errors";
-import { CheckCircle2, Package, ArrowLeft, CreditCard } from "lucide-react";
+import { CheckCircle2, Package, ArrowLeft, CreditCard, MapPin } from "lucide-react";
 import { useState } from "react";
 import type { CompraResponse } from "@/api/types";
 
@@ -22,13 +23,23 @@ export default function CheckoutPage() {
   const [orden, setOrden] = useState<CompraResponse | null>(null);
   const crear = useCrearCompra();
   const pagar = useProcesarPago();
-
   const isPending = crear.isPending || pagar.isPending;
   const error = crear.error ?? pagar.error;
 
+  const [direccionId, setDireccionId] = useState("");
+  const direcciones = useListarMisDirecciones({ skip: 0, limit: 100 });
+  const direccionPredeterminada =
+    direcciones.data?.items?.find((d) => d.es_predeterminada)?.id ??
+    direcciones.data?.items?.[0]?.id ??
+    "";
+  const direccionEfectiva = direccionId || direccionPredeterminada;
+
   const handleConfirmarOrden = () => {
     crear.mutate(
-      { items: items.map((i) => ({ producto_id: i.id, cantidad: i.cantidad })) },
+      {
+        items: items.map((i) => ({ producto_id: i.id, cantidad: i.cantidad })),
+        direccion_id: direccionEfectiva || undefined,
+      },
       {
         onSuccess: (respuesta) => {
           clearCart();
@@ -95,7 +106,7 @@ export default function CheckoutPage() {
 
       {error && (
         <ErrorAlert
-          error={new Error(extraerMensajeError(error))} // ✅ "Saldo insuficiente" real
+          error={new Error(extraerMensajeError(error))}
           fallback="No se pudo procesar la compra."
         />
       )}
@@ -129,8 +140,42 @@ export default function CheckoutPage() {
         </div>
       </div>
 
+      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5 space-y-3">
+        <h2 className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+          <MapPin className="w-4 h-4 text-blue-600" />
+          Dirección de entrega
+        </h2>
+
+        {direcciones.isLoading ? (
+          <p className="text-sm text-gray-500">Cargando direcciones...</p>
+        ) : direcciones.data?.items?.length ? (
+          <Select
+            value={direccionEfectiva}
+            onChange={setDireccionId}
+            options={
+              direcciones.data.items.map((d) => ({
+                value: d.id,
+                label: `${d.alias} — ${d.direccion}, ${d.ciudad}${d.es_predeterminada ? " (predeterminada)" : ""}`,
+              }))
+            }
+            placeholder="Selecciona una dirección..."
+          />
+        ) : (
+          <p className="text-sm text-gray-500">
+            No tienes direcciones registradas.{" "}
+            <button
+              type="button"
+              onClick={() => navigate("/direcciones")}
+              className="text-blue-600 font-medium hover:underline"
+            >
+              Agregar una
+            </button>
+          </p>
+        )}
+      </div>
+
       {paso === "resumen" ? (
-        <Button variant="primary" size="lg" className="w-full" disabled={isPending} onClick={handleConfirmarOrden}>
+        <Button variant="primary" size="lg" className="w-full" disabled={isPending || !direccionEfectiva} onClick={handleConfirmarOrden}>
           {crear.isPending ? "Creando orden..." : "Confirmar Orden"}
         </Button>
       ) : (

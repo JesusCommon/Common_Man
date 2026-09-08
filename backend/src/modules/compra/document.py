@@ -100,6 +100,11 @@ class Compras(Document, TimestampMixim):
         description="Notas adicionales o instrucciones de envío"
     )
 
+    direccion_id: PydanticObjectId | None = Field(
+        default=None,
+        description="ID de la dirección de entrega asociada a la compra"
+    )
+
     @model_validator(mode="before")
     @classmethod
     def convertir_decimals(cls, data: dict) -> dict:
@@ -108,7 +113,6 @@ class Compras(Document, TimestampMixim):
                 if field in data and isinstance(data[field], Decimal128):
                     data[field] = data[field].to_decimal()
             
-            # También aplicar a los items embebidos si existen
             if "items" in data and isinstance(data["items"], list):
                 for item in data["items"]:
                     if isinstance(item, dict):
@@ -121,10 +125,7 @@ class Compras(Document, TimestampMixim):
     class Settings:
         name = "compras"
         indexes = [
-            # Historial de compras de un usuario, ordenado de más reciente a más antiguo
             IndexModel([("usuario_id", ASCENDING), ("fecha_creacion", DESCENDING)]),
-            # Búsqueda rápida por folio de orden
             IndexModel([("numero_orden", ASCENDING)], unique=True),
-            # Panel de administración: filtrar por estado y ordenar por fecha
             IndexModel([("estado", ASCENDING), ("fecha_creacion", DESCENDING)]),
         ]

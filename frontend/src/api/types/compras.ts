@@ -15,6 +15,7 @@ export interface CompraCreate {
   notas?: string;
   descuento?: number;
   impuestos?: number;
+  direccion_id?: string;
 }
 
 export interface CompraUpdate {
@@ -43,6 +44,7 @@ export interface CompraResponse {
   total: number;
   estado: EstadoCompraEnum;
   notas?: string;
+  direccion_id: string | null;
   fecha_creacion: string;
   fecha_actualizacion: string;
 }

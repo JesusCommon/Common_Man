@@ -27,7 +27,7 @@ export function EnvioDetalleModal({ envio, isAdmin = false, onClose }: Props) {
   const [transportadora, setTransportadora] = useState(envio.transportadora ?? "");
   const [seguimiento, setSeguimiento] = useState(envio.numero_seguimiento ?? "");
   const [fechaEstimada, setFechaEstimada] = useState(
-    envio.fecha_estimada_entrega ? envio.fecha_estimada_entrega.slice(0, 10) : ""
+    envio.fecha_estimada_entrega ? envio.fecha_estimada_entrega.slice(0, 16) : ""
   );
 
   const actualizarEstado = useActualizarEstadoEnvioAdmin();
@@ -164,7 +164,7 @@ export function EnvioDetalleModal({ envio, isAdmin = false, onClose }: Props) {
               />
               <TextField
                 label="Fecha estimada de entrega"
-                type="date"
+                type="datetime-local"
                 value={fechaEstimada}
                 onChange={setFechaEstimada}
               />

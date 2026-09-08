@@ -7,6 +7,7 @@ from src.modules.compra.document import Compras, ItemCompra, EstadoCompraEnum
 from src.modules.compra.schema import CompraCreate
 from src.modules.compra.repo import CompraRepo
 from src.modules.productos.repo import ProductoRepo
+from src.modules.direcciones.document import Direcciones
 
 class CompraService:
     def __init__(self):
@@ -25,6 +26,25 @@ class CompraService:
         
         timestamp = int(time.time())
         return f"ORD-{fecha}-{timestamp}"
+
+    async def _validar_direccion(
+        self,
+        direccion_id: PydanticObjectId | None,
+        usuario_id: PydanticObjectId,
+    ) -> None:
+        if not direccion_id:
+            return
+
+        direccion = await Direcciones.find_one(
+            Direcciones.id == direccion_id,
+            Direcciones.usuario_id == usuario_id,
+        )
+
+        if not direccion:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="La dirección de entrega no es válida o no pertenece al usuario",
+            )
 
     async def _validar_productos_y_calcular_items(
         self, items_data: list[dict]
@@ -90,8 +110,8 @@ class CompraService:
             [item.model_dump() for item in data.items]
         )
 
+        await self._validar_direccion(data.direccion_id, usuario_id)
         numero_orden = await self._generar_numero_orden()
-
         descuento = data.descuento or Decimal("0.00")
         impuestos = data.impuestos or Decimal("0.00")
         total = (subtotal - descuento + impuestos).quantize(Decimal("0.01"))
@@ -103,7 +123,6 @@ class CompraService:
             )
 
         await self._descontar_stock_productos(items_validados)
-
         compra = Compras(
             usuario_id=usuario_id,
             numero_orden=numero_orden,
@@ -113,18 +132,18 @@ class CompraService:
             impuestos=impuestos,
             total=total,
             estado=EstadoCompraEnum.PENDIENTE,
-            notas=data.notas
+            notas=data.notas,
+            direccion_id=data.direccion_id
         )
 
         try:
             await compra.insert()
-        except Exception as e:
+        except Exception:
             for item in items_validados:
                 await self.producto_repo.actualizar_stock(
-                    item.producto_id, 
+                    item.producto_id,
                     item.cantidad
                 )
-            
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error al crear la compra. Stock revertido."
