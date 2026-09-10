@@ -48,7 +48,6 @@ export default function AdminBuscar() {
   const trimmed = query.trim();
   const type = determineType(trimmed, searchType);
 
-  // Solo se habilita la query cuando el usuario ejecutó la búsqueda
   const byId = useObtenerPorObjectId(searched && type === "objectid" ? trimmed : undefined);
   const byUUID = useObtenerPorUUID(searched && type === "uuid" ? trimmed : undefined);
 
@@ -65,8 +64,8 @@ export default function AdminBuscar() {
   return (
     <div className="space-y-6 max-w-2xl">
       <div>
-        <h1 className="text-2xl font-bold text-white mb-1">Buscar por ID</h1>
-        <p className="text-slate-500 text-sm">Encuentra un usuario por su ID de MongoDB o UUID.</p>
+        <h1 className="text-2xl font-bold text-[#18181B] mb-1">Buscar por ID</h1>
+        <p className="text-[#52525B] text-sm">Encuentra un usuario por su ID de MongoDB o UUID.</p>
       </div>
 
       <form onSubmit={handleSearch} className="space-y-3">
@@ -78,7 +77,6 @@ export default function AdminBuscar() {
               resetSearch();
             }}
             placeholder="Pega el ID o UUID aquí..."
-            mono
           />
           <Button type="submit" variant="primary" className="h-11 px-6">
             Buscar
@@ -104,22 +102,16 @@ export default function AdminBuscar() {
       )}
 
       {result && (
-        <div className="rounded-2xl border border-slate-800 bg-slate-900 overflow-hidden">
-          <div className="px-6 py-5 border-b border-slate-800 flex items-center gap-4">
+        <div className="rounded-2xl border border-[#E4E4E1] bg-white shadow-sm overflow-hidden">
+          <div className="px-6 py-5 border-b border-[#F4F4F5] flex items-center gap-4">
             <Avatar name={result.nombre} size="lg" variant="primary" />
-            <div>
-              <h2 className="text-lg font-bold text-white">
+            <div className="min-w-0">
+              <h2 className="text-lg font-bold text-[#18181B]">
                 {result.nombre} {result.apellido || ""}
               </h2>
-              <p className="text-sm text-slate-500">@{result.username}</p>
+              <p className="text-sm text-[#52525B]">@{result.username}</p>
             </div>
-            <span
-              className={`ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${
-                result.activo
-                  ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                  : "bg-red-500/10 text-red-400 border border-red-500/20"
-              }`}
-            >
+            <span className="ml-auto">
               <StatusBadge active={result.activo} />
             </span>
           </div>

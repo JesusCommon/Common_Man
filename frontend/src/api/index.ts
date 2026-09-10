@@ -14,3 +14,4 @@ export * as pagosApi from "./endpoints/pagos";
 export * as configFinanzasApi from "./endpoints/configFinanzas";
 export * as direccionesApi from "./endpoints/direcciones";
 export * as enviosApi from "./endpoints/envios";
+export * as notificacionesApi from "./endpoints/notificaciones";

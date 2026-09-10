@@ -2,8 +2,10 @@ import { Outlet, useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuthStore } from "@/store";
 import { usePerfil } from "@/hooks";
 import { useAuthInit } from "@/hooks";
+import { useWebSocket } from '@/hooks/useWebSocket';
+import { NotificacionesDropdown } from '@/components/NotificacionesDropdown';
 import { useState, useRef, useEffect } from "react";
-import { Search, LogOut, User, Wallet, Shield, ChevronDown, Bell, TrendingUp, Lock, LocationEdit, Truck} from "lucide-react";
+import { Search, LogOut, User, Wallet, Shield, ChevronDown, TrendingUp, Lock, LocationEdit, Truck } from "lucide-react";
 
 type NavKey = "/dashboard" | "/buscar" | "/recargar" | "/perfil" | "/password" | "/direcciones" | "/envios";
 
@@ -15,12 +17,12 @@ interface NavItem {
 
 export default function MainLayout() {
   useAuthInit();
+  useWebSocket();
   const navigate = useNavigate();
   const location = useLocation();
   const logout = useAuthStore((s) => s.logout);
   const user = useAuthStore((s) => s.user);
   const isAdmin = user?.rol === "admin";
-  
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -48,7 +50,7 @@ export default function MainLayout() {
     { key: "/perfil", label: "Perfil", icon: User },
     { key: "/password", label: "Seguridad", icon: Lock },
     { key: "/direcciones", label: "Mis Direcciones", icon: LocationEdit },
-    { key: "/envios", label: "Mis Envios", icon: Truck }
+    { key: "/envios", label: "Mis Envios", icon: Truck },
   ];
 
   const isActive = (path: NavKey) => location.pathname === path;
@@ -91,11 +93,8 @@ export default function MainLayout() {
 
             {/* Acciones derecha */}
             <div className="flex items-center gap-3">
-              {/* Notificaciones */}
-              <button className="relative w-9 h-9 rounded-full bg-[#FAFAF8] border border-[#E4E4E1] flex items-center justify-center hover:bg-[#F4F4F5] transition-colors">
-                <Bell className="w-4 h-4 text-[#52525B]" />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#2563EB] rounded-full border-2 border-white" />
-              </button>
+              {/* Dropdown de notificaciones */}
+              <NotificacionesDropdown />
 
               {/* Menú de usuario */}
               <div className="relative" ref={menuRef}>

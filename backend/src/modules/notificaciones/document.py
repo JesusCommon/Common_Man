@@ -1,5 +1,5 @@
 from enum import Enum
-from beanie import Document, PydanticObjectId, Indexed
+from beanie import Document, PydanticObjectId
 from pydantic import Field
 from pymongo import IndexModel, ASCENDING, DESCENDING
 from src.shared.mixins import TimestampMixim
@@ -11,10 +11,10 @@ class TipoNotificacionEnum(str, Enum):
     SALDO = "saldo"
     SOPORTE = "soporte"
     PROMOCION = "promocion"
-    FOLLOW = "seguidores"
+    FOLLOW = "seguidores"  # ✅ Agregado
 
 class Notificacion(Document, TimestampMixim):
-    usuario_id: PydanticObjectId = Indexed(
+    usuario_id: PydanticObjectId = Field(
         ..., 
         description="ID del usuario destinatario"
     )
@@ -55,12 +55,14 @@ class Notificacion(Document, TimestampMixim):
     accion_url: str | None = Field(
         default=None, 
         max_length=200, 
-        description="Ruta frontend para navegar al hacer click (ej: /tienda/mis-compras/ORD-123)"
+        description="Ruta frontend para navegar al hacer click"
     )
 
     class Settings:
         name = "notificaciones"
         indexes = [
+            # Índice compuesto para listar historial de un usuario ordenado por fecha
             IndexModel([("usuario_id", ASCENDING), ("fecha_creacion", DESCENDING)]),
+            # Índice compuesto para contar/obtener no leídas rápidamente
             IndexModel([("usuario_id", ASCENDING), ("leida", ASCENDING)]),
         ]

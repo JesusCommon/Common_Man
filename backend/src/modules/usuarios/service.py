@@ -11,7 +11,8 @@ from src.modules.usuarios.repo import UsuarioRepo
 from src.core.security.password import hashear_password, verificar_password
 from beanie import PydanticObjectId
 from uuid import UUID
-
+from src.modules.notificaciones.service import NotificacionService
+from src.modules.notificaciones.schema import NotificacionCreate
 
 class UsuarioService:
     def __init__(self):
@@ -130,7 +131,21 @@ class UsuarioService:
     ) -> Usuario:
         usuario = await self.obtener_por_identificador(identificador)
         self._validar_activo(usuario)
-        return await self.repo.recargar_saldo(identificador, data.monto)
+        
+        usuario_actualizado = await self.repo.recargar_saldo(identificador, data.monto)
+        
+        notif_service = NotificacionService()
+        await notif_service.crear_y_enviar(
+            NotificacionCreate(
+                usuario_id=usuario.id,
+                tipo="saldo",
+                titulo="Saldo recargado",
+                mensaje=f"Se han añadido ${data.monto:,.2f} a tu cuenta.",
+                accion_url="/dashboard"
+            )
+        )
+        
+        return usuario_actualizado
 
     async def buscar_personas(
         self,
@@ -202,10 +217,24 @@ class UsuarioService:
 
         self._validar_activo(usuario)
 
-        return await self.repo.recargar_saldo_admin(filtro, data.monto)
+        usuario_actualizado = await self.repo.recargar_saldo_admin(filtro, data.monto)
+        
+        notif_service = NotificacionService()
+        await notif_service.crear_y_enviar(
+            NotificacionCreate(
+                usuario_id=usuario.id,
+                tipo="saldo",
+                titulo="Saldo recargado por administrador",
+                mensaje=f"Un administrador ha añadido ${data.monto:,.2f} a tu cuenta.",
+                accion_url="/dashboard"
+            )
+        )
+
+        return usuario_actualizado
 
     async def restar_saldo_admin(
-        self, identificador: PydanticObjectId | UUID, data: UsuarioRecargarSaldo) -> Usuario:
+        self, identificador: PydanticObjectId | UUID, data: UsuarioRecargarSaldo
+    ) -> Usuario:
         if isinstance(identificador, PydanticObjectId):
             usuario = await self.obtener_por_id(identificador)
             filtro = {Usuario.id: identificador}
@@ -227,6 +256,18 @@ class UsuarioService:
                 status_code=status.HTTP_409_CONFLICT,
                 detail="El saldo cambió antes de completar la operación, intenta de nuevo",
             )
+            
+        notif_service = NotificacionService()
+        await notif_service.crear_y_enviar(
+            NotificacionCreate(
+                usuario_id=usuario.id,
+                tipo="saldo",
+                titulo="Saldo descontado",
+                mensaje=f"Se han descontado ${data.monto:,.2f} de tu cuenta.",
+                accion_url="/dashboard"
+            )
+        )
+        
         return resultado
 
     async def activar(self, id: PydanticObjectId) -> Usuario:

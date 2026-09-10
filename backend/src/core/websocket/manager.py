@@ -13,18 +13,25 @@ class ConnectionManager:
 
     def disconnect(self, websocket: WebSocket, user_id: str):
         if user_id in self.active_connections:
-            self.active_connections[user_id].remove(websocket)
+            if websocket in self.active_connections[user_id]:
+                self.active_connections[user_id].remove(websocket)
             if not self.active_connections[user_id]:
                 del self.active_connections[user_id]
 
-    async def send_personal_message(self, message: dict, user_id: str):
+    async def send_to_user(self, user_id: str, message: dict):
         if user_id in self.active_connections:
             for connection in self.active_connections[user_id]:
-                await connection.send_json(message)
+                try:
+                    await connection.send_json(message)
+                except Exception:
+                    pass
 
     async def broadcast(self, message: dict):
-        for user_id, connections in self.active_connections.items():
-            for connection in connections:
-                await connection.send_json(message)
+        for user_id in list(self.active_connections.keys()):
+            for connection in self.active_connections[user_id]:
+                try:
+                    await connection.send_json(message)
+                except Exception:
+                    pass
 
 manager = ConnectionManager()

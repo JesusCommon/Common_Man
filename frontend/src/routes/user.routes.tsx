@@ -13,6 +13,7 @@ import MisCompras from "@/pages/tienda/MisCompras";
 import CompraDetalle from "@/pages/tienda/CompraDetalle";
 import MisDirecciones from "@/pages/usuario/MisDirecciones";
 import MisEnvios from "@/pages/usuario/MisEnvios";
+import Notificaciones from '@/pages/usuario/Notificaciones';
 
 export const userRoutes: RouteObject[] = [
   {
@@ -30,6 +31,7 @@ export const userRoutes: RouteObject[] = [
       { path: "/perfil/:username", element: <PerfilPublico /> },
       { path: "/direcciones", element: <MisDirecciones /> },
       { path: "/envios", element: <MisEnvios /> },
+      { path: '/notificaciones', element: <Notificaciones /> },
     ],
   },
   

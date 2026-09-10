@@ -180,3 +180,11 @@ export type {
   EnvioAdminResponseOutput,
   ListarEnviosInput
 } from "./envios";
+
+export {
+  ListarNotificacionesSchema
+} from "./notificaciones";
+
+export type {
+  ListarNotificacionesInput
+} from "./notificaciones";

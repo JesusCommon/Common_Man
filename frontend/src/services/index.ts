@@ -117,3 +117,12 @@ export {
   actualizarEstadoEnvioAdminService,
   obtenerEnvioPorCompraAdminService
 } from "./envios.service";
+
+//Notificaciones
+export {
+  contarNoLeidasService,
+  marcarNotificacionLeidaService,
+  eliminarNotificacionService,
+  listarMisNotificacionesService,
+  marcarTodasNotificacionesLeidasService
+} from "./notificaciones.service";

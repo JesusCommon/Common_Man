@@ -1,45 +1,27 @@
 from fastapi import WebSocket, WebSocketException, status
-from beanie import PydanticObjectId
 from src.core.security.jwt import decodificar
 from src.modules.usuarios.document import Usuario
+from uuid import UUID
 
 async def get_current_user_ws(websocket: WebSocket) -> Usuario:
     token = websocket.query_params.get("token")
-    
     if not token:
-        raise WebSocketException(
-            code=status.WS_1008_POLICY_VIOLATION, 
-            reason="Token no proporcionado"
-        )
+        raise WebSocketException(code=status.WS_1008_POLICY_VIOLATION, reason="Token requerido")
 
     payload = decodificar(token)
-    
     if payload is None:
-        raise WebSocketException(
-            code=status.WS_1008_POLICY_VIOLATION, 
-            reason="Token inválido o expirado"
-        )
+        raise WebSocketException(code=status.WS_1008_POLICY_VIOLATION, reason="Token inválido")
 
     if payload.get("type") != "access":
-        raise WebSocketException(
-            code=status.WS_1008_POLICY_VIOLATION, 
-            reason="Se requiere un access token"
-        )
+        raise WebSocketException(code=status.WS_1008_POLICY_VIOLATION, reason="Token inválido")
 
     try:
-        identificador = PydanticObjectId(payload["sub"])
+        identificador = UUID(payload["sub"])
     except Exception:
-        raise WebSocketException(
-            code=status.WS_1008_POLICY_VIOLATION, 
-            reason="Token inválido"
-        )
-    
-    usuario = await Usuario.find_one(Usuario.identificador == identificador)
+        raise WebSocketException(code=status.WS_1008_POLICY_VIOLATION, reason="Token inválido")
 
-    if usuario is None or not usuario.activo:
-        raise WebSocketException(
-            code=status.WS_1008_POLICY_VIOLATION, 
-            reason="Usuario no válido"
-        )
+    usuario = await Usuario.find_one(Usuario.identificador == identificador)
+    if not usuario or not usuario.activo:
+        raise WebSocketException(code=status.WS_1008_POLICY_VIOLATION, reason="Usuario inválido")
 
     return usuario

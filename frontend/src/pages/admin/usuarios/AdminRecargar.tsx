@@ -27,11 +27,9 @@ export default function AdminRecargar() {
   const [monto, setMonto] = useState("");
   const [confirming, setConfirming] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
-
   const recargar = useRecargarSaldoAdmin();
   const restar = useRestarSaldoAdmin();
   const mutation = operacion === "recargar" ? recargar : restar;
-
   const montoNum = parseInt(monto, 10);
   const isValid = userId.trim().length > 0 && !Number.isNaN(montoNum) && montoNum > 0;
 
@@ -60,10 +58,11 @@ export default function AdminRecargar() {
   return (
     <div className="space-y-6 max-w-lg">
       <div>
-        <h1 className="text-2xl font-bold text-white mb-1">Gestionar saldo</h1>
-        <p className="text-slate-500 text-sm">
+        <h1 className="text-2xl font-bold text-[#18181B] mb-1">Gestionar saldo</h1>
+        <p className="text-[#52525B] text-sm">
           Ingresa el ID del usuario y el monto. Puedes obtener el ID desde{" "}
-          <span className="text-blue-400">Usuarios</span> o <span className="text-blue-400">Buscar por ID</span>.
+          <span className="text-[#2563EB]">Usuarios</span> o{" "}
+          <span className="text-[#2563EB]">Buscar por ID</span>.
         </p>
       </div>
 
@@ -83,7 +82,7 @@ export default function AdminRecargar() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6 space-y-5">
+        <div className="rounded-xl border border-[#E4E4E1] bg-white shadow-sm p-6 space-y-5">
           <SegmentedControl options={operacionOptions} value={operacion} onChange={setOperacion} />
 
           <TextField
@@ -92,10 +91,7 @@ export default function AdminRecargar() {
             value={userId}
             onChange={setUserId}
             placeholder="Pega el MongoDB ID o UUID"
-            mono
-            hint="Usa el ID que aparece en la lista de usuarios o en la búsqueda por ID."
           />
-
           <TextField
             label={operacion === "recargar" ? "Monto a recargar" : "Monto a restar"}
             icon={Wallet}
@@ -104,7 +100,6 @@ export default function AdminRecargar() {
             placeholder="100"
             type="number"
             min={1}
-            focusColor="emerald"
           />
 
           <Button
@@ -121,15 +116,21 @@ export default function AdminRecargar() {
         </div>
       </form>
 
-      <div className="rounded-lg border border-slate-800 bg-slate-900/30 p-4">
-        <h3 className="text-sm font-medium text-slate-400 mb-2 flex items-center gap-2">
+      <div className="rounded-lg border border-[#E4E4E1] bg-white shadow-sm p-4">
+        <h3 className="text-sm font-medium text-[#52525B] mb-2 flex items-center gap-2">
           <User className="w-4 h-4" />
           ¿Cómo obtener el ID?
         </h3>
-        <ul className="text-xs text-slate-500 space-y-1.5 list-disc list-inside">
-          <li>Ve a <span className="text-slate-400">Usuarios</span> y haz clic en cualquier usuario de la lista.</li>
-          <li>En el modal que aparece, copia el <span className="text-slate-400">ID MongoDB</span>.</li>
-          <li>También puedes usar <span className="text-slate-400">Buscar por ID</span> para encontrar un usuario específico.</li>
+        <ul className="text-xs text-[#52525B] space-y-1.5 list-disc list-inside">
+          <li>
+            Ve a <span className="text-[#18181B]">Usuarios</span> y haz clic en cualquier usuario de la lista.
+          </li>
+          <li>
+            En el modal que aparece, copia el <span className="text-[#18181B]">ID MongoDB</span>.
+          </li>
+          <li>
+            También puedes usar <span className="text-[#18181B]">Buscar por ID</span> para encontrar un usuario específico.
+          </li>
           <li>Pega el ID aquí, ingresa el monto y confirma.</li>
         </ul>
       </div>
@@ -142,24 +143,28 @@ export default function AdminRecargar() {
           onConfirm={handleConfirm}
           onCancel={() => setConfirming(false)}
         >
-          <div className="rounded-lg bg-slate-950 border border-slate-800 p-4 space-y-3">
+          <div className="rounded-lg bg-gray-50 border border-[#E4E4E1] p-4 space-y-3">
             <div>
-              <p className="text-xs text-slate-500 mb-1">Operación</p>
-              <p className={`text-sm font-medium flex items-center gap-1.5 ${operacion === "recargar" ? "text-emerald-400" : "text-red-400"}`}>
+              <p className="text-xs text-[#52525B] mb-1">Operación</p>
+              <p
+                className={`text-sm font-medium flex items-center gap-1.5 ${
+                  operacion === "recargar" ? "text-emerald-600" : "text-red-600"
+                }`}
+              >
                 {operacion === "restar" && <ArrowDown className="w-3.5 h-3.5" />}
                 {operacionTexto[operacion].accion}
               </p>
             </div>
             <div>
-              <p className="text-xs text-slate-500 mb-1">ID del usuario</p>
-              <code className="text-sm text-slate-300 font-mono break-all">{userId.trim()}</code>
+              <p className="text-xs text-[#52525B] mb-1">ID del usuario</p>
+              <code className="text-sm text-[#18181B] font-mono break-all">{userId.trim()}</code>
             </div>
             <div>
-              <p className="text-xs text-slate-500 mb-1">Monto</p>
-              <p className="text-lg font-bold text-white">${montoNum.toLocaleString()}</p>
+              <p className="text-xs text-[#52525B] mb-1">Monto</p>
+              <p className="text-lg font-bold text-[#18181B]">${montoNum.toLocaleString()}</p>
             </div>
           </div>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-[#52525B]">
             Verifica que el ID y el monto sean correctos antes de confirmar. Esta operación se aplica de inmediato.
           </p>
         </ConfirmModal>

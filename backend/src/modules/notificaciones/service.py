@@ -1,4 +1,4 @@
-from fastapi import HTTPException, status
+from fastapi import HTTPException
 from beanie import PydanticObjectId
 from src.modules.notificaciones.document import Notificacion
 from src.modules.notificaciones.schema import NotificacionCreate
@@ -35,7 +35,7 @@ class NotificacionService:
         }
 
         if data.usuario_id:
-            await manager.send_personal_message(payload, str(data.usuario_id))
+            await manager.send_to_user(str(data.usuario_id), payload)        
         else:
             await manager.broadcast(payload)
 
