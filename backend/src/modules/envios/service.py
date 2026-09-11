@@ -7,6 +7,9 @@ from src.modules.envios.repo import EnvioRepo
 from src.modules.compra.document import Compras, EstadoCompraEnum
 from src.modules.compra.repo import CompraRepo
 from src.modules.direcciones.repo import DireccionRepo
+from src.modules.notificaciones.service import NotificacionService
+from src.modules.notificaciones.schema import NotificacionCreate
+from src.modules.notificaciones.document import TipoNotificacionEnum
 
 TRANSICIONES_VALIDAS: dict[EstadoEnvioEnum, list[EstadoEnvioEnum]] = {
     EstadoEnvioEnum.PENDIENTE: [EstadoEnvioEnum.PREPARANDO, EstadoEnvioEnum.CANCELADO],
@@ -17,11 +20,35 @@ TRANSICIONES_VALIDAS: dict[EstadoEnvioEnum, list[EstadoEnvioEnum]] = {
     EstadoEnvioEnum.CANCELADO: [],
 }
 
+MENSAJES_ESTADO_ENVIO: dict[EstadoEnvioEnum, dict[str, str]] = {
+    EstadoEnvioEnum.PREPARANDO: {
+        "titulo": "Pedido en preparación",
+        "mensaje": "Tu pedido está siendo preparado para el envío.",
+    },
+    EstadoEnvioEnum.ENVIADO: {
+        "titulo": "Pedido enviado",
+        "mensaje": "Tu pedido fue despachado. ¡Pronto estará en camino!",
+    },
+    EstadoEnvioEnum.EN_TRANSITO: {
+        "titulo": "Pedido en camino",
+        "mensaje": "Tu pedido está en tránsito hacia tu dirección.",
+    },
+    EstadoEnvioEnum.ENTREGADO: {
+        "titulo": "¡Pedido entregado!",
+        "mensaje": "Tu pedido fue entregado exitosamente. Gracias por tu compra.",
+    },
+    EstadoEnvioEnum.CANCELADO: {
+        "titulo": "Envío cancelado",
+        "mensaje": "El envío de tu pedido fue cancelado.",
+    },
+}
+
 class EnvioService:
     def __init__(self):
         self.repo = EnvioRepo()
         self.compra_repo = CompraRepo()
         self.direccion_repo = DireccionRepo()
+        self.notif_service = NotificacionService()
 
     async def _validar_transicion_estado(
         self, estado_actual: EstadoEnvioEnum, nuevo_estado: EstadoEnvioEnum
@@ -86,6 +113,19 @@ class EnvioService:
         )
 
         await envio.insert()
+
+        await self.notif_service.crear_y_enviar(
+            NotificacionCreate(
+                usuario_id=compra.usuario_id,
+                tipo=TipoNotificacionEnum.ENVIO,
+                titulo="Envío creado",
+                mensaje=f"Tu orden {compra.numero_orden} está siendo procesada para el envío.",
+                referencia_id=envio.id,
+                referencia_tipo="envio",
+                accion_url="/envios"
+            )
+        )
+
         return envio
 
     async def obtener_por_id(self, id: PydanticObjectId) -> Envios:
@@ -140,8 +180,23 @@ class EnvioService:
     async def actualizar_datos(
         self, id: PydanticObjectId, data: EnvioUpdate
     ) -> Envios:
-        await self.obtener_por_id(id)
-        return await self.repo.actualizar(id, data)
+        envio = await self.obtener_por_id(id)
+        resultado = await self.repo.actualizar(id, data)
+
+        if data.numero_seguimiento and data.numero_seguimiento != envio.numero_seguimiento:
+            await self.notif_service.crear_y_enviar(
+                NotificacionCreate(
+                    usuario_id=envio.usuario_id,
+                    tipo=TipoNotificacionEnum.ENVIO,
+                    titulo="Número de seguimiento disponible",
+                    mensaje=f"Tu envío ya tiene número de seguimiento: {data.numero_seguimiento}. Puedes rastrearlo con la transportadora {data.transportadora or 'asignada'}.",
+                    referencia_id=envio.id,
+                    referencia_tipo="envio",
+                    accion_url="/envios"
+                )
+            )
+
+        return resultado
 
     async def actualizar_estado(
         self, id: PydanticObjectId, data: EnvioEstadoUpdate
@@ -169,6 +224,25 @@ class EnvioService:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error al actualizar el estado del envío"
+            )
+
+        if data.estado in MENSAJES_ESTADO_ENVIO:
+            mensaje_config = MENSAJES_ESTADO_ENVIO[data.estado]
+            
+            mensaje = mensaje_config["mensaje"]
+            if data.descripcion:
+                mensaje = f"{mensaje} {data.descripcion}"
+
+            await self.notif_service.crear_y_enviar(
+                NotificacionCreate(
+                    usuario_id=envio.usuario_id,
+                    tipo=TipoNotificacionEnum.ENVIO,
+                    titulo=mensaje_config["titulo"],
+                    mensaje=mensaje,
+                    referencia_id=envio.id,
+                    referencia_tipo="envio",
+                    accion_url="/envios"
+                )
             )
 
         return resultado

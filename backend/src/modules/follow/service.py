@@ -1,9 +1,13 @@
 from fastapi import HTTPException, status
+from datetime import datetime, timedelta
 from src.modules.follow.document import Follow
 from src.modules.follow.schema import FollowCreate
 from src.modules.follow.repo import FollowRepo
 from src.modules.usuarios.document import Usuario
 from src.modules.usuarios.repo import UsuarioRepo
+from src.modules.notificaciones.service import NotificacionService
+from src.modules.notificaciones.schema import NotificacionCreate
+from src.modules.notificaciones.document import Notificacion, TipoNotificacionEnum
 from beanie import PydanticObjectId
 
 class FollowService:
@@ -27,6 +31,18 @@ class FollowService:
             )
         return seguido
 
+    async def _debe_notificar_follow(self, seguidor_id: PydanticObjectId, seguido_id: PydanticObjectId) -> bool:
+        hace_24_horas = datetime.now() - timedelta(hours=24)
+        
+        notificacion_reciente = await Notificacion.find_one(
+            Notificacion.usuario_id == seguido_id,
+            Notificacion.tipo == TipoNotificacionEnum.FOLLOW,
+            Notificacion.referencia_id == seguidor_id,
+            Notificacion.fecha_creacion >= hace_24_horas
+        )
+        
+        return notificacion_reciente is None
+
     async def seguir(self, seguidor: Usuario, data: FollowCreate) -> Follow:
         seguido = await self._resolver_seguido(data.username)
 
@@ -47,9 +63,25 @@ class FollowService:
                 )
             existente.activo = True
             await existente.save()
-            return existente
+            relacion = existente
+        else:
+            relacion = await self.repo.crear_relacion(seguidor, seguido)
 
-        return await self.repo.crear_relacion(seguidor, seguido)
+        if await self._debe_notificar_follow(seguidor.id, seguido.id):
+            notif_service = NotificacionService()
+            await notif_service.crear_y_enviar(
+                NotificacionCreate(
+                    usuario_id=seguido.id,
+                    tipo=TipoNotificacionEnum.FOLLOW,
+                    titulo="Nuevo seguidor",
+                    mensaje=f"{seguidor.nombre} {seguidor.apellido or ''} ahora te sigue.",
+                    referencia_id=seguidor.id,
+                    referencia_tipo="usuario",
+                    accion_url=f"/perfil/{seguidor.username}"
+                )
+            )
+
+        return relacion
 
     async def dejar_de_seguir(self, seguidor: Usuario, username: str) -> Follow:
         seguido = await self._resolver_seguido(username)

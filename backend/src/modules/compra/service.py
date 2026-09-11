@@ -8,11 +8,15 @@ from src.modules.compra.schema import CompraCreate
 from src.modules.compra.repo import CompraRepo
 from src.modules.productos.repo import ProductoRepo
 from src.modules.direcciones.document import Direcciones
+from src.modules.notificaciones.service import NotificacionService
+from src.modules.notificaciones.schema import NotificacionCreate
+from src.modules.notificaciones.document import TipoNotificacionEnum
 
 class CompraService:
     def __init__(self):
         self.repo = CompraRepo()
         self.producto_repo = ProductoRepo()
+        self.notif_service = NotificacionService()
 
     async def _generar_numero_orden(self) -> str:
         fecha = time.strftime("%Y%m%d")
@@ -105,6 +109,47 @@ class CompraService:
                     detail=f"Error al descontar stock del producto '{item.nombre_producto_snapshot}'"
                 )
 
+    async def _notificar_estado_compra(
+        self,
+        compra: Compras,
+        estado: EstadoCompraEnum
+    ) -> None:        
+        mensajes = {
+            EstadoCompraEnum.PAGADO: {
+                "titulo": "Pago confirmado",
+                "mensaje": f"El pago de tu orden {compra.numero_orden} fue procesado correctamente.",
+            },
+            EstadoCompraEnum.ENVIADO: {
+                "titulo": "Pedido enviado",
+                "mensaje": f"Tu orden {compra.numero_orden} está en camino. ¡Pronto la recibirás!",
+            },
+            EstadoCompraEnum.ENTREGADO: {
+                "titulo": "Pedido entregado",
+                "mensaje": f"¡Tu orden {compra.numero_orden} fue entregada! Gracias por tu compra.",
+            },
+            EstadoCompraEnum.CANCELADO: {
+                "titulo": "Pedido cancelado",
+                "mensaje": f"Tu orden {compra.numero_orden} fue cancelada.",
+            },
+        }
+
+        if estado not in mensajes:
+            return
+
+        notif_data = mensajes[estado]
+        
+        await self.notif_service.crear_y_enviar(
+            NotificacionCreate(
+                usuario_id=compra.usuario_id,
+                tipo=TipoNotificacionEnum.COMPRA,
+                titulo=notif_data["titulo"],
+                mensaje=notif_data["mensaje"],
+                referencia_id=compra.id,
+                referencia_tipo="compra",
+                accion_url=f"/tienda/mis-compras/{compra.numero_orden}"
+            )
+        )
+
     async def crear(self, data: CompraCreate, usuario_id: PydanticObjectId) -> Compras:
         items_validados, subtotal = await self._validar_productos_y_calcular_items(
             [item.model_dump() for item in data.items]
@@ -148,6 +193,18 @@ class CompraService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error al crear la compra. Stock revertido."
             )
+
+        await self.notif_service.crear_y_enviar(
+            NotificacionCreate(
+                usuario_id=usuario_id,
+                tipo=TipoNotificacionEnum.COMPRA,
+                titulo="Compra registrada",
+                mensaje=f"Tu orden {numero_orden} fue creada. Total: ${total:,.2f}. Pendiente de pago.",
+                referencia_id=compra.id,
+                referencia_tipo="compra",
+                accion_url=f"/tienda/mis-compras/{numero_orden}"
+            )
+        )
 
         return compra
 
@@ -227,5 +284,7 @@ class CompraService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error al actualizar el estado de la compra"
             )
+        
+        await self._notificar_estado_compra(resultado, nuevo_estado)
         
         return resultado

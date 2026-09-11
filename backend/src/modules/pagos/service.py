@@ -8,12 +8,16 @@ from src.modules.compra.repo import CompraRepo
 from src.modules.usuarios.document import Usuario
 from src.modules.productos.repo import ProductoRepo
 from src.modules.config_finanzas.document import ConfiguracionSistema
+from src.modules.notificaciones.service import NotificacionService
+from src.modules.notificaciones.schema import NotificacionCreate
+from src.modules.notificaciones.document import TipoNotificacionEnum
 
 class PagoService:
     def __init__(self):
         self.repo = MovimientoSaldoRepo()
         self.compra_repo = CompraRepo()
         self.producto_repo = ProductoRepo()
+        self.notif_service = NotificacionService()
 
     async def _obtener_o_crear_configuracion(self) -> ConfiguracionSistema:
         config = await ConfiguracionSistema.find_one()
@@ -108,7 +112,7 @@ class PagoService:
 
         try:
             await movimiento.insert()
-        except Exception as e:
+        except Exception:
             await Usuario.find_one(Usuario.id == usuario_id).update(
                 {"$inc": {"saldo": compra.total}}
             )
@@ -137,6 +141,18 @@ class PagoService:
                 "saldo_plataforma": compra.total,
                 "total_transacciones": 1
             }}
+        )
+
+        await self.notif_service.crear_y_enviar(
+            NotificacionCreate(
+                usuario_id=usuario_id,
+                tipo=TipoNotificacionEnum.COMPRA,
+                titulo="Pago confirmado",
+                mensaje=f"El pago de tu orden {compra.numero_orden} por ${compra.total:,.2f} fue procesado correctamente.",
+                referencia_id=compra.id,
+                referencia_tipo="compra",
+                accion_url=f"/tienda/mis-compras/{compra.numero_orden}"
+            )
         )
 
         return movimiento
@@ -170,6 +186,8 @@ class PagoService:
                 detail="No se puede cancelar una compra que ya fue entregada"
             )
 
+        mensaje_notificacion = f"Tu orden {compra.numero_orden} fue cancelada."
+        
         if compra.estado == EstadoCompraEnum.PENDIENTE:
             for item in compra.items:
                 await self.producto_repo.actualizar_stock(
@@ -223,6 +241,11 @@ class PagoService:
                     item.producto_id, item.cantidad
                 )
 
+            mensaje_notificacion = (
+                f"Tu orden {compra.numero_orden} fue cancelada. "
+                f"Se reembolsaron ${monto_reembolso:,.2f} a tu saldo."
+            )
+
         resultado = await self.compra_repo.actualizar_estado(
             compra_id, EstadoCompraEnum.CANCELADO
         )
@@ -232,6 +255,18 @@ class PagoService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error al actualizar el estado de la compra a cancelado"
             )
+        
+        await self.notif_service.crear_y_enviar(
+            NotificacionCreate(
+                usuario_id=usuario_id,
+                tipo=TipoNotificacionEnum.COMPRA,
+                titulo="Pedido cancelado",
+                mensaje=mensaje_notificacion,
+                referencia_id=compra.id,
+                referencia_tipo="compra",
+                accion_url=f"/tienda/mis-compras/{compra.numero_orden}"
+            )
+        )
         
         return resultado
 
