@@ -22,6 +22,7 @@ from src.modules.config_finanzas.route import router as wallet_route
 from src.modules.direcciones.route import router as direccion_route
 from src.modules.envios.route import router as envio_route
 from src.modules.notificaciones.route import router as notificacion_route
+from src.modules.reportes.route import router as reporte_route
 from src.modules.usuarios.document import Usuario
 from src.modules.follow.document import Follow
 from src.modules.categoriasProductos.document import Categorias
@@ -32,12 +33,13 @@ from src.modules.config_finanzas.document import ConfiguracionSistema
 from src.modules.direcciones.document import Direcciones
 from src.modules.envios.document import Envios
 from src.modules.notificaciones.document import Notificacion
+from src.modules.reportes.document import Reporte
 
 
 settings = get_settings()
 setup_logging(environment=settings.app.environment, debug=settings.app.debug)
 
-document_models = [Usuario, Follow, Categorias, Productos, Compras, MovimientoSaldo, ConfiguracionSistema, Direcciones, Envios, Notificacion]
+document_models = [Usuario, Follow, Categorias, Productos, Compras, MovimientoSaldo, ConfiguracionSistema, Direcciones, Envios, Notificacion, Reporte]
 
 
 @asynccontextmanager
@@ -88,6 +90,7 @@ app.include_router(wallet_route)
 app.include_router(direccion_route)
 app.include_router(envio_route)
 app.include_router(notificacion_route)
+app.include_router(reporte_route)
 
 @app.get("/")
 async def health_check():
