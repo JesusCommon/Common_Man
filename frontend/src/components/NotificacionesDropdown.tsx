@@ -1,34 +1,81 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  useListarMisNotificaciones,
-  useContarNoLeidas,
-  useMarcarNotificacionLeida,
-  useMarcarTodasNotificacionesLeidas,
-} from "@/hooks";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/Button";
 import { Bell, Check, ExternalLink } from "lucide-react";
-import type { NotificacionResponse } from "@/api/types";
+import { apiClient } from "@/api/client";
+import type { NotificacionResponse, Paginado } from "@/api/types";
+
+async function fetchNotificaciones(): Promise<Paginado<NotificacionResponse>> {
+  const { data } = await apiClient.get<Paginado<NotificacionResponse>>(
+    '/notificaciones/?skip=0&limit=5&solo_no_leidas=false'
+  );
+  return data;
+}
+
+async function marcarLeida(id: string) {
+  const { data } = await apiClient.patch(`/notificaciones/${id}/leida`);
+  return data;
+}
+
+async function marcarTodasLeidas() {
+  const { data } = await apiClient.patch('/notificaciones/marcar-todas-leidas');
+  return data;
+}
+
+function formatearMensaje(notif: NotificacionResponse): string {
+  if (notif.contador > 1) {
+    switch (notif.tipo) {
+      case "soporte":
+        return `${notif.contador} mensajes nuevos en tu reporte`;
+      case "seguidores":
+        return `${notif.contador} nuevos seguidores`;
+      default:
+        return `${notif.contador} notificaciones nuevas`;
+    }
+  }
+  return notif.mensaje;
+}
 
 export function NotificacionesDropdown() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  
   const [isOpen, setIsOpen] = useState(false);
-  const countQuery = useContarNoLeidas();
-  const listQuery = useListarMisNotificaciones({ skip: 0, limit: 5 }, );
-  const marcarLeida = useMarcarNotificacionLeida();
-  const marcarTodas = useMarcarTodasNotificacionesLeidas();
-  const countNoLeidas = countQuery.data ?? 0;
-  const notificaciones: NotificacionResponse[] = listQuery.data?.items ?? [];
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['notificaciones', 'dropdown'],
+    queryFn: fetchNotificaciones,
+    enabled: isOpen,
+  });
+
+  const marcarLeidaMutation = useMutation({
+    mutationFn: marcarLeida,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notificaciones'] });
+    },
+  });
+
+  const marcarTodasMutation = useMutation({
+    mutationFn: marcarTodasLeidas,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notificaciones'] });
+    },
+  });
+
+  const countNoLeidas = data?.items?.filter(n => !n.leida).length ?? 0;
 
   const handleNotificacionClick = (notif: NotificacionResponse) => {
     if (!notif.leida) {
-      marcarLeida.mutate(notif.id);
+      marcarLeidaMutation.mutate(notif.id);
     }
     if (notif.accion_url) {
       navigate(notif.accion_url);
     }
     setIsOpen(false);
   };
+
+  const notificaciones: NotificacionResponse[] = data?.items ?? [];
 
   return (
     <div className="relative">
@@ -38,7 +85,9 @@ export function NotificacionesDropdown() {
       >
         <Bell className="w-4 h-4 text-[#52525B]" />
         {countNoLeidas > 0 && (
-          <span className="absolute top-1 right-1 w-2 h-2 bg-[#2563EB] rounded-full border-2 border-white" />
+          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-[#2563EB] text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
+            {countNoLeidas}
+          </span>
         )}
       </button>
 
@@ -50,8 +99,8 @@ export function NotificacionesDropdown() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => marcarTodas.mutate()}
-                disabled={marcarTodas.isPending}
+                onClick={() => marcarTodasMutation.mutate()}
+                disabled={marcarTodasMutation.isPending}
                 className="text-xs"
               >
                 <Check className="w-3 h-3 mr-1" />
@@ -61,7 +110,7 @@ export function NotificacionesDropdown() {
           </div>
 
           <div className="max-h-96 overflow-y-auto">
-            {listQuery.isLoading ? (
+            {isLoading ? (
               <div className="p-4 text-center text-sm text-[#A1A19A]">Cargando...</div>
             ) : notificaciones.length === 0 ? (
               <div className="p-4 text-center text-sm text-[#A1A19A]">Sin notificaciones</div>
@@ -71,20 +120,29 @@ export function NotificacionesDropdown() {
                   key={notif.id}
                   onClick={() => handleNotificacionClick(notif)}
                   className={`w-full text-left px-4 py-3 border-b border-[#F4F4F5] hover:bg-[#FAFAF8] transition-colors ${
-                    !notif.leida ? "bg-blue-50/50" : ""
+                    !notif.leida ? 'bg-blue-50/50' : ''
                   }`}
                 >
                   <div className="flex items-start gap-3">
-                    <div
-                      className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${
-                        !notif.leida ? "bg-[#2563EB]" : "bg-transparent"
-                      }`}
-                    />
+                    <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${
+                      !notif.leida ? 'bg-[#2563EB]' : 'bg-transparent'
+                    }`} />
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-[#18181B] truncate">{notif.titulo}</p>
-                      <p className="text-xs text-[#52525B] line-clamp-2 mt-0.5">{notif.mensaje}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium text-[#18181B] truncate">
+                          {notif.titulo}
+                        </p>
+                        {notif.contador > 1 && (
+                          <span className="shrink-0 px-1.5 py-0.5 bg-[#2563EB] text-white text-[10px] font-bold rounded-full">
+                            x{notif.contador}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-[#52525B] line-clamp-2 mt-0.5">
+                        {formatearMensaje(notif)}
+                      </p>
                       <p className="text-[10px] text-[#A1A19A] mt-1">
-                        {new Date(notif.fecha_creacion).toLocaleString("es-CO")}
+                        {new Date(notif.fecha_creacion).toLocaleString('es-CO')}
                       </p>
                     </div>
                   </div>
@@ -95,7 +153,7 @@ export function NotificacionesDropdown() {
 
           <button
             onClick={() => {
-              navigate("/notificaciones");
+              navigate('/notificaciones');
               setIsOpen(false);
             }}
             className="w-full px-4 py-2.5 text-xs font-medium text-[#2563EB] hover:bg-[#EFF4FE] transition-colors flex items-center justify-center gap-1.5"

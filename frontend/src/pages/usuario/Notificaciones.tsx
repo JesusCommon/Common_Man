@@ -56,20 +56,32 @@ export default function Notificaciones() {
         </div>
       ) : (
         <div className="space-y-3">
-          {notificaciones.map((notif) => (
+          {notificaciones.map((notif: NotificacionResponse) => (
             <div
               key={notif.id}
               className={`bg-white border border-[#E4E4E1] rounded-xl p-4 flex items-start gap-4 ${
-                !notif.leida ? "border-l-4 border-l-[#2563EB]" : ""
+                !notif.leida ? 'border-l-4 border-l-[#2563EB]' : ''
               }`}
             >
               <div className="flex-1">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <h3 className="text-sm font-semibold text-[#18181B]">{notif.titulo}</h3>
-                    <p className="text-sm text-[#52525B] mt-1">{notif.mensaje}</p>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-sm font-semibold text-[#18181B]">{notif.titulo}</h3>
+                      {notif.contador > 1 && (
+                        <span className="px-2 py-0.5 bg-[#2563EB] text-white text-[11px] font-bold rounded-full">
+                          x{notif.contador}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-[#52525B] mt-1">
+                      {notif.contador > 1 
+                        ? `${notif.contador} eventos nuevos` 
+                        : notif.mensaje
+                      }
+                    </p>
                     <p className="text-xs text-[#A1A19A] mt-2">
-                      {new Date(notif.fecha_creacion).toLocaleString("es-CO")}
+                      {new Date(notif.fecha_creacion).toLocaleString('es-CO')}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">

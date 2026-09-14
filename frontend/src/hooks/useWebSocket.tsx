@@ -16,12 +16,15 @@ export function useWebSocket() {
     }
 
     if (previousTokenRef.current === accessToken) return;
-
+    
     previousTokenRef.current = accessToken;
     wsManager.disconnect();
 
     wsManager.connect(accessToken, {
       onNotification: () => {
+        queryClient.invalidateQueries({ queryKey: ["notificaciones"] });
+      },
+      onNotificationUpdated: () => {
         queryClient.invalidateQueries({ queryKey: ["notificaciones"] });
       },
       onSaldoActualizado: (data: { saldo: number }) => {

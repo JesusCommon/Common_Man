@@ -13,6 +13,7 @@ export interface NotificacionResponse {
   titulo: string;
   mensaje: string;
   leida: boolean;
+  contador: number;
   referencia_id: string | null;
   referencia_tipo: string | null;
   accion_url: string | null;
@@ -32,4 +33,5 @@ export interface NotificacionCreate {
   referencia_id?: string;
   referencia_tipo?: string;
   accion_url?: string;
+  agrupable?: boolean;
 }

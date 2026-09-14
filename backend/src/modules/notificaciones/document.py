@@ -11,7 +11,7 @@ class TipoNotificacionEnum(str, Enum):
     SALDO = "saldo"
     SOPORTE = "soporte"
     PROMOCION = "promocion"
-    FOLLOW = "seguidores"  # ✅ Agregado
+    FOLLOW = "seguidores"
 
 class Notificacion(Document, TimestampMixim):
     usuario_id: PydanticObjectId = Field(
@@ -41,15 +41,20 @@ class Notificacion(Document, TimestampMixim):
         description="Indica si el usuario ya vio la notificación"
     )
     
+    contador: int = Field(
+        default=1,
+        description="Cantidad de eventos agrupados en esta notificación"
+    )
+    
     referencia_id: PydanticObjectId | None = Field(
         default=None, 
-        description="ID de la entidad relacionada (ej: ID de la compra)"
+        description="ID de la entidad relacionada (ej: ID del reporte)"
     )
     
     referencia_tipo: str | None = Field(
         default=None, 
         max_length=50, 
-        description="Tipo de entidad relacionada (ej: 'compra', 'envio')"
+        description="Tipo de entidad relacionada (ej: 'reporte')"
     )
     
     accion_url: str | None = Field(
@@ -61,8 +66,12 @@ class Notificacion(Document, TimestampMixim):
     class Settings:
         name = "notificaciones"
         indexes = [
-            # Índice compuesto para listar historial de un usuario ordenado por fecha
             IndexModel([("usuario_id", ASCENDING), ("fecha_creacion", DESCENDING)]),
-            # Índice compuesto para contar/obtener no leídas rápidamente
             IndexModel([("usuario_id", ASCENDING), ("leida", ASCENDING)]),
+            IndexModel([
+                ("usuario_id", ASCENDING), 
+                ("referencia_id", ASCENDING), 
+                ("tipo", ASCENDING),
+                ("leida", ASCENDING)
+            ]),
         ]

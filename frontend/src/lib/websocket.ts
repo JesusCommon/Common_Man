@@ -4,6 +4,7 @@ type MessageHandler<T = unknown> = (data: T) => void;
 
 interface WebSocketConfig {
   onNotification?: MessageHandler<NotificacionResponse>;
+  onNotificationUpdated?: MessageHandler<NotificacionResponse>;
   onSaldoActualizado?: MessageHandler<{ saldo: number }>;
   onConnect?: () => void;
   onDisconnect?: () => void;
@@ -11,7 +12,7 @@ interface WebSocketConfig {
 }
 
 interface WebSocketMessage {
-  type: 'NEW_NOTIFICATION' | 'SALDO_ACTUALIZADO' | string;
+  type: 'NEW_NOTIFICATION' | 'NOTIFICATION_UPDATED' | 'SALDO_ACTUALIZADO' | string;
   data: NotificacionResponse | { saldo: number } | unknown;
 }
 
@@ -91,6 +92,9 @@ export class WebSocketManager {
     switch (message.type) {
       case 'NEW_NOTIFICATION':
         this.handlers.onNotification?.(message.data as NotificacionResponse);
+        break;
+      case 'NOTIFICATION_UPDATED':
+        this.handlers.onNotificationUpdated?.(message.data as NotificacionResponse);
         break;
       case 'SALDO_ACTUALIZADO':
         this.handlers.onSaldoActualizado?.(message.data as { saldo: number });

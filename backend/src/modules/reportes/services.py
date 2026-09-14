@@ -168,6 +168,7 @@ class ReporteService:
                 referencia_id=reporte.id,
                 referencia_tipo="reporte",
                 accion_url=f"/soporte/{reporte.id}",
+                agrupable=True
             )
         )
 
@@ -274,7 +275,13 @@ class ReporteService:
         usuario_id: PydanticObjectId | None = None,
     ) -> Reporte:
         if usuario_id:
-            return await self._validar_propiedad_reporte(reporte_id, usuario_id)
+            reporte = await self._validar_propiedad_reporte(reporte_id, usuario_id)
+            await self.notif_service.marcar_leidas_por_referencia(
+                usuario_id=usuario_id,
+                referencia_id=reporte_id,
+                referencia_tipo="reporte",
+            )
+            return reporte
         
         reporte = await self.repo.obtener_por_id(reporte_id)
         if not reporte:

@@ -14,6 +14,10 @@ class NotificacionCreate(BaseModel):
     referencia_id: PydanticObjectId | None = None
     referencia_tipo: str | None = Field(default=None, max_length=50)
     accion_url: str | None = Field(default=None, max_length=200)
+    agrupable: bool = Field(
+        default=False,
+        description="Si es True, busca una notificación existente no leída y la actualiza"
+    )
 
 class NotificacionUpdate(BaseModel):
     leida: bool
@@ -24,6 +28,7 @@ class NotificacionResponse(BaseModel):
     titulo: str
     mensaje: str
     leida: bool
+    contador: int
     referencia_id: PydanticObjectId | None
     referencia_tipo: str | None
     accion_url: str | None
