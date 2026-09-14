@@ -18,7 +18,6 @@ from src.modules.notificaciones.service import NotificacionService
 from src.modules.notificaciones.schema import NotificacionCreate
 from src.modules.notificaciones.document import TipoNotificacionEnum
 
-
 class ReporteService:
     def __init__(self):
         self.repo = ReporteRepo()
@@ -68,7 +67,6 @@ class ReporteService:
             codigo_referencia=data.codigo_referencia,
             estado=EstadoReporteEnum.ABIERTO,
         )
-
         await reporte.insert()
 
         await self.notif_service.crear_y_enviar(
@@ -82,7 +80,6 @@ class ReporteService:
                 accion_url=f"/soporte/{reporte.id}",
             )
         )
-
         return reporte
 
     async def responder_reporte_usuario(
@@ -107,19 +104,6 @@ class ReporteService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error al agregar el mensaje"
             )
-
-        await self.notif_service.crear_y_enviar(
-            NotificacionCreate(
-                usuario_id=usuario.id,
-                tipo=TipoNotificacionEnum.SOPORTE,
-                titulo="Mensaje enviado",
-                mensaje=f"Tu respuesta en el reporte '{reporte.asunto}' fue enviada. Un administrador la revisará.",
-                referencia_id=reporte.id,
-                referencia_tipo="reporte",
-                accion_url=f"/soporte/{reporte.id}",
-            )
-        )
-
         return resultado
 
     async def eliminar_reporte_usuario(

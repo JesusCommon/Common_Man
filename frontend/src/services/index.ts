@@ -126,3 +126,18 @@ export {
   listarMisNotificacionesService,
   marcarTodasNotificacionesLeidasService
 } from "./notificaciones.service";
+
+//Reportes
+export {
+  crearReporteService,
+  listarMisReportesService,
+  listarReportesPorEstadoAdminService,
+  listarTodosReportesAdminService,
+  obtenerMiReporteService,
+  obtenerReporteAdminService,
+  responderMiReporteService,
+  eliminarMiReporteService,
+  eliminarReporteAdminService,
+  actualizarEstadoReporteAdminService,
+  responderReporteAdminService
+} from "./reportes.service";

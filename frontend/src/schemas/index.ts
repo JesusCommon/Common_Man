@@ -188,3 +188,17 @@ export {
 export type {
   ListarNotificacionesInput
 } from "./notificaciones";
+
+export {
+  ReporteCreateSchema,
+  ReporteEstadoUpdateSchema,
+  ListarReportesParamsSchema,
+  MensajeCreateSchema
+} from "./reportes";
+
+export type {
+  ReporteCreateInput,
+  ReporteEstadoUpdateInput,
+  ListarReportesParamsInput,
+  MensajeCreateInput
+} from "./reportes";

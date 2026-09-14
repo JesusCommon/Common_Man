@@ -14,6 +14,8 @@ import AdminProductoForm from "@/pages/admin/productos/AdminProductoForm";
 import AdminBuscarProducto from "@/pages/admin/productos/AdminBuscarProductos";
 import AdminFinanzas from "@/pages/admin/AdminFinanzas";
 import AdminEnvios from "@/pages/admin/envios/EnviosAdmin";
+import AdminReportes from "@/pages/admin/reportes/AdminReportes";
+import AdminReporteDetalle from "@/pages/admin/reportes/AdminReporteDetalle";
 
 export const adminRoutes: RouteObject[] = [
   {
@@ -49,6 +51,10 @@ export const adminRoutes: RouteObject[] = [
 
       // Envios
       { path: "/admin/envios", element: <AdminEnvios /> },
+
+      // Reportes
+      { path: "/admin/soporte", element: <AdminReportes /> },
+      { path: "/admin/soporte/:reporteId", element: <AdminReporteDetalle /> },
     ],
   },
 ];

@@ -113,3 +113,16 @@ export { useMarcarNotificacionLeida } from "./notificaciones/useMarcarNotificaci
 export { useMarcarTodasNotificacionesLeidas } from "./notificaciones/useMarcarTodasNotificacionesLeida";
 export { useEliminarNotificacion } from "./notificaciones/useEliminarNotificacion";
 export { useWebSocket } from "./useWebSocket";
+
+//Reportes
+export { useCrearReporte } from "./reportes/useCrearReporte";
+export { useListarMisReportes } from "./reportes/useListarMisReportes";
+export { useObtenerMiReporte } from "./reportes/useObtenerMiReporte";
+export { useResponderMiReporte } from "./reportes/useResponderMiReporte";
+export { useEliminarMiReporte } from "./reportes/useEliminarMiReporte";
+export { useListarTodosReportesAdmin } from "./reportes/useListarTodosReportesAdmin";
+export { useListarReportesPorEstadoAdmin } from "./reportes/useListarReportesPorEstadoAdmin";
+export { useObtenerReporteAdmin } from "./reportes/useObtenerReporteAdmin";
+export { useResponderReporteAdmin } from "./reportes/useResponderReporteAdmin";
+export { useActualizarEstadoReporteAdmin } from "./reportes/useActualizarEstadoReporteAdmin";
+export { useEliminarReporteAdmin } from "./reportes/useEliminarReporteAdmin";

@@ -9,3 +9,4 @@ export * from "./configFinanzas";
 export * from "./direcciones";
 export * from "./envios";
 export * from "./notificaciones";
+export * from "./reportes";
