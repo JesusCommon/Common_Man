@@ -79,6 +79,11 @@ class Usuario(Document, TimestampMixim, StatusMixin):
         description="URL de la foto de perfil"
     )
 
+    portada: HttpUrl | None = Field(
+        default=None,
+        description="URL de la foto de portada"
+    )
+
     bio: str | None = Field(
         default=None,
         max_length=280,

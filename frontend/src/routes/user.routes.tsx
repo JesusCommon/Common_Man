@@ -1,10 +1,10 @@
 import type { RouteObject } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import ProtectedRoute from "@/components/layout/ProtectedRoute";
 import MainLayout from "@/components/layout/MainLayout";
 import StoreLayout from "@/components/layout/StoreLayout";
 import Dashboard from "@/pages/usuario/Dashboard";
-import Perfil from "@/pages/usuario/Perfil";
-import Password from "@/pages/usuario/Password";
+import Configuracion from "@/pages/usuario/Configuracion";
 import Buscar from "@/pages/usuario/Buscar";
 import RecargarSaldo from "@/pages/usuario/RecargarSaldo";
 import PerfilPublico from "@/pages/PerfilPublico";
@@ -26,8 +26,11 @@ export const userRoutes: RouteObject[] = [
     ),
     children: [
       { path: "/dashboard", element: <Dashboard /> },
-      { path: "/perfil", element: <Perfil /> },
-      { path: "/password", element: <Password /> },
+      
+      { path: "/configuracion", element: <Configuracion /> },
+      { path: "/perfil", element: <Navigate to="/configuracion?tab=perfil" replace /> },
+      { path: "/password", element: <Navigate to="/configuracion?tab=seguridad" replace /> },
+      
       { path: "/buscar", element: <Buscar /> },
       { path: "/recargar", element: <RecargarSaldo /> },
       { path: "/perfil/:username", element: <PerfilPublico /> },

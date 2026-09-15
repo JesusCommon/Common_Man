@@ -5,6 +5,8 @@ import { useEffect } from "react";
 import { ExternalLink, Shield, Users, Store } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
+import { ReportesRecientesCard } from "@/components/dashboard/ReportesRecientesCard";
+
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -80,6 +82,8 @@ export default function Dashboard() {
             Ver perfil público
           </Button>
         </motion.div>
+        
+          <ReportesRecientesCard />
 
         <motion.div
           initial={{ opacity: 0, x: -10 }}

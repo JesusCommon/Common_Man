@@ -17,6 +17,7 @@ export interface UsuarioUpdate {
   correo?: string;
   bio?: string;
   avatar?: string;
+  portada?: string;
 }
 
 export interface UsuarioAdminUpdate extends UsuarioUpdate {
@@ -41,6 +42,7 @@ export interface UsuarioPublicResponse {
   username: string;
   bio?: string;
   avatar?: string;
+  portada?: string;
   activo: boolean;
   fecha_creacion: string;
 }

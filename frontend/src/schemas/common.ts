@@ -58,6 +58,11 @@ export const AvatarSchema = z
   .url({ message: "La URL del avatar no es válida" })
   .optional();
 
+export const PortadaSchema = z
+  .string({ message: "El avatar debe ser una URL" })
+  .url({ message: "La URL del avatar no es válida" })
+  .optional();
+
 export const PasswordSchema = z
   .string({ message: "La contraseña es obligatoria" })
   .min(8, { message: "La contraseña debe tener al menos 8 caracteres" })

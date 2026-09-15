@@ -88,7 +88,13 @@ class UsuarioValidaciones:
         if v is None:
             return None
         return v
-
+    
+    @field_validator("portada", mode="before", check_fields=False)
+    @classmethod
+    def validar_avatar(cls, v):
+        if v is None:
+            return None
+        return v
 
 class PasswordValidacion:
     @field_validator("password", mode="before")
@@ -130,18 +136,16 @@ class UsuarioUpdate(UsuarioValidaciones, BaseModel):
     correo: EmailStr | None = Field(default=None)
     bio: str | None = Field(default=None)
     avatar: HttpUrl | None = Field(default=None)
-
+    portada: HttpUrl | None = Field(default=None)
 
 class UsuarioAdminUpdate(UsuarioUpdate):
     rol: RolUsuario | None = Field(default=None)
     activo: bool | None = Field(default=None)
     saldo: Decimal | None = Field(default=None, ge=0)
 
-
 class UsuarioCambiarPassword(PasswordValidacion, BaseModel):
     password_actual: str = Field(...)
     password: str = Field(...)
-
 
 class UsuarioRecargarSaldo(BaseModel):
     monto: Decimal = Field(...)
@@ -159,6 +163,7 @@ class UsuarioPublicResponse(BaseModel):
     username: str
     bio: str | None = None
     avatar: HttpUrl | None = None
+    portada: HttpUrl | None = None
     activo: bool
     fecha_creacion: datetime
 

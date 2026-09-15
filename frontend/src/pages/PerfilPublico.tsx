@@ -89,7 +89,7 @@ export default function PerfilPublico() {
       })
     : "—";
 
-  const coverImage = perfil.avatar || "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&h=400&fit=crop";
+  const coverImage = perfil.portada || "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&h=400&fit=crop";
 
   return (
     <div className="min-h-screen bg-[#FAFAF8] py-8 px-4">
@@ -110,9 +110,7 @@ export default function PerfilPublico() {
         className="max-w-4xl mx-auto"
       >
         <div className="bg-white rounded-2xl shadow-sm border border-[#E4E4E1] overflow-hidden">
-          
-          {/* Cover Image */}
-          <div className="relative h-48 sm:h-56 overflow-hidden">
+                    <div className="relative h-48 sm:h-56 overflow-hidden">
             <img 
               src={coverImage} 
               alt="Cover" 
@@ -125,10 +123,7 @@ export default function PerfilPublico() {
             </button>
           </div>
 
-          {/* Contenido Principal */}
-          <div className="relative px-6 sm:px-8 pb-8">
-            
-            {/* Avatar y Header */}
+          <div className="relative px-6 sm:px-8 pb-8">            
             <div className="flex flex-col sm:flex-row gap-4 -mt-12 mb-6">
               <div className="relative shrink-0">
                 <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl border-4 border-white shadow-lg overflow-hidden bg-[#FAFAF8]">
@@ -202,7 +197,6 @@ export default function PerfilPublico() {
               </div>
             </div>
 
-            {/* Bio */}
             {perfil.bio && (
               <motion.div
                 initial={{ opacity: 0 }}
@@ -216,7 +210,6 @@ export default function PerfilPublico() {
               </motion.div>
             )}
 
-            {/* Contadores */}
             <div className="flex gap-6 mb-6 pb-6 border-b border-[#E4E4E1]">
               <button 
                 onClick={() => openModal("seguidos")}
@@ -234,7 +227,6 @@ export default function PerfilPublico() {
               </button>
             </div>
 
-            {/* Info adicional */}
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="p-4 rounded-xl bg-[#FAFAF8] border border-[#E4E4E1]">
                 <div className="flex items-center gap-3 mb-2">

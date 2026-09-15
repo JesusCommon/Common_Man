@@ -7,6 +7,7 @@ import {
   CorreoSchema,
   BioSchema,
   AvatarSchema,
+  PortadaSchema,
   PasswordSchema,
   MontoSchema,
   RolUsuarioSchema,
@@ -31,6 +32,7 @@ export const UsuarioUpdateSchema = z.object({
   telefono: TelefonoSchema.optional(),
   bio: BioSchema.optional(),
   avatar: AvatarSchema.optional(),
+  portada: PortadaSchema.optional()
 });
 
 export type UsuarioUpdateInput = z.infer<typeof UsuarioUpdateSchema>;
@@ -42,6 +44,7 @@ export const ObtenerPerfilPublico = z.object({
   username: z.string(),
   bio: z.string().nullable().optional(),
   avatar: z.string().url().nullable().optional(),
+  portada: z.string().url().nullable().optional(),
   activo: z.boolean(),
   fecha_creacion: z.string().datetime(),
 });
