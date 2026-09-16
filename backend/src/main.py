@@ -23,6 +23,10 @@ from src.modules.direcciones.route import router as direccion_route
 from src.modules.envios.route import router as envio_route
 from src.modules.notificaciones.route import router as notificacion_route
 from src.modules.reportes.route import router as reporte_route
+from src.modules.biblioteca.autor.route import router as autor_route
+from src.modules.biblioteca.editorial.route import router as editorial_route
+from src.modules.biblioteca.genero.route import router as genero_route
+from src.modules.biblioteca.libros.route import router as libro_route
 from src.modules.usuarios.document import Usuario
 from src.modules.follow.document import Follow
 from src.modules.categoriasProductos.document import Categorias
@@ -34,12 +38,17 @@ from src.modules.direcciones.document import Direcciones
 from src.modules.envios.document import Envios
 from src.modules.notificaciones.document import Notificacion
 from src.modules.reportes.document import Reporte
+from src.modules.biblioteca.autor.document import Autor
+from src.modules.biblioteca.editorial.document import Editorial
+from src.modules.biblioteca.genero.document import Genero
+from src.modules.biblioteca.libros.document import Libro
 
 
 settings = get_settings()
 setup_logging(environment=settings.app.environment, debug=settings.app.debug)
 
-document_models = [Usuario, Follow, Categorias, Productos, Compras, MovimientoSaldo, ConfiguracionSistema, Direcciones, Envios, Notificacion, Reporte]
+document_models = [Usuario, Follow, Categorias, Productos, Compras, 
+MovimientoSaldo, ConfiguracionSistema, Direcciones, Envios, Notificacion, Reporte, Autor, Editorial, Genero, Libro]
 
 
 @asynccontextmanager
@@ -91,6 +100,10 @@ app.include_router(direccion_route)
 app.include_router(envio_route)
 app.include_router(notificacion_route)
 app.include_router(reporte_route)
+app.include_router(autor_route)
+app.include_router(editorial_route)
+app.include_router(genero_route)
+app.include_router(libro_route)
 
 @app.get("/")
 async def health_check():
