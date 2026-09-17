@@ -1,143 +1,17 @@
-export type { ServiceResult, ServiceError } from "./types";
-
-// Auth
-export { iniciarSesion, refrescarToken } from "./auth.service";
-
-// Usuarios
-export {
-  registrarUsuario,
-  buscarPersonasService,
-  miPerfil,
-  actualizarPerfil,
-  cambiarPassword,
-  recargarSaldo,
-  listarTodos,
-  listarUsuariosInactivos,
-  listarUsuariosActivos,
-  buscarAdmin,
-  obtenerPorUUID,
-  obtenerPorObjectId,
-  actualizarUsuarioAdmin,
-  recargarSaldoAdministrador,
-  restarSaldoAdministrador,
-  activarCuenta,
-  desactivarCuenta,
-  obtenerPerfilPublicoService,
-} from "./usuario.service";
-
-// Follows
-export {
-  seguirUsuario,
-  dejarDeSeguirUsuario,
-  obtenerMisSeguidores,
-  obtenerMisSeguidos,
-  verificarSiSigueA,
-  obtenerSeguidoresDe,
-  obtenerSeguidosDe,
-} from "./follow.service";
-
-//Categorias Productos
-export {
-  crearCategoriaService,
-  activarCategoriaService,
-  actualizarCategoriaService,
-  desactivarCategoriaService,
-  obtenerCategoriaPorIdService,
-  listarCategoriasActivasService,
-  listarCategoriasPublicasService,
-  listarTodasLasCategoriasService,
-  listarCategoriasInactivasService
-} from "./categoriasProductos.service";
-
-//Productos
-export {
-  crearProductoService,
-  actualizarProductoService,
-  listarProductosService,
-  listarProductosActivosAdminService,
-  listarProductosInactivosAdminService,
-  listarPorCategoriaService,
-  listarTodosProductosAdminService,
-  buscarProductosService,
-  obtenerProductoPorIdAdminService,
-  obtenerProductoPorSlugService,
-  obtenerProductosRecientesService,
-  actualizarStockService,
-  descontarStockService,
-  establecerStockService,
-  activarProductoService,
-  desactivarProductoService
-} from "./productos.service";
-
-//Compras
-export {
-  crearCompraService,
-  listarMisComprasService,
-  obtenerCompraPorIdService,
-  obtenerCompraPorNumeroOrdenService,
-  listarTodasComprasAdminService,
-  listarComprasPorEstadoAdminService,
-  obtenerCompraAdminService,
-  actualizarEstadoCompraAdminService,
-} from "./compras.service";
-
-//Pagos
-export {
-  procesarPagoService,
-  cancelarCompraService,
-  obtenerMovimientoDeCompraService,
-  listarHistorialMovimientosService,
-} from "./pagos.service";
-
-//Configuración Finanzas
-export {
-  obtenerWalletService,
-  listarHistorialFinancieroService,
-} from "./configFinanzas.service";
-
-//Direcciones
-export {
-  crearDireccionService,
-  actualizarDireccionService,
-  eliminarDireccionService,
-  obtenerDireccionService,
-  listarMisDireccionesService,
-  marcarDireccionPredeterminadaService,
-  listarDireccionesDeUsuarioAdminService
-} from "./direcciones.service"
-
-//Envios
-export {
-  crearEnvioAdminService,
-  actualizarEnvioAdminService,
-  listarMisEnviosService,
-  listarTodosLosEnviosAdminService,
-  listarEnviosPorEstadoAdminService,
-  obtenerEnvioService,
-  actualizarEstadoEnvioAdminService,
-  obtenerEnvioPorCompraAdminService
-} from "./envios.service";
-
-//Notificaciones
-export {
-  contarNoLeidasService,
-  marcarNotificacionLeidaService,
-  eliminarNotificacionService,
-  listarMisNotificacionesService,
-  marcarTodasNotificacionesLeidasService
-} from "./notificaciones.service";
-
-//Reportes
-export {
-  crearReporteService,
-  listarMisReportesService,
-  listarReportesPorEstadoAdminService,
-  listarTodosReportesAdminService,
-  obtenerMiReporteService,
-  obtenerReporteAdminService,
-  responderMiReporteService,
-  eliminarMiReporteService,
-  eliminarReporteAdminService,
-  actualizarEstadoReporteAdminService,
-  responderReporteAdminService
-} from "./reportes.service";
+export type * from "./types";
+export * from "./auth.service";
+export * from "./usuario.service";
+export * from "./follow.service";
+export * from "./categoriasProductos.service";
+export * from "./productos.service";
+export * from "./compras.service";
+export * from "./pagos.service";
+export * from "./configFinanzas.service";
+export * from "./direcciones.service"
+export * from "./envios.service";
+export * from "./notificaciones.service";
+export * from "./reportes.service";
+export * from "./autor.service";
+export * from "./editorial.service";
+export * from "./genero.service";
+export * from "./libros.service";

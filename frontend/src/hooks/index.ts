@@ -126,3 +126,46 @@ export { useObtenerReporteAdmin } from "./reportes/useObtenerReporteAdmin";
 export { useResponderReporteAdmin } from "./reportes/useResponderReporteAdmin";
 export { useActualizarEstadoReporteAdmin } from "./reportes/useActualizarEstadoReporteAdmin";
 export { useEliminarReporteAdmin } from "./reportes/useEliminarReporteAdmin";
+
+//Autor
+export { useCrearAutor } from "./biblioteca/autor/useCrearAutor";
+export { useListarAutores } from "./biblioteca/autor/useListarAutores";
+export type { FiltroListadoAutores } from "./biblioteca/autor/useListarAutores";
+export { useAutoresPublicos } from "./biblioteca/autor/useAutoresPublicos";
+export { useObtenerAutor } from "./biblioteca/autor/useObtenerAutor";
+export { useActualizarAutor } from "./biblioteca/autor/useActualizarAutor";
+export { useActivarAutor } from "./biblioteca/autor/useActivarAutor";
+export { useDesactivarAutor } from "./biblioteca/autor/useDesactivarAutor";
+
+//Genero
+export { useCrearGenero } from "./biblioteca/genero/useCrearGenero";
+export { useListarGeneros } from "./biblioteca/genero/useListarGeneros";
+export type { FiltroListadoGeneros } from "./biblioteca/genero/useListarGeneros";
+export { useGenerosPublicos } from "./biblioteca/genero/useGenerosPublicos";
+export { useObtenerGenero } from "./biblioteca/genero/useObtenerGenero";
+export { useActualizarGenero } from "./biblioteca/genero/useActualizarGenero";
+export { useActivarGenero } from "./biblioteca/genero/useActivarGenero";
+export { useDesactivarGenero } from "./biblioteca/genero/useDesactivarGenero";
+
+//Editorial
+export { useCrearEditorial } from "./biblioteca/editorial/useCrearEditorial";
+export { useListarEditoriales } from "./biblioteca/editorial/useListarEditoriales";
+export type { FiltroListadoEditoriales } from "./biblioteca/editorial/useListarEditoriales";
+export { useEditorialesPublicas } from "./biblioteca/editorial/useEditorialesPublicas";
+export { useObtenerEditorial } from "./biblioteca/editorial/useObtenerEditorial";
+export { useActualizarEditorial } from "./biblioteca/editorial/useActualizarEditorial";
+export { useActivarEditorial } from "./biblioteca/editorial/useActivarEditorial";
+export { useDesactivarEditorial } from "./biblioteca/editorial/useDesactivarEditorial";
+
+//Libros
+export { useBuscarLibros } from "./biblioteca/libros/useBuscarLibros";
+export { useObtenerLibro } from "./biblioteca/libros/useObtenerLibro";
+export { useObtenerContenidoLibro } from "./biblioteca/libros/useObtenerContenidoLibro";
+export { useListarLibrosAdmin } from "./biblioteca/libros/useListarLibrosAdmin";
+export { useObtenerLibroAdmin } from "./biblioteca/libros/useObtenerLibroAdmin";
+export { useObtenerLibroPorCodigo } from "./biblioteca/libros/useObtenerLibroPorCodigo";
+export type { TipoCodigoLibro } from "./biblioteca/libros/useObtenerLibroPorCodigo";
+export { useCrearLibro } from "./biblioteca/libros/useCrearLibro";
+export { useActualizarLibro } from "./biblioteca/libros/useActualizarLibro";
+export { useActivarLibro } from "./biblioteca/libros/useActivarLibro";
+export { useDesactivarLibro } from "./biblioteca/libros/useDesactivarLibro";

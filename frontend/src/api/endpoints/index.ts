@@ -10,3 +10,7 @@ export * from "./direcciones";
 export * from "./envios";
 export * from "./notificaciones";
 export * from "./reportes";
+export * from "./autor";
+export * from "./editorial";
+export * from "./genero";
+export * from "./libros";

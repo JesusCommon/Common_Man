@@ -16,3 +16,7 @@ export * as direccionesApi from "./endpoints/direcciones";
 export * as enviosApi from "./endpoints/envios";
 export * as notificacionesApi from "./endpoints/notificaciones";
 export * as reportesApi from "./endpoints/reportes";
+export * as autoresApi from "./endpoints/autor";
+export * as editorialesApi from "./endpoints/editorial";
+export * as generosApi from "./endpoints/genero";
+export * as librosApi from "./endpoints/libros";

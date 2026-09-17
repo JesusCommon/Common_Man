@@ -16,9 +16,6 @@ from src.shared.common_schema import RespuestaConMensaje, Paginado
 router = APIRouter(prefix="/libros", tags=["Libros"])
 controller = LibroController()
 
-
-# ========== CATÁLOGO (USUARIO) ==========
-
 @router.get(
     "/",
     response_model=Paginado[LibroResponse],
@@ -37,7 +34,6 @@ async def buscar_libros(
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, ge=1, le=100),
 ):
-    """Catálogo de libros con filtros (solo activos, sin contenido)"""
     libros, total = await controller.buscar(
         nombre=nombre,
         autor_id=autor_id,
@@ -61,7 +57,6 @@ async def buscar_libros(
     dependencies=[Depends(obtener_usuario_actual)],
 )
 async def obtener_libro(libro_id: PydanticObjectId):
-    """Detalle público de un libro (sin contenido)"""
     return await controller.obtener_por_id(libro_id)
 
 
@@ -74,14 +69,7 @@ async def obtener_contenido_libro(
     libro_id: PydanticObjectId,
     usuario=Depends(obtener_usuario_actual),
 ):
-    """
-    🔒 Recurso protegido: devuelve la URL del contenido
-    solo si el usuario pagó el libro (o es admin)
-    """
     return await controller.obtener_contenido(libro_id, usuario)
-
-
-# ========== ADMINISTRACIÓN ==========
 
 @router.get(
     "/admin/all",
@@ -98,7 +86,6 @@ async def listar_libros_admin(
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, ge=1, le=100),
 ):
-    """Listado de administración (incluye inactivos y contenido)"""
     libros, total = await controller.buscar(
         nombre=nombre,
         autor_id=autor_id,
@@ -118,7 +105,6 @@ async def listar_libros_admin(
     dependencies=[Depends(obtener_usuario_admin)],
 )
 async def obtener_libro_por_isbn(isbn: str):
-    """Busca un libro por su ISBN"""
     return await controller.obtener_por_isbn(isbn)
 
 
@@ -128,7 +114,6 @@ async def obtener_libro_por_isbn(isbn: str):
     dependencies=[Depends(obtener_usuario_admin)],
 )
 async def obtener_libro_por_sku(sku: str):
-    """Busca un libro por su SKU"""
     return await controller.obtener_por_sku(sku)
 
 
@@ -138,7 +123,6 @@ async def obtener_libro_por_sku(sku: str):
     dependencies=[Depends(obtener_usuario_admin)],
 )
 async def obtener_libro_admin(libro_id: PydanticObjectId):
-    """Detalle de administración (incluye contenido)"""
     return await controller.obtener_por_id(libro_id)
 
 
@@ -149,7 +133,6 @@ async def obtener_libro_admin(libro_id: PydanticObjectId):
     dependencies=[Depends(obtener_usuario_admin)],
 )
 async def crear_libro(data: LibroCreate):
-    """Crea un libro validando unicidad y relaciones"""
     libro = await controller.crear(data)
     return RespuestaConMensaje(mensaje="Libro creado correctamente", data=libro)
 
@@ -160,7 +143,6 @@ async def crear_libro(data: LibroCreate):
     dependencies=[Depends(obtener_usuario_admin)],
 )
 async def actualizar_libro(libro_id: PydanticObjectId, data: LibroUpdate):
-    """Actualización parcial con re-validación de unicidad"""
     libro = await controller.actualizar(libro_id, data)
     return RespuestaConMensaje(mensaje="Libro actualizado correctamente", data=libro)
 
@@ -171,7 +153,6 @@ async def actualizar_libro(libro_id: PydanticObjectId, data: LibroUpdate):
     dependencies=[Depends(obtener_usuario_admin)],
 )
 async def activar_libro(libro_id: PydanticObjectId):
-    """Reactiva un libro en el catálogo"""
     libro = await controller.activar(libro_id)
     return RespuestaConMensaje(mensaje="Libro activado correctamente", data=libro)
 
@@ -182,6 +163,5 @@ async def activar_libro(libro_id: PydanticObjectId):
     dependencies=[Depends(obtener_usuario_admin)],
 )
 async def desactivar_libro(libro_id: PydanticObjectId):
-    """Da de baja un libro sin eliminarlo"""
     libro = await controller.desactivar(libro_id)
     return RespuestaConMensaje(mensaje="Libro desactivado correctamente", data=libro)
