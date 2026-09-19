@@ -4,7 +4,8 @@ import {
   Folder, 
   Package, 
   Wallet,
-  Truck 
+  Truck,
+  Library
 } from "lucide-react";
 import type { ComponentType } from "react";
 
@@ -81,6 +82,17 @@ export const navigationConfig: NavModule[] = [
     icon: Truck,
     children: [
       { label: "Gestión de Envíos", route: "/admin/envios" },
+    ],
+  },
+  {
+    id: "biblioteca",
+    label: "Biblioteca",
+    icon: Library,
+    children: [
+      { label: "Autores", route: "/admin/biblioteca/autores" },
+      { label: "Editoriales", route: "/admin/biblioteca/editoriales" },
+      { label: "Géneros", route: "/admin/biblioteca/generos" },
+      { label: "Libros", route: "/admin/biblioteca/libros" },
     ],
   },
 ];

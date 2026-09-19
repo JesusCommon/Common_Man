@@ -16,6 +16,7 @@ import AdminFinanzas from "@/pages/admin/AdminFinanzas";
 import AdminEnvios from "@/pages/admin/envios/EnviosAdmin";
 import AdminReportes from "@/pages/admin/reportes/AdminReportes";
 import AdminReporteDetalle from "@/pages/admin/reportes/AdminReporteDetalle";
+import AdminAutores from "@/pages/admin/biblioteca/AdminAutores";
 
 export const adminRoutes: RouteObject[] = [
   {
@@ -55,6 +56,8 @@ export const adminRoutes: RouteObject[] = [
       // Reportes
       { path: "/admin/soporte", element: <AdminReportes /> },
       { path: "/admin/soporte/:reporteId", element: <AdminReporteDetalle /> },
+
+      { path: "/admin/biblioteca/autores", element: <AdminAutores /> },
     ],
   },
 ];
