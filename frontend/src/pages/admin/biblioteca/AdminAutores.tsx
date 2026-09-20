@@ -3,191 +3,247 @@ import {
   useListarAutores,
   useActivarAutor,
   useDesactivarAutor,
-  type FiltroListadoAutores,
 } from "@/hooks";
 import { ActivoBadge } from "@/components/biblioteca/ActivarBadge";
 import { AutorFormModal } from "@/components/biblioteca/AutorFormModal";
-import { Pencil, UserPlus, Users } from "lucide-react";
+import {
+  Users,
+  UserCheck,
+  UserX,
+  CheckCircle2,
+  XCircle,
+  Pencil,
+  UserPlus,
+} from "lucide-react";
 import type { AutorResponse } from "@/api/types";
 
-const FILTROS: { value: FiltroListadoAutores; label: string }[] = [
-  { value: "all", label: "📋 Todos" },
-  { value: "activos", label: "🟢 Activos" },
-  { value: "inactivos", label: "🔴 Inactivos" },
-];
+type Tab = "all" | "activos" | "inactivos";
+const PAGE_SIZE = 20;
 
 export default function AdminAutores() {
-  const [filtro, setFiltro] = useState<FiltroListadoAutores>("all");
-  const [skip, setSkip] = useState(0);
-  const limit = 10;
-
+  const [tab, setTab] = useState<Tab>("all");
+  const [page, setPage] = useState(1);
   const [modalAbierto, setModalAbierto] = useState(false);
   const [autorEditando, setAutorEditando] = useState<AutorResponse | null>(null);
-
-  const { data, isLoading, isError } = useListarAutores(filtro, { skip, limit });
+  const params = { skip: (page - 1) * PAGE_SIZE, limit: PAGE_SIZE };
+  const todos = useListarAutores("all", params);
+  const activos = useListarAutores("activos", params);
+  const inactivos = useListarAutores("inactivos", params);
   const activar = useActivarAutor();
   const desactivar = useDesactivarAutor();
 
-  const autores = data?.items ?? [];
-  const total = data?.total ?? 0;
-  const totalPaginas = Math.ceil(total / limit);
-  const paginaActual = Math.floor(skip / limit) + 1;
+  const current = tab === "all" ? todos : tab === "activos" ? activos : inactivos;
 
-  function cambiarFiltro(nuevo: FiltroListadoAutores) {
-    setFiltro(nuevo);
-    setSkip(0);
-  }
+  const tabs: { key: Tab; label: string; count: number }[] = [
+    { key: "all", label: "Todos", count: todos.data?.total ?? 0 },
+    { key: "activos", label: "Activos", count: activos.data?.total ?? 0 },
+    { key: "inactivos", label: "Inactivos", count: inactivos.data?.total ?? 0 },
+  ];
 
-  function abrirNuevo() {
+  const handleTabChange = (key: Tab) => {
+    setTab(key);
+    setPage(1);
+  };
+
+  const abrirNuevo = () => {
     setAutorEditando(null);
     setModalAbierto(true);
-  }
+  };
 
-  function abrirEdicion(autor: AutorResponse) {
+  const abrirEdicion = (autor: AutorResponse) => {
     setAutorEditando(autor);
     setModalAbierto(true);
+  };
+
+  const autores = current.data?.items ?? [];
+  const total = current.data?.total ?? 0;
+  const totalPaginas = Math.ceil(total / PAGE_SIZE);
+
+  if (current.isLoading) {
+    return (
+      <div className="flex justify-center py-20">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#E4E4E1] border-t-[#2563EB]" />
+      </div>
+    );
   }
 
-  function toggleEstado(autor: AutorResponse) {
-    const nombre = `${autor.nombre} ${autor.apellido}`;
-    const mensaje = autor.activo
-      ? `¿Desactivar a "${nombre}"? Sus libros no se eliminan.`
-      : `¿Activar nuevamente a "${nombre}"?`;
-    if (!window.confirm(mensaje)) return;
-
-    if (autor.activo) desactivar.mutate(autor.id);
-    else activar.mutate(autor.id);
+  if (current.isError) {
+    return (
+      <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
+        <p className="text-sm text-red-600">Error al cargar los autores.</p>
+      </div>
+    );
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-6">
-      {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
+    <div className="mx-auto max-w-5xl px-4 py-6 space-y-6">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Autores</h1>
-          <p className="text-sm text-gray-500">Gestiona el catálogo de autores</p>
+          <h1 className="text-2xl font-bold text-[#18181B]">Autores</h1>
+          <p className="text-sm text-[#52525B]">
+            Gestión de autores del catálogo de libros.
+          </p>
         </div>
         <button
           onClick={abrirNuevo}
-          className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition"
+          className="flex items-center gap-2 rounded-lg bg-[#2563EB] px-4 py-2 text-sm font-medium text-white hover:bg-[#1D4ED8] transition"
         >
           <UserPlus className="w-4 h-4" />
           Nuevo autor
         </button>
       </div>
 
-      {/* Filtros */}
-      <div className="mb-6 flex flex-wrap gap-2">
-        {FILTROS.map(({ value, label }) => (
+      <div className="grid grid-cols-3 gap-4">
+        <div className="rounded-xl border border-[#E4E4E1] bg-white p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-[#EFF4FE] flex items-center justify-center">
+            <Users className="w-5 h-5 text-[#2563EB]" />
+          </div>
+          <div>
+            <p className="text-lg font-bold text-[#18181B]">{todos.data?.total ?? 0}</p>
+            <p className="text-xs text-[#A1A19A]">Total</p>
+          </div>
+        </div>
+        <div className="rounded-xl border border-[#E4E4E1] bg-white p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center">
+            <UserCheck className="w-5 h-5 text-emerald-600" />
+          </div>
+          <div>
+            <p className="text-lg font-bold text-[#18181B]">{activos.data?.total ?? 0}</p>
+            <p className="text-xs text-[#A1A19A]">Activos</p>
+          </div>
+        </div>
+        <div className="rounded-xl border border-[#E4E4E1] bg-white p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center">
+            <UserX className="w-5 h-5 text-red-500" />
+          </div>
+          <div>
+            <p className="text-lg font-bold text-[#18181B]">{inactivos.data?.total ?? 0}</p>
+            <p className="text-xs text-[#A1A19A]">Inactivos</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-1 bg-[#F4F4F5] rounded-full p-1 w-fit">
+        {tabs.map(({ key, label, count }) => (
           <button
-            key={value}
-            onClick={() => cambiarFiltro(value)}
-            className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-              filtro === value
-                ? "bg-blue-600 text-white shadow-sm"
-                : "border border-gray-200 bg-white text-gray-600 hover:border-gray-300"
+            key={key}
+            onClick={() => handleTabChange(key)}
+            className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${
+              tab === key
+                ? "bg-white text-[#18181B] shadow-sm"
+                : "text-[#52525B] hover:text-[#18181B]"
             }`}
           >
-            {label}
+            {label} <span className="text-xs text-[#A1A19A]">({count})</span>
           </button>
         ))}
       </div>
 
-      {/* Listado */}
-      {isLoading ? (
-        <div className="flex justify-center py-12">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
-        </div>
-      ) : isError ? (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
-          <p className="text-sm text-red-600">Error al cargar los autores.</p>
-        </div>
-      ) : autores.length === 0 ? (
-        <div className="rounded-lg border border-gray-200 bg-white p-12 text-center">
-          <Users className="mx-auto mb-3 h-10 w-10 text-gray-300" />
-          <h3 className="text-lg font-medium text-gray-900">No hay autores</h3>
-          <p className="mt-1 text-sm text-gray-500">
-            Crea el primero para empezar a catalogar libros.
+      {autores.length === 0 ? (
+        <div className="rounded-lg border border-[#E4E4E1] bg-white p-12 text-center">
+          <Users className="mx-auto mb-3 h-10 w-10 text-[#E4E4E1]" />
+          <h3 className="text-lg font-medium text-[#18181B]">No hay autores</h3>
+          <p className="mt-1 text-sm text-[#52525B]">
+            No hay autores en esta categoría.
           </p>
         </div>
       ) : (
-        <>
-          <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                <tr>
-                  <th className="px-4 py-3">Autor</th>
-                  <th className="px-4 py-3">País</th>
-                  <th className="px-4 py-3">Estado</th>
-                  <th className="px-4 py-3 text-right">Acciones</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {autores.map((autor) => (
-                  <tr key={autor.id} className="transition hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium text-gray-900">
-                      {autor.nombre} {autor.apellido}
-                    </td>
-                    <td className="px-4 py-3 text-gray-500">
-                      {autor.pais_nacimiento ?? "—"}
-                    </td>
-                    <td className="px-4 py-3">
-                      <ActivoBadge activo={autor.activo} />
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => abrirEdicion(autor)}
-                          title="Editar"
-                          className="rounded-md bg-blue-50 px-2.5 py-1.5 text-xs font-medium text-blue-700 transition hover:bg-blue-100"
-                        >
-                          <Pencil className="h-3.5 w-3.5" />
-                        </button>
-                        <button
-                          onClick={() => toggleEstado(autor)}
-                          disabled={activar.isPending || desactivar.isPending}
-                          className={`rounded-md px-2.5 py-1.5 text-xs font-medium transition disabled:opacity-50 ${
-                            autor.activo
-                              ? "bg-red-50 text-red-700 hover:bg-red-100"
-                              : "bg-green-50 text-green-700 hover:bg-green-100"
-                          }`}
-                        >
-                          {autor.activo ? "Desactivar" : "Activar"}
-                        </button>
+        <div className="overflow-x-auto rounded-xl border border-[#E4E4E1] bg-white shadow-sm">
+          <table className="w-full text-sm">
+            <thead className="bg-[#FAFAF8] text-left text-xs font-semibold uppercase tracking-wider text-[#A1A19A]">
+              <tr>
+                <th className="px-4 py-3">Autor</th>
+                <th className="px-4 py-3">Estado</th>
+                <th className="px-4 py-3 text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#F4F4F5]">
+              {autores.map((a) => (
+                <tr
+                  key={a.id}
+                  onClick={() => abrirEdicion(a)}
+                  className="cursor-pointer transition hover:bg-[#FAFAF8]"
+                >
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-[#EFF4FE] border border-[#BFDBFE] flex items-center justify-center text-sm font-bold text-[#2563EB] shrink-0">
+                        {a.nombre.charAt(0).toUpperCase()}
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Paginación */}
-          {totalPaginas > 1 && (
-            <div className="mt-6 flex items-center justify-center gap-2">
-              <button
-                onClick={() => setSkip(Math.max(0, skip - limit))}
-                disabled={skip === 0}
-                className="rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-              >
-                Anterior
-              </button>
-              <span className="text-sm text-gray-500">
-                Página {paginaActual} de {totalPaginas} ({total} autores)
-              </span>
-              <button
-                onClick={() => setSkip(skip + limit)}
-                disabled={paginaActual >= totalPaginas}
-                className="rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-              >
-                Siguiente
-              </button>
-            </div>
-          )}
-        </>
+                      <div>
+                        <p className="font-medium text-[#18181B]">
+                          {a.nombre} {a.apellido || ""}
+                        </p>
+                        <p className="text-xs text-[#A1A19A]">
+                          {a.pais_nacimiento || "Sin país"}
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <ActivoBadge activo={a.activo} />
+                  </td>
+                  <td className="px-4 py-3">
+                    <div
+                      className="flex items-center justify-end gap-1"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button
+                        onClick={() => abrirEdicion(a)}
+                        title="Editar"
+                        className="p-1.5 rounded-lg hover:bg-[#F4F4F5] text-[#2563EB] transition"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      {a.activo ? (
+                        <button
+                          onClick={() => desactivar.mutate(a.id)}
+                          disabled={desactivar.isPending}
+                          title="Desactivar"
+                          className="p-1.5 rounded-lg hover:bg-red-50 text-red-500 transition disabled:opacity-50"
+                        >
+                          <XCircle className="w-4 h-4" />
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => activar.mutate(a.id)}
+                          disabled={activar.isPending}
+                          title="Activar"
+                          className="p-1.5 rounded-lg hover:bg-emerald-50 text-emerald-600 transition disabled:opacity-50"
+                        >
+                          <CheckCircle2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
-      {/* Modal crear/editar */}
+      {totalPaginas > 1 && (
+        <div className="flex items-center justify-center gap-2">
+          <button
+            onClick={() => setPage(Math.max(1, page - 1))}
+            disabled={page === 1}
+            className="rounded-md border border-[#E4E4E1] bg-white px-3 py-1.5 text-sm text-[#52525B] hover:bg-[#FAFAF8] disabled:opacity-50"
+          >
+            Anterior
+          </button>
+          <span className="text-sm text-[#52525B]">
+            Página {page} de {totalPaginas} ({total} autores)
+          </span>
+          <button
+            onClick={() => setPage(page + 1)}
+            disabled={page >= totalPaginas}
+            className="rounded-md border border-[#E4E4E1] bg-white px-3 py-1.5 text-sm text-[#52525B] hover:bg-[#FAFAF8] disabled:opacity-50"
+          >
+            Siguiente
+          </button>
+        </div>
+      )}
+
       <AutorFormModal
         abierto={modalAbierto}
         autor={autorEditando}
