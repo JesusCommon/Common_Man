@@ -3,8 +3,6 @@ import ProtectedRoute from "@/components/layout/ProtectedRoute";
 import AdminLayout from "@/components/layout/AdminLayout";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import Admin from "@/pages/admin/usuarios/Admin";
-import AdminBuscar from "@/pages/admin/usuarios/AdminBuscar";
-import AdminBuscarPorNombre from "@/pages/admin/usuarios/AdminBuscarNombre";
 import AdminRecargar from "@/pages/admin/usuarios/AdminRecargar";
 import AdminCategoriasProductos from "@/pages/admin/categoriasProductos/AdminCategoriasProductos";
 import AdminCategoriaForm from "@/pages/admin/categoriasProductos/AdminCategoriaForm";
@@ -19,6 +17,8 @@ import AdminReporteDetalle from "@/pages/admin/reportes/AdminReporteDetalle";
 import AdminAutores from "@/pages/admin/biblioteca/AdminAutores";
 import AdminEditoriales from "@/pages/admin/biblioteca/AdminEditoriales";
 import AdminGeneros from "@/pages/admin/biblioteca/AdminGeneros";
+import AdminLibros from "@/pages/admin/biblioteca/AdminLibros";
+
 
 export const adminRoutes: RouteObject[] = [
   {
@@ -33,9 +33,7 @@ export const adminRoutes: RouteObject[] = [
       
       // Usuarios
       { path: "/admin/usuarios", element: <Admin /> },
-      { path: "/admin/buscar", element: <AdminBuscar /> },
       { path: "/admin/recargas", element: <AdminRecargar /> },
-      { path: "/admin/buscar/usuarios", element: <AdminBuscarPorNombre /> },
       
       // Categorías
       { path: "/admin/categoriasProductos", element: <AdminCategoriasProductos /> },
@@ -62,6 +60,7 @@ export const adminRoutes: RouteObject[] = [
       { path: "/admin/biblioteca/autores", element: <AdminAutores /> },
       { path: "/admin/biblioteca/editoriales", element: <AdminEditoriales /> },
       { path: "/admin/biblioteca/generos", element: <AdminGeneros /> },
+      { path: "/admin/biblioteca/libros", element: <AdminLibros /> },
     ],
   },
 ];

@@ -1,25 +1,11 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { useRecargarSaldoAdmin, useRestarSaldoAdmin } from "@/hooks";
-import { Button } from "@/components/ui/Button";
-import { Alert } from "@/components/ui/Alert";
-import { TextField } from "@/components/ui/TextField";
-import { SegmentedControl } from "@/components/ui/SegmentedControl";
-import type { SegmentedOption } from "@/components/ui/SegmentedControl";
+import { Wallet, Fingerprint, User, ArrowDown, AlertCircle, CheckCircle2 } from "lucide-react";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
-import { Wallet, Fingerprint, User, ArrowRight, ArrowDown } from "lucide-react";
+import { extraerMensajeError } from "@/lib/errors";
 
 type Operacion = "recargar" | "restar";
-
-const operacionOptions: SegmentedOption<Operacion>[] = [
-  { key: "recargar", label: "Recargar" },
-  { key: "restar", label: "Restar" },
-];
-
-const operacionTexto: Record<Operacion, { accion: string; exito: string }> = {
-  recargar: { accion: "Recargar saldo", exito: "El saldo se ha acreditado correctamente." },
-  restar: { accion: "Restar saldo", exito: "El saldo se ha descontado correctamente." },
-};
 
 export default function AdminRecargar() {
   const [operacion, setOperacion] = useState<Operacion>("recargar");
@@ -27,6 +13,7 @@ export default function AdminRecargar() {
   const [monto, setMonto] = useState("");
   const [confirming, setConfirming] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const recargar = useRecargarSaldoAdmin();
   const restar = useRestarSaldoAdmin();
   const mutation = operacion === "recargar" ? recargar : restar;
@@ -36,6 +23,7 @@ export default function AdminRecargar() {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     setSuccessMsg(null);
+    setErrorMsg(null);
     if (!isValid) return;
     setConfirming(true);
   };
@@ -46,126 +34,210 @@ export default function AdminRecargar() {
       {
         onSuccess: (data) => {
           setSuccessMsg(data.mensaje);
+          setErrorMsg(null);
           setUserId("");
           setMonto("");
           setConfirming(false);
         },
-        onError: () => setConfirming(false),
+        onError: (err) => {
+          setErrorMsg(extraerMensajeError(err));
+          setConfirming(false);
+        },
       }
     );
   };
 
   return (
-    <div className="space-y-6 max-w-lg">
-      <div>
-        <h1 className="text-2xl font-bold text-[#18181B] mb-1">Gestionar saldo</h1>
-        <p className="text-[#52525B] text-sm">
-          Ingresa el ID del usuario y el monto. Puedes obtener el ID desde{" "}
-          <span className="text-[#2563EB]">Usuarios</span> o{" "}
-          <span className="text-[#2563EB]">Buscar por ID</span>.
+    <div className="mx-auto max-w-6xl px-4 py-6">
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-[#18181B]">Gestionar saldo</h1>
+        <p className="text-sm text-[#52525B]">
+          Ingresa el ID del usuario y el monto para recargar o descontar saldo.
         </p>
       </div>
 
+      {/* Alertas */}
       {successMsg && (
-        <Alert variant="success" message={successMsg} description={operacionTexto[operacion].exito} />
-      )}
-
-      {mutation.isError && (
-        <Alert
-          variant="error"
-          message={
-            mutation.error instanceof Error
-              ? mutation.error.message
-              : "Error al procesar la operación. Verifica el ID y el monto."
-          }
-        />
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="rounded-xl border border-[#E4E4E1] bg-white shadow-sm p-6 space-y-5">
-          <SegmentedControl options={operacionOptions} value={operacion} onChange={setOperacion} />
-
-          <TextField
-            label="ID del usuario"
-            icon={Fingerprint}
-            value={userId}
-            onChange={setUserId}
-            placeholder="Pega el MongoDB ID o UUID"
-          />
-          <TextField
-            label={operacion === "recargar" ? "Monto a recargar" : "Monto a restar"}
-            icon={Wallet}
-            value={monto}
-            onChange={setMonto}
-            placeholder="100"
-            type="number"
-            min={1}
-          />
-
-          <Button
-            type="submit"
-            variant="primary"
-            size="lg"
-            className="w-full"
-            disabled={mutation.isPending || !isValid}
-          >
-            <Wallet className="w-4 h-4 mr-2" />
-            {operacionTexto[operacion].accion}
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
+        <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3 flex items-start gap-2">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 shrink-0" />
+          <p className="text-sm text-emerald-700">{successMsg}</p>
         </div>
-      </form>
+      )}
+      {errorMsg && (
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 flex items-start gap-2">
+          <AlertCircle className="w-4 h-4 text-red-600 mt-0.5 shrink-0" />
+          <p className="text-sm text-red-700">{errorMsg}</p>
+        </div>
+      )}
 
-      <div className="rounded-lg border border-[#E4E4E1] bg-white shadow-sm p-4">
-        <h3 className="text-sm font-medium text-[#52525B] mb-2 flex items-center gap-2">
-          <User className="w-4 h-4" />
-          ¿Cómo obtener el ID?
-        </h3>
-        <ul className="text-xs text-[#52525B] space-y-1.5 list-disc list-inside">
-          <li>
-            Ve a <span className="text-[#18181B]">Usuarios</span> y haz clic en cualquier usuario de la lista.
-          </li>
-          <li>
-            En el modal que aparece, copia el <span className="text-[#18181B]">ID MongoDB</span>.
-          </li>
-          <li>
-            También puedes usar <span className="text-[#18181B]">Buscar por ID</span> para encontrar un usuario específico.
-          </li>
-          <li>Pega el ID aquí, ingresa el monto y confirma.</li>
-        </ul>
+      {/* Grid: formulario + consejo al lado */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+        {/* Formulario (3 cols) */}
+        <form onSubmit={handleSubmit} className="lg:col-span-3">
+          <div className="rounded-xl border border-[#E4E4E1] bg-white shadow-sm p-6 space-y-5">
+            {/* Segmented control inline */}
+            <div>
+              <label className="block text-sm font-medium text-[#52525B] mb-2">
+                Operación
+              </label>
+              <div className="grid grid-cols-2 bg-[#F4F4F5] rounded-lg p-1">
+                <button
+                  type="button"
+                  onClick={() => setOperacion("recargar")}
+                  className={`py-2 rounded-md text-sm font-medium transition ${
+                    operacion === "recargar"
+                      ? "bg-white text-emerald-600 shadow-sm"
+                      : "text-[#52525B] hover:text-[#18181B]"
+                  }`}
+                >
+                  ↑ Recargar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOperacion("restar")}
+                  className={`py-2 rounded-md text-sm font-medium transition ${
+                    operacion === "restar"
+                      ? "bg-white text-red-600 shadow-sm"
+                      : "text-[#52525B] hover:text-[#18181B]"
+                  }`}
+                >
+                  ↓ Restar
+                </button>
+              </div>
+            </div>
+
+            {/* ID */}
+            <div>
+              <label className="mb-1 block text-sm font-medium text-[#52525B]">
+                <Fingerprint className="w-3.5 h-3.5 inline mr-1.5 -mt-0.5" />
+                ID del usuario
+              </label>
+              <input
+                type="text"
+                value={userId}
+                onChange={(e) => setUserId(e.target.value)}
+                placeholder="Pega el MongoDB ID o UUID"
+                className="w-full rounded-lg border border-[#E4E4E1] px-3 py-2 text-sm font-mono focus:border-[#2563EB] focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
+              />
+            </div>
+
+            {/* Monto */}
+            <div>
+              <label className="mb-1 block text-sm font-medium text-[#52525B]">
+                <Wallet className="w-3.5 h-3.5 inline mr-1.5 -mt-0.5" />
+                {operacion === "recargar" ? "Monto a recargar" : "Monto a restar"}
+              </label>
+              <input
+                type="number"
+                value={monto}
+                onChange={(e) => setMonto(e.target.value)}
+                placeholder="100"
+                min={1}
+                className="w-full rounded-lg border border-[#E4E4E1] px-3 py-2 text-sm focus:border-[#2563EB] focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={mutation.isPending || !isValid}
+              className={`w-full rounded-lg px-4 py-2.5 text-sm font-medium text-white transition disabled:opacity-50 ${
+                operacion === "recargar"
+                  ? "bg-emerald-600 hover:bg-emerald-700"
+                  : "bg-red-600 hover:bg-red-700"
+              }`}
+            >
+              {mutation.isPending
+                ? "Procesando..."
+                : operacion === "recargar"
+                ? "Recargar saldo"
+                : "Restar saldo"}
+            </button>
+          </div>
+        </form>
+
+        {/* Consejo (2 cols) */}
+        <aside className="lg:col-span-2 space-y-4">
+          <div className="rounded-xl border border-[#E4E4E1] bg-white shadow-sm p-5 sticky top-6">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-8 h-8 rounded-lg bg-[#EFF4FE] flex items-center justify-center">
+                <User className="w-4 h-4 text-[#2563EB]" />
+              </div>
+              <h3 className="text-sm font-semibold text-[#18181B]">
+                ¿Cómo obtener el ID?
+              </h3>
+            </div>
+            <ol className="text-xs text-[#52525B] space-y-2 list-decimal list-inside">
+              <li>
+                Ve a{" "}
+                <span className="text-[#2563EB] font-medium">Usuarios</span>{" "}
+                y haz clic en cualquier usuario.
+              </li>
+              <li>
+                En el modal que aparece, copia el{" "}
+                <span className="font-mono text-[#18181B]">ID MongoDB</span>.
+              </li>
+              <li>
+                O usa{" "}
+                <span className="text-[#2563EB] font-medium">Buscar por ID</span>{" "}
+                para localizar uno específico.
+              </li>
+              <li>Pega el ID aquí, ingresa el monto y confirma.</li>
+            </ol>
+          </div>
+
+          <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
+              <div>
+                <h4 className="text-xs font-semibold text-amber-800 mb-1">
+                  Importante
+                </h4>
+                <p className="text-xs text-amber-700">
+                  Esta operación se aplica de inmediato y no se puede deshacer.
+                  Verifica el ID y el monto antes de confirmar.
+                </p>
+              </div>
+            </div>
+          </div>
+        </aside>
       </div>
 
       {confirming && (
         <ConfirmModal
           title={operacion === "recargar" ? "Confirmar recarga" : "Confirmar descuento"}
-          confirmLabel={operacionTexto[operacion].accion}
+          confirmLabel={operacion === "recargar" ? "Recargar saldo" : "Restar saldo"}
           isPending={mutation.isPending}
           onConfirm={handleConfirm}
           onCancel={() => setConfirming(false)}
         >
-          <div className="rounded-lg bg-gray-50 border border-[#E4E4E1] p-4 space-y-3">
+          <div className="rounded-lg bg-[#FAFAF8] border border-[#E4E4E1] p-4 space-y-3">
             <div>
-              <p className="text-xs text-[#52525B] mb-1">Operación</p>
+              <p className="text-xs text-[#A1A19A] mb-1">Operación</p>
               <p
                 className={`text-sm font-medium flex items-center gap-1.5 ${
                   operacion === "recargar" ? "text-emerald-600" : "text-red-600"
                 }`}
               >
                 {operacion === "restar" && <ArrowDown className="w-3.5 h-3.5" />}
-                {operacionTexto[operacion].accion}
+                {operacion === "recargar" ? "Recargar saldo" : "Restar saldo"}
               </p>
             </div>
             <div>
-              <p className="text-xs text-[#52525B] mb-1">ID del usuario</p>
-              <code className="text-sm text-[#18181B] font-mono break-all">{userId.trim()}</code>
+              <p className="text-xs text-[#A1A19A] mb-1">ID del usuario</p>
+              <code className="text-sm text-[#18181B] font-mono break-all">
+                {userId.trim()}
+              </code>
             </div>
             <div>
-              <p className="text-xs text-[#52525B] mb-1">Monto</p>
-              <p className="text-lg font-bold text-[#18181B]">${montoNum.toLocaleString()}</p>
+              <p className="text-xs text-[#A1A19A] mb-1">Monto</p>
+              <p className="text-lg font-bold text-[#18181B]">
+                ${montoNum.toLocaleString()}
+              </p>
             </div>
           </div>
           <p className="text-xs text-[#52525B]">
-            Verifica que el ID y el monto sean correctos antes de confirmar. Esta operación se aplica de inmediato.
+            Verifica que el ID y el monto sean correctos antes de confirmar.
           </p>
         </ConfirmModal>
       )}

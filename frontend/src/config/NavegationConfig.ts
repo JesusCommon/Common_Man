@@ -5,7 +5,8 @@ import {
   Package, 
   Wallet,
   Truck,
-  Library
+  Library,
+  MessageCircle
 } from "lucide-react";
 import type { ComponentType } from "react";
 
@@ -43,8 +44,6 @@ export const navigationConfig: NavModule[] = [
     icon: Users,
     children: [
       { label: "Listado General", route: "/admin/usuarios" },
-      { label: "Buscar por ID/UUID", route: "/admin/buscar" },
-      { label: "Buscar por Nombre", route: "/admin/buscar/usuarios" },
       { label: "Gestión de Recargas", route: "/admin/recargas" },
     ],
   },
@@ -95,4 +94,12 @@ export const navigationConfig: NavModule[] = [
       { label: "Libros", route: "/admin/biblioteca/libros" },
     ],
   },
+  {
+    id: "reporte",
+    label: "Reportes",
+    icon: MessageCircle,
+    children: [
+      { label: "Reportes", route: "admin/soporte"}
+    ]
+  }
 ];
