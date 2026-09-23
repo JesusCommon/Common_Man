@@ -12,7 +12,7 @@ export interface LibroCreate {
   portada?: string;
   isbn?: string;
   sku?: string;
-  precio: number;
+  precio: string;
   stock: number;
   descripcion?: string;
   contenido: string;

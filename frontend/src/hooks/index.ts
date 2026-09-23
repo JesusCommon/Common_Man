@@ -169,3 +169,6 @@ export { useCrearLibro } from "./biblioteca/libros/useCrearLibro";
 export { useActualizarLibro } from "./biblioteca/libros/useActualizarLibro";
 export { useActivarLibro } from "./biblioteca/libros/useActivarLibro";
 export { useDesactivarLibro } from "./biblioteca/libros/useDesactivarLibro";
+export { useListarLibrosInactivos } from "./biblioteca/libros/useListarLibroInactivos";
+export { useListarLibrosActivos } from "./biblioteca/libros/useListarLibrosActivos";
+export { useListarLibros } from "./biblioteca/libros/useListarLibros";

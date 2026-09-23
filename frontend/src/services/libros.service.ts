@@ -69,6 +69,33 @@ export async function listarLibrosAdminService(
   }
 }
 
+export async function listarTodosLosLibros(skip = 0, limit = 20): Promise<ServiceResult<Paginado<LibroAdminResponse>>> {
+  try {
+    const data = await librosApi.listarLibros(skip, limit);
+    return { success: true, data };
+  } catch (err) {
+    return { success: false, error: networkError(err as AxiosError) };
+  }
+}
+
+export async function listarLibrosInactivos(skip = 0, limit = 20): Promise<ServiceResult<Paginado<LibroAdminResponse>>> {
+  try {
+    const data = await librosApi.listarInactivos(skip, limit);
+    return { success: true, data };
+  } catch (err) {
+    return { success: false, error: networkError(err as AxiosError) };
+  }
+}
+
+export async function listarLibrosActivos(skip = 0, limit = 20): Promise<ServiceResult<Paginado<LibroAdminResponse>>> {
+  try {
+    const data = await librosApi.listarActivos(skip, limit);
+    return { success: true, data };
+  } catch (err) {
+    return { success: false, error: networkError(err as AxiosError) };
+  }
+}
+
 export async function obtenerLibroPorIsbnService(
   isbn: string
 ): Promise<ServiceResult<LibroAdminResponse>> {

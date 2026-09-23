@@ -10,8 +10,6 @@ import type {
   Idiomas,
 } from "../types";
 
-// ========== PARAMS ==========
-
 export interface BuscarLibrosParams {
   nombre?: string;
   autor_id?: string;
@@ -32,12 +30,10 @@ export interface ListarLibrosAdminParams {
   editorial_id?: string;
   genero_id?: string;
   idioma?: Idiomas;
-  solo_activos?: boolean;
+  activos?: boolean;
   skip?: number;
   limit?: number;
 }
-
-// ========== CATÁLOGO (USUARIO) ==========
 
 export async function buscarLibros(params: BuscarLibrosParams = {}) {
   const { data } = await apiClient.get<Paginado<LibroResponse>>("/libros/", {
@@ -58,13 +54,25 @@ export async function obtenerContenidoLibro(libroId: string) {
   return data;
 }
 
-// ========== ADMINISTRACIÓN ==========
-
 export async function listarLibrosAdmin(params: ListarLibrosAdminParams = {}) {
   const { data } = await apiClient.get<Paginado<LibroAdminResponse>>(
-    "/libros/admin/all",
-    { params }
+    "libros/admin/all", {params}
   );
+  return data
+}
+
+export async function listarLibros(skip = 0, limit = 20) {
+  const { data } = await apiClient.get<Paginado<LibroAdminResponse>>("/libros/all", { params: { skip, limit } });
+  return data;
+}
+
+export async function listarInactivos(skip = 0, limit = 20) {
+  const { data } = await apiClient.get<Paginado<LibroAdminResponse>>("/libros/inactivos", { params: { skip, limit } });
+  return data;
+}
+
+export async function listarActivos(skip = 0, limit = 20) {
+  const { data } = await apiClient.get<Paginado<LibroAdminResponse>>("/libros/activos", { params: { skip, limit } });
   return data;
 }
 

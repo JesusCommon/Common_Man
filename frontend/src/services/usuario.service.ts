@@ -96,8 +96,6 @@ export async function recargarSaldo(payload: unknown): Promise<ServiceResult<Res
   }
 }
 
-// --- Funciones de Admin (Tipos de retorno agregados para consistencia) ---
-
 export async function listarTodos(skip = 0, limit = 20): Promise<ServiceResult<Paginado<UsuarioAdminResponse>>> {
   try {
     const data = await usersApi.listarUsuarios(skip, limit);

@@ -170,7 +170,6 @@ class LibroUpdate(LibroValidaciones, BaseModel):
     activo: bool | None = Field(default=None)
 
 class LibroResponse(BaseModel):
-    """Vista pública de catálogo. ⚠️ SIN contenido: se libera solo tras la compra"""
     id: PydanticObjectId
     nombre: str
     autor_id: PydanticObjectId
