@@ -113,6 +113,15 @@ class LibroService:
         await libro.insert()
         return libro
 
+    async def listar(self, skip: int = 0, limit: int = 20) -> tuple[list[Libro], int]:
+        return await self.repo.listar(skip=skip, limit=limit)
+
+    async def listar_activos(self, skip: int = 0, limit: int = 20) -> tuple[list[Libro], int]:
+        return await self.repo.listar_activos(skip=skip, limit=limit)
+    
+    async def listar_inactivos(self, skip: int = 0, limit: int = 20) -> tuple[list[Libro], int]:
+        return await self.repo.listar_inactivos(skip=skip, limit=limit)
+
     async def actualizar(self, id: PydanticObjectId, data: LibroUpdate) -> Libro:
         libro = await self.obtener_por_id(id)
 

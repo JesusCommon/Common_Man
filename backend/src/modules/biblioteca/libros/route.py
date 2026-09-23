@@ -98,6 +98,20 @@ async def listar_libros_admin(
     )
     return Paginado(items=libros, total=total, skip=skip, limit=limit)
 
+@router.get("/all", response_model=Paginado[LibroAdminResponse], dependencies=[Depends(obtener_usuario_admin)])
+async def listar(skip: int = 0, limit: int = 20):
+    usuarios, total = await controller.listar(skip=skip, limit=limit)
+    return Paginado(items=usuarios, total=total, skip=skip, limit=limit)
+
+@router.get("/inactivos", response_model=Paginado[LibroAdminResponse], dependencies=[Depends(obtener_usuario_admin)])
+async def listar_inactivos(skip: int = 0, limit: int = 20):
+    usuarios, total = await controller.listar_inactivos(skip=skip, limit=limit)
+    return Paginado(items=usuarios, total=total, skip=skip, limit=limit)
+
+@router.get("/activos", response_model=Paginado[LibroAdminResponse], dependencies=[Depends(obtener_usuario_admin)])
+async def listar_activos(skip: int = 0, limit: int = 20):
+    usuarios, total = await controller.listar_activos(skip=skip, limit=limit)
+    return Paginado(items=usuarios, total=total, skip=skip, limit=limit)
 
 @router.get(
     "/admin/isbn/{isbn}",

@@ -15,6 +15,15 @@ class LibroController:
     async def crear(self, data: LibroCreate) -> Libro:
         return await self.service.crear(data)
 
+    async def listar(self, skip: int = 0, limit: int = 20) -> tuple[list[Libro], int]:
+        return await self.service.listar(skip=skip, limit=limit)
+    
+    async def listar_activos(self, skip: int = 0, limit: int = 20) -> tuple[list[Libro], int]:
+        return await self.service.listar_activos(skip=skip, limit=limit)
+
+    async def listar_inactivos(self, skip: int = 0, limit: int = 20) -> tuple[list[Libro], int]:
+        return await self.service.listar_inactivos(skip=skip, limit=limit)
+
     async def actualizar(self, id: PydanticObjectId, data: LibroUpdate) -> Libro:
         return await self.service.actualizar(id, data)
 
