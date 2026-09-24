@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store";
 import { usePerfil } from "@/hooks";
 import { useEffect } from "react";
-import { ExternalLink, Shield, Users, Store } from "lucide-react";
+import { ExternalLink, Shield, Store, Library } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { ReportesRecientesCard } from "@/components/dashboard/ReportesRecientesCard";
@@ -95,12 +95,6 @@ export default function Dashboard() {
             Resumen
           </h4>
           <div className="grid grid-cols-2 gap-3">
-            <div className="p-3 rounded-xl bg-[#EFF4FE] border border-[#BFDBFE]">
-              <Users className="w-4 h-4 text-[#2563EB] mb-1" />
-              <p className="text-lg font-bold text-[#18181B]">—</p>
-              <p className="text-[10px] text-[#52525B]">Seguidores</p>
-            </div>
-
             <button
               type="button"
               onClick={() => navigate("/tienda")}
@@ -109,6 +103,16 @@ export default function Dashboard() {
               <Store className="w-4 h-4 text-white mb-1" />
               <p className="text-sm font-bold text-white">Ir a la Tienda</p>
               <p className="text-[10px] text-blue-100">Explorar productos</p>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => navigate("/biblioteca")}
+              className="p-3 rounded-xl bg-[#ec822c] border border-[#b8bac1] hover:bg-[#db6f30] transition-colors text-left"
+            >
+              <Library className="w-4 h-4 text-white mb-1" />
+              <p className="text-sm font-bold text-white">Ir a la Biblioteca</p>
+              <p className="text-[10px] text-blue-100">Explorar libros</p>
             </button>
           </div>
         </motion.div>
