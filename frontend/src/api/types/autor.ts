@@ -2,12 +2,15 @@ export interface AutorCreate {
   nombre: string;
   apellido: string;
   pais_nacimiento?: string;
+  imagen?: string;
+
 }
 
 export interface AutorUpdate {
   nombre?: string;
   apellido?: string;
   pais_nacimiento?: string;
+  imagen?: string;
 }
 
 export interface AutorResponse {
@@ -15,6 +18,7 @@ export interface AutorResponse {
   nombre: string;
   apellido: string;
   pais_nacimiento?: string;
+  imagen?: string;
   activo: boolean;
   fecha_creacion: string;
   fecha_actualizacion: string;

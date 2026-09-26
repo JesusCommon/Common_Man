@@ -11,6 +11,7 @@ import type {
   LibroResponse,
   LibroAdminResponse,
   LibroContenidoResponse,
+  AutorDestacado,
   Paginado,
   RespuestaConMensaje,
 } from "@/api/types";
@@ -63,6 +64,17 @@ export async function listarLibrosAdminService(
 
   try {
     const data = await librosApi.listarLibrosAdmin(parsed.data);
+    return { success: true, data };
+  } catch (err) {
+    return { success: false, error: networkError(err as AxiosError) };
+  }
+}
+
+export async function listarAutoresDestacadosService(
+  limit = 6
+): Promise<ServiceResult<AutorDestacado[]>> {
+  try {
+    const data = await librosApi.listarAutoresDestacados(limit);
     return { success: true, data };
   } catch (err) {
     return { success: false, error: networkError(err as AxiosError) };

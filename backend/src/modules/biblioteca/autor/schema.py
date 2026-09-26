@@ -52,12 +52,13 @@ class AutorCreate(AutorValidaciones, BaseModel):
     nombre: str = Field(...)
     apellido: str = Field(...)
     pais_nacimiento: str | None = Field(default=None)
-
+    imagen: str | None = Field(default=None)
 
 class AutorUpdate(AutorValidaciones, BaseModel):
     nombre: str | None = Field(default=None)
     apellido: str | None = Field(default=None)
     pais_nacimiento: str | None = Field(default=None)
+    imagen: str | None = Field(default=None)
 
 
 class AutorResponse(BaseModel):
@@ -65,6 +66,7 @@ class AutorResponse(BaseModel):
     nombre: str
     apellido: str
     pais_nacimiento: str | None = None
+    imagen: str | None = None
     activo: bool
     fecha_creacion: datetime
     fecha_actualizacion: datetime
@@ -85,6 +87,7 @@ class AutorPublicResponse(BaseModel):
     nombre: str
     apellido: str
     pais_nacimiento: str | None = None
+    imagen: str | None = None
     slug: str
 
     model_config = ConfigDict(from_attributes=True)

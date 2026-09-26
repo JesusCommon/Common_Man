@@ -13,10 +13,10 @@ interface AutorFormModalProps {
 export function AutorFormModal({ abierto, autor, onClose }: AutorFormModalProps) {
   const crear = useCrearAutor();
   const actualizar = useActualizarAutor();
-
   const [nombre, setNombre] = useState(autor?.nombre ?? "");
   const [apellido, setApellido] = useState(autor?.apellido ?? "");
   const [pais, setPais] = useState(autor?.pais_nacimiento ?? "");
+  const [imagen, setImagen] = useState(autor?.imagen ?? "");
 
   const prevAutorId = useRef(autor?.id);
   useEffect(() => {
@@ -24,6 +24,7 @@ export function AutorFormModal({ abierto, autor, onClose }: AutorFormModalProps)
       setNombre(autor?.nombre ?? "");
       setApellido(autor?.apellido ?? "");
       setPais(autor?.pais_nacimiento ?? "");
+      setImagen(autor?.imagen ?? "");
       prevAutorId.current = autor?.id;
     }
   }, [autor]);
@@ -37,6 +38,7 @@ export function AutorFormModal({ abierto, autor, onClose }: AutorFormModalProps)
       nombre,
       apellido,
       pais_nacimiento: pais.trim() ? pais.trim() : undefined,
+      imagen: imagen.trim() || undefined,
     };
 
     if (autor) {
@@ -104,6 +106,34 @@ export function AutorFormModal({ abierto, autor, onClose }: AutorFormModalProps)
               maxLength={50}
               className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
+          </div>
+          
+          <div>
+            <label className="mb-1 block text-sm font-medium text-[#52525B]">
+              Imagen del autor{" "}
+              <span className="font-normal text-[#A1A19A]">(opcional, URL)</span>
+            </label>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full overflow-hidden border border-[#E4E4E1] bg-[#F4F4F5] flex items-center justify-center shrink-0">
+                {imagen.trim() ? (
+                  <img src={imagen.trim()} alt="Vista previa" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-sm font-bold text-[#2563EB]">
+                    {(nombre || "A").charAt(0).toUpperCase()}
+                  </span>
+                )}
+              </div>
+              <input
+                type="url"
+                value={imagen}
+                onChange={(e) => setImagen(e.target.value)}
+                placeholder="https://…/autor.jpg"
+                className="w-full rounded-lg border border-[#E4E4E1] px-3 py-2 text-sm focus:border-[#2563EB] focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
+              />
+            </div>
+            <p className="mt-1 text-xs text-[#A1A19A]">
+              Se muestra como avatar en la sección "Voces destacadas" de la biblioteca.
+            </p>
           </div>
 
           {error && (

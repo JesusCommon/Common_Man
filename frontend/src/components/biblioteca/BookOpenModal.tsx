@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, BookOpen, ExternalLink, ShoppingCart } from "lucide-react";
+import { X, BookOpen, ExternalLink, ShoppingCart, Building2 } from "lucide-react";
 import { useObtenerContenidoLibro } from "@/hooks";
 import { extraerMensajeError } from "@/lib/errors";
 import type { LibroResponse } from "@/api/types";
@@ -41,7 +41,6 @@ function Book3D({ portada, nombre, onOpenComplete }: { portada?: string; nombre:
           initial="closed"
           animate="open"
         />
-        {/* Portada con doble cara */}
         <motion.div
           className="absolute inset-0"
           style={{ transformOrigin: "left center", transformStyle: "preserve-3d" }}
@@ -72,15 +71,15 @@ function Book3D({ portada, nombre, onOpenComplete }: { portada?: string; nombre:
   );
 }
 
-/* ---------- Modal ---------- */
 interface BookOpenModalProps {
   libro: LibroResponse;
   autor: string;
   genero: string;
+  editorial: string;
   onClose: () => void;
 }
 
-export function BookOpenModal({ libro, autor, genero, onClose }: BookOpenModalProps) {
+export function BookOpenModal({ libro, autor, genero, editorial, onClose }: BookOpenModalProps) {
   const navigate = useNavigate();
   const [cerrando, setCerrando] = useState(false);
   const [abierto, setAbierto] = useState(false);
@@ -145,6 +144,13 @@ export function BookOpenModal({ libro, autor, genero, onClose }: BookOpenModalPr
                       {autor}
                       {libro.edicion ? ` · ${libro.edicion}` : ""}
                     </p>
+
+                    {editorial && (
+                      <p className="mt-2 inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.15em] font-semibold text-[#b23a2f]/80">
+                        <Building2 className="w-3.5 h-3.5" />
+                        {editorial}
+                      </p>
+                    )}
 
                     {libro.descripcion && (
                       <p className="mt-4 text-sm leading-relaxed text-[#221e19]/80 line-clamp-5">{libro.descripcion}</p>

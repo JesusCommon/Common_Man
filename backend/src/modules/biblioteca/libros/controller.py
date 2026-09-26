@@ -10,10 +10,11 @@ class LibroController:
     def __init__(self):
         self.service = LibroService()
 
-    # ========== OPERACIONES ==========
-
     async def crear(self, data: LibroCreate) -> Libro:
         return await self.service.crear(data)
+    
+    async def autores_destacados(self, limit: int = 6):
+        return await self.service.autores_destacados(limit=limit)
 
     async def listar(self, skip: int = 0, limit: int = 20) -> tuple[list[Libro], int]:
         return await self.service.listar(skip=skip, limit=limit)
@@ -32,8 +33,6 @@ class LibroController:
 
     async def desactivar(self, id: PydanticObjectId) -> Libro:
         return await self.service.desactivar(id)
-
-    # ========== CONSULTAS ==========
 
     async def obtener_por_id(self, id: PydanticObjectId) -> Libro:
         return await self.service.obtener_por_id(id)

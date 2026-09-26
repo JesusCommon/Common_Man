@@ -7,6 +7,7 @@ import type {
   LibroResponse,
   LibroAdminResponse,
   LibroContenidoResponse,
+  AutorDestacado,
   Idiomas,
 } from "../types";
 
@@ -50,6 +51,14 @@ export async function obtenerLibro(libroId: string) {
 export async function obtenerContenidoLibro(libroId: string) {
   const { data } = await apiClient.get<LibroContenidoResponse>(
     `/libros/${libroId}/contenido`
+  );
+  return data;
+}
+
+export async function listarAutoresDestacados(limit = 6) {
+  const { data } = await apiClient.get<AutorDestacado[]>(
+    "/libros/autores/destacados",
+    { params: { limit } }
   );
   return data;
 }

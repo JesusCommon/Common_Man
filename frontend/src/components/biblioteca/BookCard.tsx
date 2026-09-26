@@ -10,11 +10,11 @@ interface BookCardProps {
 
 export function BookCard({ libro, autor, genero, onOpen }: BookCardProps) {
   return (
-    <button onClick={onOpen} className="group text-left w-full">
+    <button onClick={onOpen} className="group text-left w-full flex flex-col items-stretch">
       <motion.div
         whileHover={{ y: -8, scale: 1.02 }}
         transition={{ type: "spring", stiffness: 300, damping: 22 }}
-        className="relative aspect-2/3 rounded-l-sm rounded-r-xl overflow-hidden bg-[#2e2a24] shadow-[0_10px_24px_rgba(34,30,25,0.14)] transition-shadow group-hover:shadow-[0_24px_48px_rgba(34,30,25,0.24)]"
+        className="relative w-full aspect-2/3 rounded-l-sm rounded-r-xl overflow-hidden bg-[#2e2a24] shadow-[0_10px_24px_rgba(34,30,25,0.14)] transition-shadow group-hover:shadow-[0_24px_48px_rgba(34,30,25,0.24)]"
       >
         {libro.portada ? (
           <img
@@ -36,14 +36,16 @@ export function BookCard({ libro, autor, genero, onOpen }: BookCardProps) {
         </div>
       </motion.div>
 
-      <h3 className="font-editorial mt-3 text-sm font-semibold leading-snug text-[#221e19] group-hover:text-[#b23a2f] transition-colors line-clamp-2">
-        {libro.nombre}
-      </h3>
-      <p className="mt-0.5 text-xs text-[#8b8377] truncate">{autor}</p>
-      <p className="text-[11px] text-[#8b8377]/80 truncate">
-        {genero ? `${genero} · ` : ""}
-        {libro.anio_publicacion}
-      </p>
+      <div className="mt-3 flex flex-col">
+        <h3 className="font-editorial text-sm font-semibold leading-snug text-[#221e19] group-hover:text-[#b23a2f] transition-colors line-clamp-2 min-h-[2.4rem]">
+          {libro.nombre}
+        </h3>
+        <p className="mt-1 text-xs text-[#8b8377] truncate">{autor}</p>
+        <p className="text-[11px] text-[#8b8377]/80 truncate">
+          {genero ? `${genero} · ` : ""}
+          {libro.anio_publicacion}
+        </p>
+      </div>
     </button>
   );
 }

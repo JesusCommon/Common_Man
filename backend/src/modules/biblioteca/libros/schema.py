@@ -204,3 +204,11 @@ class LibroContenidoResponse(BaseModel):
     contenido: HttpUrl
 
     model_config = ConfigDict(from_attributes=True)
+
+class AutorDestacadoResponse(BaseModel):
+    id: PydanticObjectId
+    nombre: str
+    apellido: str | None = None
+    imagen: str | None = None
+    pais_nacimiento: str | None = None
+    total_libros: int

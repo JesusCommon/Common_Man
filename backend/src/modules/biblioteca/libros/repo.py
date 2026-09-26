@@ -17,6 +17,16 @@ class LibroRepo(BaseRepoConEstado[Libro, LibroCreate, LibroUpdate]):
     async def obtener_por_sku(self, sku: str) -> Libro | None:
         return await self.model.find_one(self.model.sku == sku)
 
+    
+    async def contar_por_autor(self, limit: int = 6) -> list[dict]:
+        pipeline = [
+            {"$match": {"activo": True}},
+            {"$group": {"_id": "$autor_id", "total": {"$sum": 1}}},
+            {"$sort": {"total": -1}},
+            {"$limit": limit},
+        ]
+        return await self.model.aggregate(pipeline).to_list()
+
     async def obtener_por_datos_unicos(
         self,
         nombre: str,

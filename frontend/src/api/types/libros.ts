@@ -67,3 +67,12 @@ export interface LibroContenidoResponse {
   nombre: string;
   contenido: string;
 }
+
+export interface AutorDestacado {
+  id: string;
+  nombre: string;
+  apellido?: string;
+  imagen?: string;
+  pais_nacimiento?: string;
+  total_libros: number;
+}

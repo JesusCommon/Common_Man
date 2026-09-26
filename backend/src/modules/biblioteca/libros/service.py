@@ -2,7 +2,7 @@ from decimal import Decimal
 from fastapi import HTTPException, status
 from beanie import PydanticObjectId
 from src.modules.biblioteca.libros.document import Libro, Idiomas
-from src.modules.biblioteca.libros.schema import LibroCreate, LibroUpdate
+from src.modules.biblioteca.libros.schema import LibroCreate, LibroUpdate, AutorDestacadoResponse
 from src.modules.biblioteca.libros.repo import LibroRepo
 from src.modules.compra.document import Compras, EstadoCompraEnum
 from src.modules.usuarios.document import Usuario, RolUsuario
@@ -112,6 +112,25 @@ class LibroService:
         libro = Libro(**data.model_dump())
         await libro.insert()
         return libro
+
+    async def autores_destacados(self, limit: int = 6) -> list[AutorDestacadoResponse]:
+        conteo = await self.repo.contar_por_autor(limit=limit)
+        resultado = []
+        for fila in conteo:
+            autor = await Autor.get(fila["_id"])
+            if not autor or not autor.activo:
+                continue
+            resultado.append(
+                AutorDestacadoResponse(
+                    id=autor.id,
+                    nombre=autor.nombre,
+                    apellido=autor.apellido,
+                    imagen=autor.imagen,
+                    pais_nacimiento=autor.pais_nacimiento,
+                    total_libros=fila["total"],
+                )
+            )
+        return resultado
 
     async def listar(self, skip: int = 0, limit: int = 20) -> tuple[list[Libro], int]:
         return await self.repo.listar(skip=skip, limit=limit)

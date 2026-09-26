@@ -172,3 +172,4 @@ export { useDesactivarLibro } from "./biblioteca/libros/useDesactivarLibro";
 export { useListarLibrosInactivos } from "./biblioteca/libros/useListarLibroInactivos";
 export { useListarLibrosActivos } from "./biblioteca/libros/useListarLibrosActivos";
 export { useListarLibros } from "./biblioteca/libros/useListarLibros";
+export { useAutoresDestacados } from "./biblioteca/autor/useAutoresDestacados";

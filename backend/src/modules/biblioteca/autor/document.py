@@ -25,6 +25,11 @@ class Autor(Document, StatusMixin, TimestampMixim):
         description="Pais de nacimiento del autor"
     )
 
+    imagen : str | None = Field(
+        default=None,
+        description="URL del avatar"
+    )
+
     class Settings:
         name = "autores"
         indexes = [

@@ -11,6 +11,7 @@ from src.modules.biblioteca.libros.schema import (
     LibroResponse,
     LibroAdminResponse,
     LibroContenidoResponse,
+    AutorDestacadoResponse
 )
 from src.shared.common_schema import RespuestaConMensaje, Paginado
 
@@ -46,6 +47,13 @@ async def buscar_libros(
         limit=limit,
     )
     return Paginado(items=libros, total=total, skip=skip, limit=limit)
+
+@router.get(
+    "/autores/destacados",
+    response_model=list[AutorDestacadoResponse],
+)
+async def autores_destacados(limit: int = Query(default=6, ge=1, le=20)):
+    return await controller.autores_destacados(limit=limit)
 
 @router.get("/all", response_model=Paginado[LibroAdminResponse], dependencies=[Depends(obtener_usuario_admin)])
 async def listar_libros(skip: int = 0, limit: int = 20):
