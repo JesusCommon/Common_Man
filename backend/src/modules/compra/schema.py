@@ -2,10 +2,11 @@ from decimal import Decimal
 from datetime import datetime
 from pydantic import BaseModel, Field, ConfigDict, field_validator
 from beanie import PydanticObjectId
-from src.modules.compra.document import EstadoCompraEnum
+from src.modules.compra.document import EstadoCompraEnum, TipoItemCompra
 
 class CompraItemCreate(BaseModel):
     producto_id: PydanticObjectId
+    tipo: TipoItemCompra = Field(default=TipoItemCompra.PRODUCTO)
     cantidad: int = Field(..., gt=0, le=999)
 
 class CompraCreate(BaseModel):

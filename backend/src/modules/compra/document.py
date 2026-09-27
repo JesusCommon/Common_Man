@@ -13,7 +13,13 @@ class EstadoCompraEnum(str, Enum):
     ENTREGADO = "entregado"
     CANCELADO = "cancelado"
 
+class TipoItemCompra(str, Enum):
+    PRODUCTO = "producto"
+    LIBRO = "libro"
+
 class ItemCompra(BaseModel):
+    tipo: TipoItemCompra = Field(default=TipoItemCompra.PRODUCTO)
+    
     producto_id: PydanticObjectId = Field(
         ..., 
         description="ID del producto comprado"
