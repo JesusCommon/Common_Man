@@ -9,6 +9,7 @@ export interface CartItem {
   imagen?: string;
   stock: number;
   cantidad: number;
+  tipo?: "producto" | "libro";
 }
 
 interface CartState {

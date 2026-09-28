@@ -3,10 +3,16 @@ import time
 import random
 from fastapi import HTTPException, status
 from beanie import PydanticObjectId
-from src.modules.compra.document import Compras, ItemCompra, EstadoCompraEnum
+from src.modules.compra.document import (
+    Compras,
+    ItemCompra,
+    EstadoCompraEnum,
+    TipoItemCompra,
+)
 from src.modules.compra.schema import CompraCreate
 from src.modules.compra.repo import CompraRepo
 from src.modules.productos.repo import ProductoRepo
+from src.modules.biblioteca.libros.repo import LibroRepo
 from src.modules.direcciones.document import Direcciones
 from src.modules.notificaciones.service import NotificacionService
 from src.modules.notificaciones.schema import NotificacionCreate
@@ -16,18 +22,19 @@ class CompraService:
     def __init__(self):
         self.repo = CompraRepo()
         self.producto_repo = ProductoRepo()
+        self.libro_repo = LibroRepo()
         self.notif_service = NotificacionService()
 
     async def _generar_numero_orden(self) -> str:
         fecha = time.strftime("%Y%m%d")
-        
+
         for _ in range(5):
             sufijo = random.randint(1000, 9999)
             numero_orden = f"ORD-{fecha}-{sufijo}"
-            
+
             if not await self.repo.numero_orden_existe(numero_orden):
                 return numero_orden
-        
+
         timestamp = int(time.time())
         return f"ORD-{fecha}-{timestamp}"
 
@@ -50,7 +57,7 @@ class CompraService:
                 detail="La dirección de entrega no es válida o no pertenece al usuario",
             )
 
-    async def _validar_productos_y_calcular_items(
+    async def _validar_items_y_calcular(
         self, items_data: list[dict]
     ) -> tuple[list[ItemCompra], Decimal]:
         items_validados = []
@@ -59,61 +66,104 @@ class CompraService:
         for item_data in items_data:
             producto_id = item_data["producto_id"]
             cantidad = item_data["cantidad"]
+            tipo_raw = item_data.get("tipo", "producto")
+            tipo = (
+                TipoItemCompra(tipo_raw)
+                if isinstance(tipo_raw, str)
+                else tipo_raw
+            )
 
-            producto = await self.producto_repo.obtener_por_id(producto_id)
-            
-            if not producto:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail=f"Producto con ID '{producto_id}' no encontrado"
-                )
-            
-            if not producto.activo:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=f"El producto '{producto.nombre}' no está disponible"
-                )
-            
-            if producto.stock < cantidad:
-                raise HTTPException(
-                    status_code=status.HTTP_409_CONFLICT,
-                    detail=f"Stock insuficiente para '{producto.nombre}'. Disponible: {producto.stock}, solicitado: {cantidad}"
-                )
+            if tipo == TipoItemCompra.LIBRO:
+                libro = await self.libro_repo.obtener_por_id(producto_id)
 
-            precio_unitario = producto.precio
+                if not libro:
+                    raise HTTPException(
+                        status_code=status.HTTP_404_NOT_FOUND,
+                        detail=f"Libro con ID '{producto_id}' no encontrado",
+                    )
+                if not libro.activo:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail=f"El libro '{libro.nombre}' no está disponible",
+                    )
+                if libro.stock < cantidad:
+                    raise HTTPException(
+                        status_code=status.HTTP_409_CONFLICT,
+                        detail=f"Stock insuficiente para '{libro.nombre}'. Disponible: {libro.stock}, solicitado: {cantidad}",
+                    )
+
+                precio_unitario = libro.precio
+                nombre_snapshot = libro.nombre
+            else:
+                producto = await self.producto_repo.obtener_por_id(producto_id)
+
+                if not producto:
+                    raise HTTPException(
+                        status_code=status.HTTP_404_NOT_FOUND,
+                        detail=f"Producto con ID '{producto_id}' no encontrado",
+                    )
+                if not producto.activo:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail=f"El producto '{producto.nombre}' no está disponible",
+                    )
+                if producto.stock < cantidad:
+                    raise HTTPException(
+                        status_code=status.HTTP_409_CONFLICT,
+                        detail=f"Stock insuficiente para '{producto.nombre}'. Disponible: {producto.stock}, solicitado: {cantidad}",
+                    )
+
+                precio_unitario = producto.precio
+                nombre_snapshot = producto.nombre
+
             subtotal_item = (cantidad * precio_unitario).quantize(Decimal("0.01"))
 
-            item = ItemCompra(
-                producto_id=producto_id,
-                nombre_producto_snapshot=producto.nombre,
-                cantidad=cantidad,
-                precio_unitario=precio_unitario,
-                subtotal=subtotal_item
+            items_validados.append(
+                ItemCompra(
+                    producto_id=producto_id,
+                    tipo=tipo,
+                    nombre_producto_snapshot=nombre_snapshot,
+                    cantidad=cantidad,
+                    precio_unitario=precio_unitario,
+                    subtotal=subtotal_item,
+                )
             )
-            
-            items_validados.append(item)
             subtotal_general += subtotal_item
 
         return items_validados, subtotal_general.quantize(Decimal("0.01"))
 
-    async def _descontar_stock_productos(self, items: list[ItemCompra]) -> None:
+
+    async def _descontar_stock(self, items: list[ItemCompra]) -> None:
         for item in items:
-            resultado = await self.producto_repo.descontar_stock(
-                item.producto_id, 
-                item.cantidad
-            )
-            
-            if not resultado:
+            if item.tipo == TipoItemCompra.LIBRO:
+                ok = await self.libro_repo.descontar_stock(
+                    item.producto_id, item.cantidad
+                )
+            else:
+                ok = await self.producto_repo.descontar_stock(
+                    item.producto_id, item.cantidad
+                )
+
+            if not ok:
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail=f"Error al descontar stock del producto '{item.nombre_producto_snapshot}'"
+                    detail=f"Error al descontar stock de '{item.nombre_producto_snapshot}'",
+                )
+
+    async def _revertir_stock(self, items: list[ItemCompra]) -> None:
+        for item in items:
+            if item.tipo == TipoItemCompra.LIBRO:
+                await self.libro_repo.devolver_stock(
+                    item.producto_id, item.cantidad
+                )
+            else:
+                await self.producto_repo.actualizar_stock(
+                    item.producto_id, item.cantidad
                 )
 
     async def _notificar_estado_compra(
-        self,
-        compra: Compras,
-        estado: EstadoCompraEnum
-    ) -> None:        
+        self, compra: Compras, estado: EstadoCompraEnum
+    ) -> None:
         mensajes = {
             EstadoCompraEnum.PAGADO: {
                 "titulo": "Pago confirmado",
@@ -137,7 +187,7 @@ class CompraService:
             return
 
         notif_data = mensajes[estado]
-        
+
         await self.notif_service.crear_y_enviar(
             NotificacionCreate(
                 usuario_id=compra.usuario_id,
@@ -146,12 +196,12 @@ class CompraService:
                 mensaje=notif_data["mensaje"],
                 referencia_id=compra.id,
                 referencia_tipo="compra",
-                accion_url=f"/tienda/mis-compras/{compra.numero_orden}"
+                accion_url=f"/tienda/mis-compras/{compra.numero_orden}",
             )
         )
 
     async def crear(self, data: CompraCreate, usuario_id: PydanticObjectId) -> Compras:
-        items_validados, subtotal = await self._validar_productos_y_calcular_items(
+        items_validados, subtotal = await self._validar_items_y_calcular(
             [item.model_dump() for item in data.items]
         )
 
@@ -164,10 +214,11 @@ class CompraService:
         if total <= 0:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="El total de la compra debe ser mayor a 0"
+                detail="El total de la compra debe ser mayor a 0",
             )
 
-        await self._descontar_stock_productos(items_validados)
+        await self._descontar_stock(items_validados)
+
         compra = Compras(
             usuario_id=usuario_id,
             numero_orden=numero_orden,
@@ -178,20 +229,16 @@ class CompraService:
             total=total,
             estado=EstadoCompraEnum.PENDIENTE,
             notas=data.notas,
-            direccion_id=data.direccion_id
+            direccion_id=data.direccion_id,
         )
 
         try:
             await compra.insert()
         except Exception:
-            for item in items_validados:
-                await self.producto_repo.actualizar_stock(
-                    item.producto_id,
-                    item.cantidad
-                )
+            await self._revertir_stock(items_validados)
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Error al crear la compra. Stock revertido."
+                detail="Error al crear la compra. Stock revertido.",
             )
 
         await self.notif_service.crear_y_enviar(
@@ -202,7 +249,7 @@ class CompraService:
                 mensaje=f"Tu orden {numero_orden} fue creada. Total: ${total:,.2f}. Pendiente de pago.",
                 referencia_id=compra.id,
                 referencia_tipo="compra",
-                accion_url=f"/tienda/mis-compras/{numero_orden}"
+                accion_url=f"/tienda/mis-compras/{numero_orden}",
             )
         )
 
@@ -212,8 +259,7 @@ class CompraService:
         compra = await self.repo.obtener_por_id(id)
         if not compra:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Compra no encontrada"
+                status_code=status.HTTP_404_NOT_FOUND, detail="Compra no encontrada"
             )
         return compra
 
@@ -222,48 +268,28 @@ class CompraService:
         if not compra:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Compra con número de orden '{numero_orden}' no encontrada"
+                detail=f"Compra con número de orden '{numero_orden}' no encontrada",
             )
         return compra
 
     async def listar_por_usuario(
-        self,
-        usuario_id: PydanticObjectId,
-        skip: int = 0,
-        limit: int = 20,
+        self, usuario_id: PydanticObjectId, skip: int = 0, limit: int = 20
     ) -> tuple[list[Compras], int]:
-        return await self.repo.listar_por_usuario(
-            usuario_id=usuario_id,
-            skip=skip,
-            limit=limit
-        )
+        return await self.repo.listar_por_usuario(usuario_id, skip=skip, limit=limit)
 
     async def listar_por_estado(
-        self,
-        estado: EstadoCompraEnum,
-        skip: int = 0,
-        limit: int = 20,
+        self, estado: EstadoCompraEnum, skip: int = 0, limit: int = 20
     ) -> tuple[list[Compras], int]:
-        return await self.repo.listar_por_estado(
-            estado=estado,
-            skip=skip,
-            limit=limit
-        )
+        return await self.repo.listar_por_estado(estado, skip=skip, limit=limit)
 
-    async def listar_todas(
-        self,
-        skip: int = 0,
-        limit: int = 20,
-    ) -> tuple[list[Compras], int]:
+    async def listar_todas(self, skip: int = 0, limit: int = 20) -> tuple[list[Compras], int]:
         return await self.repo.listar_todas(skip=skip, limit=limit)
 
     async def actualizar_estado(
-        self,
-        id: PydanticObjectId,
-        nuevo_estado: EstadoCompraEnum,
+        self, id: PydanticObjectId, nuevo_estado: EstadoCompraEnum
     ) -> Compras:
         compra = await self.obtener_por_id(id)
-        
+
         transiciones_validas = {
             EstadoCompraEnum.PENDIENTE: [EstadoCompraEnum.PAGADO, EstadoCompraEnum.CANCELADO],
             EstadoCompraEnum.PAGADO: [EstadoCompraEnum.ENVIADO, EstadoCompraEnum.CANCELADO],
@@ -275,16 +301,16 @@ class CompraService:
         if nuevo_estado not in transiciones_validas.get(compra.estado, []):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"No se puede cambiar el estado de '{compra.estado.value}' a '{nuevo_estado.value}'"
+                detail=f"No se puede cambiar el estado de '{compra.estado.value}' a '{nuevo_estado.value}'",
             )
 
         resultado = await self.repo.actualizar_estado(id, nuevo_estado)
         if not resultado:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Error al actualizar el estado de la compra"
+                detail="Error al actualizar el estado de la compra",
             )
-        
+
         await self._notificar_estado_compra(resultado, nuevo_estado)
-        
+
         return resultado

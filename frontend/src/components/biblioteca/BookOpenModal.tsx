@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, BookOpen, ExternalLink, ShoppingCart, Building2 } from "lucide-react";
 import { useObtenerContenidoLibro } from "@/hooks";
+import { useCartStore } from "@/store/useCartStore";
 import { extraerMensajeError } from "@/lib/errors";
 import type { LibroResponse } from "@/api/types";
 
@@ -81,6 +82,8 @@ interface BookOpenModalProps {
 
 export function BookOpenModal({ libro, autor, genero, editorial, onClose }: BookOpenModalProps) {
   const navigate = useNavigate();
+  const addItem = useCartStore((s) => s.addItem);
+
   const [cerrando, setCerrando] = useState(false);
   const [abierto, setAbierto] = useState(false);
   const [intentandoLeer, setIntentandoLeer] = useState(false);
@@ -93,6 +96,22 @@ export function BookOpenModal({ libro, autor, genero, editorial, onClose }: Book
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  const handleComprar = () => {
+    addItem(
+      {
+        id: libro.id,
+        nombre: libro.nombre,
+        slug: "",
+        precio: Number(libro.precio),
+        imagen: libro.portada ?? undefined,
+        stock: libro.stock,
+        tipo: "libro",
+      },
+      1
+    );
+    navigate("/tienda/checkout");
+  };
+
   return (
     <AnimatePresence onExitComplete={onClose}>
       {!cerrando && (
@@ -104,10 +123,7 @@ export function BookOpenModal({ libro, autor, genero, editorial, onClose }: Book
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
         >
-          <motion.div
-            className="absolute inset-0 bg-[#1e1b16]/55 backdrop-blur-md"
-            onClick={() => setCerrando(true)}
-          />
+          <motion.div className="absolute inset-0 bg-[#1e1b16]/55 backdrop-blur-md" onClick={() => setCerrando(true)} />
 
           <motion.div
             className="relative w-full max-w-215 max-h-[90vh] overflow-y-auto rounded-3xl bg-[#fbf9f4] shadow-[0_40px_90px_rgba(20,17,13,0.4)]"
@@ -195,7 +211,7 @@ export function BookOpenModal({ libro, autor, genero, editorial, onClose }: Book
                         <div className="rounded-xl border border-[#e4dccd] bg-[#f3eee5] p-4 space-y-3">
                           <p className="text-sm text-[#221e19]">{extraerMensajeError(contenido.error)}</p>
                           <button
-                            onClick={() => navigate("/tienda")}
+                            onClick={handleComprar}
                             className="inline-flex items-center gap-2 rounded-full bg-[#221e19] px-5 py-2.5 text-sm font-medium text-[#f3eee5] hover:bg-[#b23a2f] transition-colors"
                           >
                             <ShoppingCart className="w-4 h-4" />

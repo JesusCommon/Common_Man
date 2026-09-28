@@ -32,6 +32,7 @@ export interface CompraItemResponse {
   cantidad: number;
   precio_unitario: number;
   subtotal: number;
+  tipo?: "producto" | "libro";
 }
 
 export interface CompraResponse {

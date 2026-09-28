@@ -15,6 +15,7 @@ import {
   XCircle,
   CalendarDays,
   CreditCard,
+  BookMarked,
 } from "lucide-react";
 import { useState } from "react";
 import type { CompraResponse } from "@/api/types";
@@ -60,6 +61,7 @@ export default function CompraDetalle() {
 
   const c = query.data;
   const puedePagar = c.estado === "pendiente";
+  const puedeLeer = c.estado === "pagado" || c.estado === "enviado" || c.estado === "entregado";
 
   const errorAccion = pagar.error ?? cancelar.error;
 
@@ -71,11 +73,11 @@ export default function CompraDetalle() {
   };
 
   const handlePagar = () => {
-  pagar.mutate({ compraId: c.id });
- };
+    pagar.mutate({ compraId: c.id });
+  };
 
   const handleCancelar = () => {
-  if (!confirm("¿Seguro que deseas cancelar esta orden?")) return;
+    if (!confirm("¿Seguro que deseas cancelar esta orden?")) return;
     cancelar.mutate(
       { compraId: c.id },
       { onSuccess: () => navigate("/tienda/mis-compras") }
@@ -99,9 +101,7 @@ export default function CompraDetalle() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <span
-            className={`text-xs px-2.5 py-1 rounded-full border font-medium capitalize ${estadoStyles[c.estado]}`}
-          >
+          <span className={`text-xs px-2.5 py-1 rounded-full border font-medium capitalize ${estadoStyles[c.estado]}`}>
             {c.estado}
           </span>
           <button
@@ -119,7 +119,11 @@ export default function CompraDetalle() {
         {c.items.map((item, i) => (
           <div key={i} className="flex items-center gap-4 p-4">
             <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
-              <Package className="w-5 h-5 text-gray-500" />
+              {item.tipo === "libro" ? (
+                <BookMarked className="w-5 h-5 text-[#b23a2f]" />
+              ) : (
+                <Package className="w-5 h-5 text-gray-500" />
+              )}
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-medium text-gray-900 text-sm truncate">
@@ -127,8 +131,19 @@ export default function CompraDetalle() {
               </p>
               <p className="text-xs text-gray-500">
                 {item.cantidad} x {formatPrecio(item.precio_unitario)}
+                {item.tipo === "libro" && (
+                  <span className="ml-2 text-[#b23a2f] font-medium">· Libro digital</span>
+                )}
               </p>
             </div>
+            {item.tipo === "libro" && puedeLeer && (
+              <Link
+                to="/biblioteca"
+                className="text-xs font-medium text-[#b23a2f] hover:underline shrink-0"
+              >
+                Leer libro →
+              </Link>
+            )}
             <span className="font-semibold text-gray-900 text-sm">
               {formatPrecio(item.subtotal)}
             </span>

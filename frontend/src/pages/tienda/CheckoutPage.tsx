@@ -5,12 +5,23 @@ import { Button } from "@/components/ui/Button";
 import { ErrorAlert } from "@/components/ui/ErrorAlert";
 import { useCartStore, selectCartTotal } from "@/store/useCartStore";
 import { extraerMensajeError } from "@/lib/errors";
-import { CheckCircle2, Package, ArrowLeft, CreditCard, MapPin } from "lucide-react";
+import {
+  CheckCircle2,
+  Package,
+  ArrowLeft,
+  CreditCard,
+  MapPin,
+  BookMarked,
+} from "lucide-react";
 import { useState } from "react";
 import type { CompraResponse } from "@/api/types";
 
 const formatPrecio = (precio: number): string =>
-  new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", minimumFractionDigits: 0 }).format(precio);
+  new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    minimumFractionDigits: 0,
+  }).format(precio);
 
 type Paso = "resumen" | "pago" | "exito";
 
@@ -37,7 +48,11 @@ export default function CheckoutPage() {
   const handleConfirmarOrden = () => {
     crear.mutate(
       {
-        items: items.map((i) => ({ producto_id: i.id, cantidad: i.cantidad })),
+        items: items.map((i) => ({
+          producto_id: i.id,
+          cantidad: i.cantidad,
+          tipo: i.tipo ?? "producto",
+        })),
         direccion_id: direccionEfectiva || undefined,
       },
       {
@@ -94,7 +109,7 @@ export default function CheckoutPage() {
     <div className="max-w-3xl mx-auto px-4 py-10 space-y-6">
       <button
         type="button"
-        onClick={() => navigate(paso === "pago" ? "/tienda" : "/tienda")}
+        onClick={() => navigate("/tienda")}
         className="inline-flex items-center text-gray-500 hover:text-gray-900 text-sm"
       >
         <ArrowLeft className="w-4 h-4 mr-2" /> Seguir comprando
@@ -115,18 +130,48 @@ export default function CheckoutPage() {
         {paso === "resumen"
           ? items.map((i) => (
               <div key={i.id} className="flex items-center justify-between p-4">
-                <div>
-                  <p className="font-medium text-gray-900 text-sm">{i.nombre}</p>
-                  <p className="text-xs text-gray-500">{i.cantidad} x {formatPrecio(i.precio)}</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
+                    {i.tipo === "libro" ? (
+                      <BookMarked className="w-5 h-5 text-[#b23a2f]" />
+                    ) : (
+                      <Package className="w-5 h-5 text-gray-500" />
+                    )}
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900 text-sm">{i.nombre}</p>
+                    <p className="text-xs text-gray-500">
+                      {i.cantidad} x {formatPrecio(i.precio)}
+                      {i.tipo === "libro" && (
+                        <span className="ml-2 text-[#b23a2f] font-medium">· Libro digital</span>
+                      )}
+                    </p>
+                  </div>
                 </div>
-                <span className="font-semibold text-gray-900 text-sm">{formatPrecio(i.cantidad * i.precio)}</span>
+                <span className="font-semibold text-gray-900 text-sm">
+                  {formatPrecio(i.cantidad * i.precio)}
+                </span>
               </div>
             ))
           : orden?.items.map((it, i) => (
               <div key={i} className="flex items-center justify-between p-4">
-                <div>
-                  <p className="font-medium text-gray-900 text-sm">{it.nombre_producto_snapshot}</p>
-                  <p className="text-xs text-gray-500">{it.cantidad} x {formatPrecio(it.precio_unitario)}</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
+                    {it.tipo === "libro" ? (
+                      <BookMarked className="w-5 h-5 text-[#b23a2f]" />
+                    ) : (
+                      <Package className="w-5 h-5 text-gray-500" />
+                    )}
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900 text-sm">{it.nombre_producto_snapshot}</p>
+                    <p className="text-xs text-gray-500">
+                      {it.cantidad} x {formatPrecio(it.precio_unitario)}
+                      {it.tipo === "libro" && (
+                        <span className="ml-2 text-[#b23a2f] font-medium">· Libro digital</span>
+                      )}
+                    </p>
+                  </div>
                 </div>
                 <span className="font-semibold text-gray-900 text-sm">{formatPrecio(it.subtotal)}</span>
               </div>
@@ -152,12 +197,10 @@ export default function CheckoutPage() {
           <Select
             value={direccionEfectiva}
             onChange={setDireccionId}
-            options={
-              direcciones.data.items.map((d) => ({
-                value: d.id,
-                label: `${d.alias} — ${d.direccion}, ${d.ciudad}${d.es_predeterminada ? " (predeterminada)" : ""}`,
-              }))
-            }
+            options={direcciones.data.items.map((d) => ({
+              value: d.id,
+              label: `${d.alias} — ${d.direccion}, ${d.ciudad}${d.es_predeterminada ? " (predeterminada)" : ""}`,
+            }))}
             placeholder="Selecciona una dirección..."
           />
         ) : (
@@ -175,12 +218,24 @@ export default function CheckoutPage() {
       </div>
 
       {paso === "resumen" ? (
-        <Button variant="primary" size="lg" className="w-full" disabled={isPending || !direccionEfectiva} onClick={handleConfirmarOrden}>
+        <Button
+          variant="primary"
+          size="lg"
+          className="w-full"
+          disabled={isPending || !direccionEfectiva}
+          onClick={handleConfirmarOrden}
+        >
           {crear.isPending ? "Creando orden..." : "Confirmar Orden"}
         </Button>
       ) : (
         <Button variant="primary" size="lg" className="w-full" disabled={isPending} onClick={handleProcesarPago}>
-          {pagar.isPending ? "Procesando pago..." : <><CreditCard className="w-4 h-4 mr-2" /> Pagar {formatPrecio(orden?.total ?? 0)}</>}
+          {pagar.isPending ? (
+            "Procesando pago..."
+          ) : (
+            <>
+              <CreditCard className="w-4 h-4 mr-2" /> Pagar {formatPrecio(orden?.total ?? 0)}
+            </>
+          )}
         </Button>
       )}
     </div>

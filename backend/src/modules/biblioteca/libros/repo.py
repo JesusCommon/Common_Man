@@ -152,3 +152,20 @@ class LibroRepo(BaseRepoConEstado[Libro, LibroCreate, LibroUpdate]):
         )
 
         return libros, total
+
+    
+    async def descontar_stock(self, id: PydanticObjectId, cantidad: int) -> bool:
+        libro = await self.model.get(id)
+        if not libro or libro.stock < cantidad:
+            return False
+        libro.stock -= cantidad
+        await libro.save()
+        return True
+
+    async def devolver_stock(self, id: PydanticObjectId, cantidad: int) -> bool:
+        libro = await self.model.get(id)
+        if not libro:
+            return False
+        libro.stock += cantidad
+        await libro.save()
+        return True
