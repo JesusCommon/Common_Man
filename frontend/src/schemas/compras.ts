@@ -23,9 +23,13 @@ const ImpuestosSchema = z
   .number({ message: "Los impuestos deben ser un número" })
   .min(0, "Los impuestos no pueden ser negativos");
 
+export const TipoItemCompraSchema = z.enum(["producto", "libro"]);
+export type TipoItemCompra = z.infer<typeof TipoItemCompraSchema>;
+
 export const CompraItemCreateSchema = z.object({
   producto_id: ProductoIdSchema,
   cantidad: CantidadSchema,
+  tipo: TipoItemCompraSchema.default("producto"), 
 });
 
 export type CompraItemCreateInput = z.infer<typeof CompraItemCreateSchema>;
@@ -65,6 +69,7 @@ export type CompraEstadoUpdateInput = z.infer<typeof CompraEstadoUpdateSchema>;
 
 export const CompraItemResponseSchema = z.object({
   producto_id: z.string(),
+  tipo: TipoItemCompraSchema.default("producto"),
   nombre_producto_snapshot: z.string(),
   cantidad: z.number(),
   precio_unitario: z.number(),

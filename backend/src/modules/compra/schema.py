@@ -40,6 +40,7 @@ class CompraEstadoUpdate(BaseModel):
 
 class CompraItemResponse(BaseModel):
     producto_id: PydanticObjectId
+    tipo: TipoItemCompra = Field(default=TipoItemCompra.PRODUCTO)
     nombre_producto_snapshot: str
     cantidad: int
     precio_unitario: Decimal

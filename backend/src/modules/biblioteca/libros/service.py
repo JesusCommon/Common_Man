@@ -244,16 +244,17 @@ class LibroService:
         libro_id: PydanticObjectId,
         usuario_id: PydanticObjectId,
     ) -> bool:
-        compras = await Compras.find(
-            Compras.usuario_id == usuario_id,
-            Compras.estado.in_(list(ESTADOS_CON_ACCESO)),
-        ).to_list()
+        estados_con_acceso = [e.value for e in ESTADOS_CON_ACCESO]
 
-        return any(
-            item.producto_id == libro_id
-            for compra in compras
-            for item in compra.items
+        compra = await Compras.find_one(
+            {
+                "usuario_id": usuario_id,
+                "estado": {"$in": estados_con_acceso},
+                "items.producto_id": libro_id,
+            }
         )
+
+        return compra is not None
 
     async def obtener_contenido(self, libro_id: PydanticObjectId, usuario: Usuario) -> Libro:
         libro = await self.obtener_por_id(libro_id)

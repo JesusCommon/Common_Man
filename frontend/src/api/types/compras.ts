@@ -1,13 +1,16 @@
-export type EstadoCompraEnum = 
+export type EstadoCompraEnum =
   | "pendiente"
   | "pagado"
   | "enviado"
   | "entregado"
   | "cancelado";
 
+export type TipoItemCompra = "producto" | "libro";
+
 export interface CompraItemCreate {
   producto_id: string;
   cantidad: number;
+  tipo?: TipoItemCompra;
 }
 
 export interface CompraCreate {
@@ -28,11 +31,11 @@ export interface CompraEstadoUpdate {
 
 export interface CompraItemResponse {
   producto_id: string;
+  tipo: TipoItemCompra;
   nombre_producto_snapshot: string;
   cantidad: number;
   precio_unitario: number;
   subtotal: number;
-  tipo?: "producto" | "libro";
 }
 
 export interface CompraResponse {
