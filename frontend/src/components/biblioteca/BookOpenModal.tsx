@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, BookOpen, ExternalLink, ShoppingCart, Building2 } from "lucide-react";
 import { useObtenerContenidoLibro } from "@/hooks";
-import { useCartStore } from "@/store/useCartStore";
 import { extraerMensajeError } from "@/lib/errors";
+import { BookCheckoutModal } from "./BookCheckoutModal";
 import type { LibroResponse } from "@/api/types";
 
 const EASE = [0.66, 0, 0.34, 1] as const;
@@ -20,9 +19,21 @@ const pageVariants = (delay: number) => ({
 });
 
 const formatPrecio = (precio: string | number): string =>
-  new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", minimumFractionDigits: 0 }).format(Number(precio));
+  new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    minimumFractionDigits: 0,
+  }).format(Number(precio));
 
-function Book3D({ portada, nombre, onOpenComplete }: { portada?: string; nombre: string; onOpenComplete: () => void }) {
+function Book3D({
+  portada,
+  nombre,
+  onOpenComplete,
+}: {
+  portada?: string;
+  nombre: string;
+  onOpenComplete: () => void;
+}) {
   return (
     <motion.div style={{ perspective: 2200 }} className="flex justify-center md:justify-start pt-4">
       <div className="relative w-65 md:w-75 aspect-2/3" style={{ transformStyle: "preserve-3d" }}>
@@ -81,12 +92,10 @@ interface BookOpenModalProps {
 }
 
 export function BookOpenModal({ libro, autor, genero, editorial, onClose }: BookOpenModalProps) {
-  const navigate = useNavigate();
-  const addItem = useCartStore((s) => s.addItem);
-
   const [cerrando, setCerrando] = useState(false);
   const [abierto, setAbierto] = useState(false);
   const [intentandoLeer, setIntentandoLeer] = useState(false);
+  const [mostrarCheckout, setMostrarCheckout] = useState(false);
 
   const contenido = useObtenerContenidoLibro(intentandoLeer ? libro.id : "");
 
@@ -95,22 +104,6 @@ export function BookOpenModal({ libro, autor, genero, editorial, onClose }: Book
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
-
-  const handleComprar = () => {
-    addItem(
-      {
-        id: libro.id,
-        nombre: libro.nombre,
-        slug: "",
-        precio: Number(libro.precio),
-        imagen: libro.portada ?? undefined,
-        stock: libro.stock,
-        tipo: "libro",
-      },
-      1
-    );
-    navigate("/tienda/checkout");
-  };
 
   return (
     <AnimatePresence onExitComplete={onClose}>
@@ -123,7 +116,10 @@ export function BookOpenModal({ libro, autor, genero, editorial, onClose }: Book
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
         >
-          <motion.div className="absolute inset-0 bg-[#1e1b16]/55 backdrop-blur-md" onClick={() => setCerrando(true)} />
+          <motion.div
+            className="absolute inset-0 bg-[#1e1b16]/55 backdrop-blur-md"
+            onClick={() => setCerrando(true)}
+          />
 
           <motion.div
             className="relative w-full max-w-215 max-h-[90vh] overflow-y-auto rounded-3xl bg-[#fbf9f4] shadow-[0_40px_90px_rgba(20,17,13,0.4)]"
@@ -140,7 +136,11 @@ export function BookOpenModal({ libro, autor, genero, editorial, onClose }: Book
             </button>
 
             <div className="flex flex-col md:flex-row gap-8 md:gap-12 p-8 md:p-12">
-              <Book3D portada={libro.portada ?? undefined} nombre={libro.nombre} onOpenComplete={() => setAbierto(true)} />
+              <Book3D
+                portada={libro.portada ?? undefined}
+                nombre={libro.nombre}
+                onOpenComplete={() => setAbierto(true)}
+              />
 
               <AnimatePresence>
                 {abierto && (
@@ -169,7 +169,9 @@ export function BookOpenModal({ libro, autor, genero, editorial, onClose }: Book
                     )}
 
                     {libro.descripcion && (
-                      <p className="mt-4 text-sm leading-relaxed text-[#221e19]/80 line-clamp-5">{libro.descripcion}</p>
+                      <p className="mt-4 text-sm leading-relaxed text-[#221e19]/80 line-clamp-5">
+                        {libro.descripcion}
+                      </p>
                     )}
 
                     <div className="mt-5 flex items-center gap-4 text-xs text-[#8b8377]">
@@ -209,9 +211,11 @@ export function BookOpenModal({ libro, autor, genero, editorial, onClose }: Book
 
                       {contenido.isError && (
                         <div className="rounded-xl border border-[#e4dccd] bg-[#f3eee5] p-4 space-y-3">
-                          <p className="text-sm text-[#221e19]">{extraerMensajeError(contenido.error)}</p>
+                          <p className="text-sm text-[#221e19]">
+                            {extraerMensajeError(contenido.error)}
+                          </p>
                           <button
-                            onClick={handleComprar}
+                            onClick={() => setMostrarCheckout(true)}
                             className="inline-flex items-center gap-2 rounded-full bg-[#221e19] px-5 py-2.5 text-sm font-medium text-[#f3eee5] hover:bg-[#b23a2f] transition-colors"
                           >
                             <ShoppingCart className="w-4 h-4" />
@@ -226,6 +230,17 @@ export function BookOpenModal({ libro, autor, genero, editorial, onClose }: Book
             </div>
           </motion.div>
         </motion.div>
+      )}
+
+      {mostrarCheckout && (
+        <BookCheckoutModal
+          libro={libro}
+          autor={autor}
+          onClose={() => setMostrarCheckout(false)}
+          onExito={() => {
+            contenido.refetch();
+          }}
+        />
       )}
     </AnimatePresence>
   );
