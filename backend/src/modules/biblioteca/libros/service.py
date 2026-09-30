@@ -4,7 +4,7 @@ from beanie import PydanticObjectId
 from src.modules.biblioteca.libros.document import Libro, Idiomas
 from src.modules.biblioteca.libros.schema import LibroCreate, LibroUpdate, AutorDestacadoResponse
 from src.modules.biblioteca.libros.repo import LibroRepo
-from src.modules.compra.document import Compras, EstadoCompraEnum
+from src.modules.compra.document import Compras, EstadoCompraEnum, TipoItemCompra
 from src.modules.usuarios.document import Usuario, RolUsuario
 from src.modules.biblioteca.autor.document import Autor
 from src.modules.biblioteca.editorial.document import Editorial
@@ -109,7 +109,11 @@ class LibroService:
             sku=data.sku,
         )
 
-        libro = Libro(**data.model_dump())
+        payload = data.model_dump()
+        if payload.get("stock", 0) == 0:
+            payload["activo"] = False
+
+        libro = Libro(**payload)
         await libro.insert()
         return libro
 
@@ -165,6 +169,10 @@ class LibroService:
             sku=data.sku,
             excluir_id=id,
         )
+
+        stock_final = data.stock if data.stock is not None else libro.stock
+        if stock_final == 0:
+            data = data.model_copy(update={"activo": False})
 
         resultado = await self.repo.actualizar(id, data)
         if not resultado:
@@ -255,6 +263,26 @@ class LibroService:
         )
 
         return compra is not None
+
+    async def mis_libros(self, usuario_id: PydanticObjectId) -> list[Libro]:
+        compras = await Compras.find(
+            {
+                "usuario_id": usuario_id,
+                "estado": {"$in": [e.value for e in ESTADOS_CON_ACCESO]},
+            }
+        ).to_list()
+        
+        libro_ids = {
+            item.producto_id
+            for compra in compras
+            for item in compra.items
+            if item.tipo == TipoItemCompra.LIBRO
+        }
+
+        if not libro_ids:
+            return []
+
+        return await Libro.find({"_id": {"$in": list(libro_ids)}}).to_list()
 
     async def obtener_contenido(self, libro_id: PydanticObjectId, usuario: Usuario) -> Libro:
         libro = await self.obtener_por_id(libro_id)

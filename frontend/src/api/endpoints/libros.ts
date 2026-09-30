@@ -43,6 +43,11 @@ export async function buscarLibros(params: BuscarLibrosParams = {}) {
   return data;
 }
 
+export async function listarMisLibros() {
+  const { data } = await apiClient.get<LibroResponse[]>("/libros/mis-libros");
+  return data;
+}
+
 export async function obtenerLibro(libroId: string) {
   const { data } = await apiClient.get<LibroResponse>(`/libros/${libroId}`);
   return data;

@@ -4,6 +4,7 @@ import BibliotecaLayout from "@/components/layout/BibliotecaLayout";
 import Tienda from "@/pages/tienda/Tienda";
 import ProductoDetalle from "@/pages/tienda/ProductosDetalles";
 import Biblioteca from "@/pages/biblioteca/Biblioteca";
+import MisLibros from "@/pages/biblioteca/MisLibros";
 
 export const publicRoutes: RouteObject[] = [
   {
@@ -17,6 +18,7 @@ export const publicRoutes: RouteObject[] = [
     element: <BibliotecaLayout />,
     children: [
       { path: "/biblioteca", element: <Biblioteca /> },
+      { path: "/biblioteca/mis-libros", element: <MisLibros /> },
     ],
   },
 ];

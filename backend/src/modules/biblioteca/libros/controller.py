@@ -73,7 +73,8 @@ class LibroController:
             limit=limit,
         )
 
-    # ========== CONTENIDO PROTEGIDO ==========
+    async def mis_libros(self, usuario_id: PydanticObjectId):
+        return await self.service.mis_libros(usuario_id)
 
     async def obtener_contenido(self, libro_id: PydanticObjectId, usuario: Usuario) -> Libro:
         return await self.service.obtener_contenido(libro_id, usuario)

@@ -45,6 +45,15 @@ export async function obtenerLibroService(
   }
 }
 
+export async function listarMisLibrosService(): Promise<ServiceResult<LibroResponse[]>> {
+  try {
+    const data = await librosApi.listarMisLibros();
+    return { success: true, data };
+  } catch (err) {
+    return { success: false, error: networkError(err as AxiosError) };
+  }
+}
+
 export async function obtenerContenidoLibroService(
   id: string
 ): Promise<ServiceResult<LibroContenidoResponse>> {

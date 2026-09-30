@@ -55,6 +55,14 @@ async def buscar_libros(
 async def autores_destacados(limit: int = Query(default=6, ge=1, le=20)):
     return await controller.autores_destacados(limit=limit)
 
+@router.get(
+    "/mis-libros",
+    response_model=list[LibroResponse],
+    dependencies=[Depends(obtener_usuario_actual)],
+)
+async def mis_libros(usuario=Depends(obtener_usuario_actual)):
+    return await controller.mis_libros(usuario.id)
+
 @router.get("/all", response_model=Paginado[LibroAdminResponse], dependencies=[Depends(obtener_usuario_admin)])
 async def listar_libros(skip: int = 0, limit: int = 20):
     libros, total = await controller.listar(skip=skip, limit=limit)

@@ -17,29 +17,17 @@ export default function StoreLayout() {
           </Link>
 
           <nav className="flex items-center gap-5">
-            <Link
-              to="/tienda"
-              className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
-            >
+            <Link to="/tienda" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
               Tienda
             </Link>
-
-            <Link
-              to="/tienda/mis-compras"
-              className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
-            >
+            <Link to="/tienda/mis-compras" className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
               <Package className="w-4 h-4" />
               <span className="hidden sm:inline">Mis Compras</span>
             </Link>
-
-            <Link
-              to="/dashboard"
-              className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
-            >
+            <Link to="/dashboard" className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
               <User className="w-4 h-4" />
               <span className="hidden sm:inline">Mi Cuenta</span>
             </Link>
-
             <button
               type="button"
               onClick={() => setCartOpen(true)}

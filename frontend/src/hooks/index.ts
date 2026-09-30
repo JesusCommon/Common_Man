@@ -136,6 +136,7 @@ export { useObtenerAutor } from "./biblioteca/autor/useObtenerAutor";
 export { useActualizarAutor } from "./biblioteca/autor/useActualizarAutor";
 export { useActivarAutor } from "./biblioteca/autor/useActivarAutor";
 export { useDesactivarAutor } from "./biblioteca/autor/useDesactivarAutor";
+export { useAutoresDestacados } from "./biblioteca/autor/useAutoresDestacados";
 
 //Genero
 export { useCrearGenero } from "./biblioteca/genero/useCrearGenero";
@@ -172,4 +173,4 @@ export { useDesactivarLibro } from "./biblioteca/libros/useDesactivarLibro";
 export { useListarLibrosInactivos } from "./biblioteca/libros/useListarLibroInactivos";
 export { useListarLibrosActivos } from "./biblioteca/libros/useListarLibrosActivos";
 export { useListarLibros } from "./biblioteca/libros/useListarLibros";
-export { useAutoresDestacados } from "./biblioteca/autor/useAutoresDestacados";
+export { useMisLibros } from "./biblioteca/libros/useMisLibros";

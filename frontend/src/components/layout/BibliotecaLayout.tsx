@@ -1,5 +1,5 @@
 import { Outlet, Link } from "react-router-dom";
-import { BookMarked, ShoppingCart, User } from "lucide-react";
+import { BookMarked, Library, User } from "lucide-react";
 
 export default function BibliotecaLayout() {
   return (
@@ -13,11 +13,11 @@ export default function BibliotecaLayout() {
 
           <nav className="flex items-center gap-5 text-sm font-medium text-[#8b8377]">
             <Link to="/biblioteca" className="hover:text-[#221e19] transition-colors">
-              Biblioteca
+              Explorar
             </Link>
-            <Link to="/tienda" className="flex items-center gap-2 hover:text-[#221e19] transition-colors">
-              <ShoppingCart className="w-4 h-4" />
-              <span className="hidden sm:inline">Tienda</span>
+            <Link to="/biblioteca/mis-libros" className="flex items-center gap-2 hover:text-[#221e19] transition-colors">
+              <Library className="w-4 h-4" />
+              <span className="hidden sm:inline">Mis Libros</span>
             </Link>
             <Link to="/dashboard" className="flex items-center gap-2 hover:text-[#221e19] transition-colors">
               <User className="w-4 h-4" />
