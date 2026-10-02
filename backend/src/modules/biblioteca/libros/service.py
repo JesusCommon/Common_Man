@@ -1,5 +1,5 @@
 from decimal import Decimal
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, UploadFile
 from beanie import PydanticObjectId
 from src.modules.biblioteca.libros.document import Libro, Idiomas
 from src.modules.biblioteca.libros.schema import LibroCreate, LibroUpdate, AutorDestacadoResponse
@@ -9,6 +9,8 @@ from src.modules.usuarios.document import Usuario, RolUsuario
 from src.modules.biblioteca.autor.document import Autor
 from src.modules.biblioteca.editorial.document import Editorial
 from src.modules.biblioteca.genero.document import Genero
+from src.core.storage.r2 import storage
+from src.core.storage.watermark import generar_version_personal_wm
 
 ESTADOS_CON_ACCESO = (
     EstadoCompraEnum.PAGADO,
@@ -115,6 +117,29 @@ class LibroService:
 
         libro = Libro(**payload)
         await libro.insert()
+        return libro
+
+    async def subir_archivo(
+        self, libro_id: PydanticObjectId, archivo: UploadFile
+    ) -> Libro:
+
+        libro = await self.obtener_por_id(libro_id)
+
+        if not archivo.filename or not archivo.filename.lower().endswith(".pdf"):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="El archivo debe ser un PDF (.pdf)",
+            )
+        if archivo.content_type not in ("application/pdf", "application/x-pdf"):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="El tipo de contenido debe ser application/pdf",
+            )
+
+        key = await storage.subir_pdf_original(libro_id, archivo)
+        libro.contenido = key
+        await libro.save()
+
         return libro
 
     async def autores_destacados(self, limit: int = 6) -> list[AutorDestacadoResponse]:
@@ -299,3 +324,43 @@ class LibroService:
             )
 
         return libro
+
+    async def preparar_lectura(
+        self, libro_id: PydanticObjectId, usuario: Usuario
+    ) -> dict:
+
+        libro = await self.obtener_por_id(libro_id)
+        if usuario.rol != RolUsuario.ADMIN:
+            if not await self._usuario_compro_libro(libro.id, usuario.id):
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Debes comprar este libro para acceder a su contenido.",
+                )
+
+        if not storage.existe_version_personal(libro.id, str(usuario.id)):
+            if not storage.existe_original(libro.id):
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="El archivo PDF de este libro no está disponible.",
+                )
+            
+            original_bytes = storage.descargar_original(libro.id)
+            
+            personal_bytes = generar_version_personal_wm(
+                original_bytes,
+                libro.id,
+                str(usuario.id),
+                usuario.email,
+            )
+            
+            storage.subir_version_personal(libro.id, str(usuario.id), personal_bytes)
+
+        key = storage.obtener_version_personal(libro.id, str(usuario.id))
+        url_firmada = storage.firmar_url_descarga(key, expira_segundos=900)
+
+        return {
+            "libro_id": libro.id,
+            "titulo": libro.nombre,
+            "url_lectura": url_firmada,
+            "expira_en_segundos": 900,
+        }

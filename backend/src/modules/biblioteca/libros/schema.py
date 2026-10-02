@@ -149,7 +149,6 @@ class LibroCreate(LibroValidaciones, BaseModel):
     precio: Decimal = Field(...)
     stock: int = Field(default=0)
     descripcion: str | None = Field(default=None)
-    contenido: HttpUrl = Field(...)
 
 class LibroUpdate(LibroValidaciones, BaseModel):
     nombre: str | None = Field(default=None)
@@ -166,7 +165,6 @@ class LibroUpdate(LibroValidaciones, BaseModel):
     precio: Decimal | None = Field(default=None)
     stock: int | None = Field(default=None)
     descripcion: str | None = Field(default=None)
-    contenido: HttpUrl | None = Field(default=None)
     activo: bool | None = Field(default=None)
 
 class LibroResponse(BaseModel):
@@ -193,7 +191,7 @@ class LibroResponse(BaseModel):
 
 
 class LibroAdminResponse(LibroResponse):
-    contenido: HttpUrl
+    contenido: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -201,7 +199,7 @@ class LibroAdminResponse(LibroResponse):
 class LibroContenidoResponse(BaseModel):
     id: PydanticObjectId
     nombre: str
-    contenido: HttpUrl
+    contenido: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -212,3 +210,11 @@ class AutorDestacadoResponse(BaseModel):
     imagen: str | None = None
     pais_nacimiento: str | None = None
     total_libros: int
+
+class LibroLecturaResponse(BaseModel):
+    libro_id: PydanticObjectId
+    titulo: str
+    url_lectura: str = Field(..., description="URL presigned de 15 minutos para leer")
+    expira_en_segundos: int = Field(default=900)
+    
+    model_config = ConfigDict(from_attributes=True)

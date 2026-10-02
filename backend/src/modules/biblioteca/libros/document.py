@@ -94,8 +94,8 @@ class Libro(Document, StatusMixin, TimestampMixim):
         description="Descripcion del libro"
     )
 
-    contenido : HttpUrl = Field(
-        ...,
+    contenido : str |None = Field(
+        default=None,
         description="Contenido del libro"
     )
 

@@ -1,6 +1,6 @@
 from decimal import Decimal
 from typing import Any
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, UploadFile, File, Depends, Query
 from beanie import PydanticObjectId
 from src.core.security.jwt import obtener_usuario_actual, obtener_usuario_admin
 from src.modules.biblioteca.libros.controller import LibroController
@@ -11,7 +11,8 @@ from src.modules.biblioteca.libros.schema import (
     LibroResponse,
     LibroAdminResponse,
     LibroContenidoResponse,
-    AutorDestacadoResponse
+    AutorDestacadoResponse,
+    LibroLecturaResponse
 )
 from src.shared.common_schema import RespuestaConMensaje, Paginado
 
@@ -123,6 +124,22 @@ async def obtener_contenido_libro(
     usuario: Any = Depends(obtener_usuario_actual),
 ):
     return await controller.obtener_contenido(libro_id, usuario)
+
+@router.post("/{libro_id}/archivo", response_model=RespuestaConMensaje[LibroAdminResponse], dependencies=[Depends(obtener_usuario_admin)])
+async def subir_archivo_libro(
+    libro_id: PydanticObjectId,
+    pdf: UploadFile = File(..., description="Archivo PDF del libro"),
+):
+    libro = await controller.subir_archivo(libro_id, pdf)
+    return RespuestaConMensaje(mensaje="Archivo PDF subido correctamente",data=libro)
+
+@router.get("/{libro_id}/lector", response_model=LibroLecturaResponse, dependencies=[Depends(obtener_usuario_actual)])
+async def preparar_libro_para_lectura(
+    libro_id: PydanticObjectId,
+    usuario=Depends(obtener_usuario_actual),
+):
+    resultado = await controller.preparar_lectura(libro_id, usuario)
+    return LibroLecturaResponse(**resultado)
 
 @router.post("/", response_model=RespuestaConMensaje[LibroAdminResponse], status_code=201, dependencies=[Depends(obtener_usuario_admin)])
 async def crear_libro(payload: LibroCreate):

@@ -2,11 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import {
   useCrearLibro,
   useActualizarLibro,
+  useSubirArchivoLibro,
   useAutoresPublicos,
   useEditorialesPublicas,
   useGenerosPublicos,
 } from "@/hooks";
-import { X } from "lucide-react";
+import { X, Upload, FileText, CheckCircle2 } from "lucide-react";
 import type { Idiomas, LibroAdminResponse } from "@/api/types";
 import { extraerMensajeError } from "@/lib/errors";
 
@@ -31,7 +32,6 @@ interface LibroForm {
   precio: string;
   stock: string;
   descripcion: string;
-  contenido: string;
 }
 
 const IDIOMAS: Idiomas[] = ["Español", "Ingles", "Portugues"];
@@ -52,7 +52,6 @@ function formVacio(): LibroForm {
     precio: "",
     stock: "0",
     descripcion: "",
-    contenido: "",
   };
 }
 
@@ -72,7 +71,6 @@ function desdeLibro(l: LibroAdminResponse): LibroForm {
     precio: String(l.precio),
     stock: String(l.stock),
     descripcion: l.descripcion ?? "",
-    contenido: String(l.contenido),
   };
 }
 
@@ -82,30 +80,35 @@ const inputCls =
 export function LibroFormModal({ abierto, libro, onClose }: LibroFormModalProps) {
   const crear = useCrearLibro();
   const actualizar = useActualizarLibro();
-
+  const subirArchivo = useSubirArchivoLibro();
   const { data: autores } = useAutoresPublicos();
   const { data: editoriales } = useEditorialesPublicas();
   const { data: generos } = useGenerosPublicos();
-
   const [form, setForm] = useState<LibroForm>(formVacio);
+  const [archivo, setArchivo] = useState<File | null>(null);
+  const [mensajeExito, setMensajeExito] = useState<string | null>(null);
 
   const prevId = useRef(libro?.id);
   useEffect(() => {
     if (libro?.id !== prevId.current) {
       setForm(libro ? desdeLibro(libro) : formVacio());
+      setArchivo(null);
+      setMensajeExito(null);
       prevId.current = libro?.id;
     }
   }, [libro]);
 
-  const isPending = crear.isPending || actualizar.isPending;
-  const error = crear.error || actualizar.error;
+  const isPending = crear.isPending || actualizar.isPending || subirArchivo.isPending;
+  const error = crear.error || actualizar.error || subirArchivo.error;
 
   function set<K extends keyof LibroForm>(key: K, value: LibroForm[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setMensajeExito(null);
+
     const payload = {
       nombre: form.nombre,
       autor_id: form.autor_id,
@@ -121,13 +124,33 @@ export function LibroFormModal({ abierto, libro, onClose }: LibroFormModalProps)
       precio: Number(form.precio),
       stock: Number(form.stock),
       descripcion: form.descripcion.trim() || undefined,
-      contenido: form.contenido.trim(),
     };
 
-    if (libro) {
-      actualizar.mutate({ id: libro.id, data: payload }, { onSuccess: onClose });
-    } else {
-      crear.mutate(payload, { onSuccess: onClose });
+    const mensajes: string[] = [];
+
+    try {
+      let libroId: string;
+
+      if (libro) {
+        const resp = await actualizar.mutateAsync({ id: libro.id, data: payload });
+        libroId = libro.id;
+        mensajes.push(resp.mensaje);
+      } else {
+        const resp = await crear.mutateAsync(payload);
+        libroId = resp.data.id;
+        mensajes.push(resp.mensaje);
+      }
+
+      if (archivo) {
+        const respSubir = await subirArchivo.mutateAsync({ libroId, archivo });
+        mensajes.push(respSubir.mensaje);
+      }
+
+      setMensajeExito(mensajes.join(" · "));
+
+      setTimeout(() => onClose(), 1500);
+    } catch {
+      // El error se renderiza vía el estado `error`
     }
   }
 
@@ -136,7 +159,6 @@ export function LibroFormModal({ abierto, libro, onClose }: LibroFormModalProps)
     form.autor_id &&
     form.editorial_id &&
     form.genero_id &&
-    form.contenido.trim() &&
     Number(form.precio) > 0;
 
   if (!abierto) return null;
@@ -349,17 +371,59 @@ export function LibroFormModal({ abierto, libro, onClose }: LibroFormModalProps)
 
             <div className="sm:col-span-2">
               <label className="mb-1 block text-sm font-medium text-[#52525B]">
-                URL de contenido <span className="text-red-500">*</span>
+                Archivo PDF{" "}
+                {!libro?.contenido && <span className="text-red-500">*</span>}
               </label>
               <input
-                type="url"
-                value={form.contenido}
-                onChange={(e) => set("contenido", e.target.value)}
-                placeholder="https://.../libro.pdf"
-                className={inputCls}
+                type="file"
+                accept="application/pdf"
+                onChange={(e) => setArchivo(e.target.files?.[0] || null)}
+                className="hidden"
+                id="pdf-input"
               />
+              <label
+                htmlFor="pdf-input"
+                className="flex items-center gap-3 rounded-lg border-2 border-dashed border-[#E4E4E1] px-4 py-3 cursor-pointer hover:border-[#2563EB] hover:bg-[#F4F4F5] transition"
+              >
+                {archivo ? (
+                  <>
+                    <FileText className="w-5 h-5 text-[#2563EB]" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-[#18181B] truncate">
+                        {archivo.name}
+                      </p>
+                      <p className="text-xs text-[#A1A19A]">
+                        {(archivo.size / 1024 / 1024).toFixed(2)} MB
+                      </p>
+                    </div>
+                  </>
+                ) : libro?.contenido ? (
+                  <>
+                    <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-[#18181B]">PDF ya subido</p>
+                      <p className="text-xs text-[#A1A19A]">
+                        Selecciona un archivo para reemplazarlo
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-5 h-5 text-[#A1A19A]" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-[#52525B]">
+                        Haz clic para seleccionar un PDF
+                      </p>
+                      <p className="text-xs text-[#A1A19A]">
+                        Tamaño máximo recomendado: 30 MB
+                      </p>
+                    </div>
+                  </>
+                )}
+              </label>
               <p className="mt-1 text-xs text-[#A1A19A]">
-                🔒 Este contenido solo se libera a quienes compren el libro.
+                🔒 Este contenido se almacena de forma segura y solo se libera a quienes
+                compren el libro.
               </p>
             </div>
 
@@ -386,6 +450,13 @@ export function LibroFormModal({ abierto, libro, onClose }: LibroFormModalProps)
             </div>
           )}
 
+          {mensajeExito && (
+            <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+              <p className="text-sm text-emerald-700">{mensajeExito}</p>
+            </div>
+          )}
+
           <div className="flex justify-end gap-3 pt-2">
             <button
               type="button"
@@ -399,7 +470,13 @@ export function LibroFormModal({ abierto, libro, onClose }: LibroFormModalProps)
               disabled={isPending || !requeridosOk}
               className="rounded-lg bg-[#2563EB] px-4 py-2 text-sm font-medium text-white hover:bg-[#1D4ED8] transition disabled:opacity-50"
             >
-              {isPending ? "Guardando..." : libro ? "Guardar cambios" : "Crear libro"}
+              {isPending
+                ? subirArchivo.isPending
+                  ? "Subiendo PDF..."
+                  : "Guardando..."
+                : libro
+                ? "Guardar cambios"
+                : "Crear libro"}
             </button>
           </div>
         </form>

@@ -15,7 +15,6 @@ export interface LibroCreate {
   precio: string;
   stock: number;
   descripcion?: string;
-  contenido: string;
 }
 
 export interface LibroUpdate {
@@ -33,7 +32,6 @@ export interface LibroUpdate {
   precio?: string;
   stock?: number;
   descripcion?: string;
-  contenido?: string;
   activo?: boolean;
 }
 
@@ -54,6 +52,7 @@ export interface LibroResponse {
   stock: number;
   descripcion?: string;
   activo: boolean;
+  contenido?: string;
   fecha_creacion: string;
   fecha_actualizacion: string;
 }

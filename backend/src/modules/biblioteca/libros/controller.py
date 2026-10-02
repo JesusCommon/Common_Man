@@ -1,5 +1,6 @@
 from decimal import Decimal
 from beanie import PydanticObjectId
+from fastapi import UploadFile
 from src.modules.biblioteca.libros.document import Libro, Idiomas
 from src.modules.biblioteca.libros.schema import LibroCreate, LibroUpdate
 from src.modules.biblioteca.libros.service import LibroService
@@ -24,6 +25,9 @@ class LibroController:
 
     async def listar_inactivos(self, skip: int = 0, limit: int = 20) -> tuple[list[Libro], int]:
         return await self.service.listar_inactivos(skip=skip, limit=limit)
+
+    async def subir_archivo(self, libro_id: PydanticObjectId, archivo: UploadFile):
+        return await self.service.subir_archivo(libro_id, archivo)
 
     async def actualizar(self, id: PydanticObjectId, data: LibroUpdate) -> Libro:
         return await self.service.actualizar(id, data)
@@ -78,3 +82,6 @@ class LibroController:
 
     async def obtener_contenido(self, libro_id: PydanticObjectId, usuario: Usuario) -> Libro:
         return await self.service.obtener_contenido(libro_id, usuario)
+
+    async def preparar_lectura(self, libro_id: PydanticObjectId, usuario: Usuario):
+        return await self.service.preparar_lectura(libro_id, usuario)

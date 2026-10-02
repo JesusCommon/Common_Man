@@ -1,4 +1,4 @@
-import fitz  # PyMuPDF
+import pymupdf 
 from datetime import datetime
 from beanie import PydanticObjectId
 
@@ -9,7 +9,7 @@ def generar_version_personal_wm(
     user_id: str,
     email: str,
 ) -> bytes:
-    doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+    doc = pymupdf.open(stream=pdf_bytes, filetype="pdf")
 
     timestamp = datetime.utcnow().isoformat()
     metadata = {

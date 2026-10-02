@@ -179,6 +179,18 @@ export async function actualizarLibroService(
   }
 }
 
+export async function subirArchivoLibroService(
+  libroId: string,
+  archivo: File
+): Promise<ServiceResult<RespuestaConMensaje<LibroAdminResponse>>> {
+  try {
+    const data = await librosApi.subirArchivoLibro(libroId, archivo);
+    return { success: true, data };
+  } catch (err) {
+    return { success: false, error: networkError(err as AxiosError) };
+  }
+}
+
 export async function activarLibroService(
   id: string
 ): Promise<ServiceResult<RespuestaConMensaje<LibroAdminResponse>>> {

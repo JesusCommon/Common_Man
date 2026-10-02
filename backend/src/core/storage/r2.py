@@ -13,7 +13,7 @@ class R2Storage:
             "s3",
             endpoint_url=settings.r2.endpoint,
             aws_access_key_id=settings.r2.access_key_id,
-            aws_secret_access_key=settings.r2.secret_access_key,
+            aws_secret_access_key=settings.r2.secret_access_key.get_secret_value(),
             config=Config(signature_version="s3v4"),
         )
         self.bucket = settings.r2.bucket

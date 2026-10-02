@@ -118,6 +118,18 @@ export async function crearLibro(data: LibroCreate) {
   return response;
 }
 
+export async function subirArchivoLibro(libroId: string, archivo: File) {
+  const formData = new FormData();
+  formData.append("pdf", archivo);
+
+  const { data: response } = await apiClient.post<
+    RespuestaConMensaje<LibroAdminResponse>
+  >(`/libros/${libroId}/archivo`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response;
+}
+
 export async function actualizarLibro(libroId: string, data: LibroUpdate) {
   const { data: response } = await apiClient.patch<
     RespuestaConMensaje<LibroAdminResponse>
