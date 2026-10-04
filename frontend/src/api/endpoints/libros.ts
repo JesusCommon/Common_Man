@@ -111,6 +111,16 @@ export async function obtenerLibroAdmin(libroId: string) {
   return data;
 }
 
+export async function prepararLectura(libroId: string) {
+  const { data } = await apiClient.get<{
+    libro_id: string;
+    titulo: string;
+    url_lectura: string;
+    expira_en_segundos: number;
+  }>(`/libros/${libroId}/lector`);
+  return data;
+}
+
 export async function crearLibro(data: LibroCreate) {
   const { data: response } = await apiClient.post<
     RespuestaConMensaje<LibroAdminResponse>

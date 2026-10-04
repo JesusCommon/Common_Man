@@ -7,7 +7,7 @@ def generar_version_personal_wm(
     pdf_bytes: bytes,
     libro_id: PydanticObjectId,
     user_id: str,
-    email: str,
+    correo: str,
 ) -> bytes:
     doc = pymupdf.open(stream=pdf_bytes, filetype="pdf")
 
@@ -16,11 +16,11 @@ def generar_version_personal_wm(
         "title": doc.metadata.get("title", ""),
         "author": doc.metadata.get("author", ""),
         "subject": f"Purchased by {user_id}",
-        "keywords": f"license:{user_id}:{email}:{timestamp}",
+        "keywords": f"license:{user_id}:{correo}:{timestamp}",
         "creator": "Common Man Biblioteca",
     }
     doc.set_metadata(metadata)
-    texto_invisible = f"User:{user_id}|Email:{email}|Time:{timestamp}"
+    texto_invisible = f"User:{user_id}|Email:{correo}|Time:{timestamp}"
     for page in doc:
         page.insert_text(
             (10, 20),

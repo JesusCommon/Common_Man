@@ -175,3 +175,4 @@ export { useListarLibrosActivos } from "./biblioteca/libros/useListarLibrosActiv
 export { useListarLibros } from "./biblioteca/libros/useListarLibros";
 export { useMisLibros } from "./biblioteca/libros/useMisLibros";
 export { useSubirArchivoLibro }from "./biblioteca/libros/useSubirArchivoLibro";
+export { usePrepararLectura }from "./biblioteca/libros/usePrepararLectura";

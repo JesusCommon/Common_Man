@@ -48,7 +48,6 @@ export const LibroCreateSchema = z.object({
   descripcion: trimOpcional(
     z.string().max(1000, "La descripción no puede exceder 1000 caracteres")
   ),
-  contenido: z.string().trim().url("El contenido debe ser una URL válida"),
 });
 
 export const LibroUpdateSchema = LibroCreateSchema.partial().extend({

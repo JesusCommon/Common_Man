@@ -161,6 +161,12 @@ class LibroRepo(BaseRepoConEstado[Libro, LibroCreate, LibroUpdate]):
 
         libro.stock -= cantidad
 
+        if libro.stock == 0:
+            libro.activo = False
+
+        await libro.save()
+        return True
+
     async def devolver_stock(self, id: PydanticObjectId, cantidad: int) -> bool:
         libro = await self.model.get(id)
         if not libro:

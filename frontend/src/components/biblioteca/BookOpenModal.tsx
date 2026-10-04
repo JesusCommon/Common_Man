@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, BookOpen, ExternalLink, ShoppingCart, Building2 } from "lucide-react";
-import { useObtenerContenidoLibro } from "@/hooks";
+import { X, BookOpen, ShoppingCart, Building2 } from "lucide-react";
+import { usePrepararLectura } from "@/hooks";
 import { extraerMensajeError } from "@/lib/errors";
 import { BookCheckoutModal } from "./BookCheckoutModal";
+import { BookReaderModal } from "./BookReaderModal";
 import type { LibroResponse } from "@/api/types";
 
 const EASE = [0.66, 0, 0.34, 1] as const;
@@ -35,8 +36,14 @@ function Book3D({
   onOpenComplete: () => void;
 }) {
   return (
-    <motion.div style={{ perspective: 2200 }} className="flex justify-center md:justify-start pt-4">
-      <div className="relative w-65 md:w-75 aspect-2/3" style={{ transformStyle: "preserve-3d" }}>
+    <motion.div
+      style={{ perspective: 2200 }}
+      className="flex justify-center md:justify-start pt-4"
+    >
+      <div
+        className="relative w-65 md:w-75 aspect-2/3"
+        style={{ transformStyle: "preserve-3d" }}
+      >
         <div className="absolute left-[6%] right-[6%] -bottom-6 h-6 rounded-[50%] blur-[6px] bg-[radial-gradient(ellipse_at_center,rgba(34,30,25,0.28),transparent_70%)]" />
         <div className="absolute inset-0 rounded-r-xl bg-[#efe8da] shadow-[0_24px_60px_rgba(34,30,25,0.25)]" />
         <motion.div
@@ -63,7 +70,10 @@ function Book3D({
         >
           <div
             className="absolute inset-0 rounded-r-xl bg-cover bg-center"
-            style={{ backgroundImage: portada ? `url(${portada})` : undefined, backfaceVisibility: "hidden" }}
+            style={{
+              backgroundImage: portada ? `url(${portada})` : undefined,
+              backfaceVisibility: "hidden",
+            }}
           >
             {!portada && (
               <span className="font-editorial absolute inset-0 flex items-center justify-center text-6xl text-[#f3eee5] bg-linear-to-br from-[#3a352d] to-[#221e19]">
@@ -75,7 +85,9 @@ function Book3D({
             className="absolute inset-0 rounded-r-xl bg-[#fbf9f4] flex flex-col items-center justify-center gap-1.5 p-5 text-center"
             style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
           >
-            <p className="font-editorial text-lg font-semibold text-[#221e19] leading-tight">{nombre}</p>
+            <p className="font-editorial text-lg font-semibold text-[#221e19] leading-tight">
+              {nombre}
+            </p>
           </div>
         </motion.div>
       </div>
@@ -91,19 +103,36 @@ interface BookOpenModalProps {
   onClose: () => void;
 }
 
-export function BookOpenModal({ libro, autor, genero, editorial, onClose }: BookOpenModalProps) {
+export function BookOpenModal({
+  libro,
+  autor,
+  genero,
+  editorial,
+  onClose,
+}: BookOpenModalProps) {
   const [cerrando, setCerrando] = useState(false);
   const [abierto, setAbierto] = useState(false);
-  const [intentandoLeer, setIntentandoLeer] = useState(false);
   const [mostrarCheckout, setMostrarCheckout] = useState(false);
+  const [lectorAbierto, setLectorAbierto] = useState(false);
+  const [urlLectura, setUrlLectura] = useState("");
 
-  const contenido = useObtenerContenidoLibro(intentandoLeer ? libro.id : "");
+  const prepararLectura = usePrepararLectura();
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setCerrando(true);
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
+
+  const handleLeer = async () => {
+    try {
+      const data = await prepararLectura.mutateAsync(libro.id);
+      setUrlLectura(data.url_lectura);
+      setLectorAbierto(true);
+    } catch {
+      // El error se renderiza vía prepararLectura.isError
+    }
+  };
 
   return (
     <AnimatePresence onExitComplete={onClose}>
@@ -179,40 +208,20 @@ export function BookOpenModal({ libro, autor, genero, editorial, onClose }: Book
                       <span className="w-px h-3 bg-[#e4dccd]" />
                       <span>{libro.idioma}</span>
                       <span className="w-px h-3 bg-[#e4dccd]" />
-                      <span className="text-[#221e19] font-semibold">{formatPrecio(libro.precio)}</span>
+                      <span className="text-[#221e19] font-semibold">
+                        {formatPrecio(libro.precio)}
+                      </span>
                     </div>
 
                     <div className="mt-6 space-y-3">
-                      {!intentandoLeer && (
-                        <button
-                          onClick={() => setIntentandoLeer(true)}
-                          className="inline-flex items-center gap-2 rounded-full bg-[#221e19] px-6 py-3 text-sm font-medium text-[#f3eee5] hover:bg-[#b23a2f] transition-colors"
-                        >
-                          <BookOpen className="w-4 h-4" />
-                          Leer libro
-                        </button>
-                      )}
-
-                      {intentandoLeer && contenido.isLoading && (
+                      {prepararLectura.isPending && (
                         <p className="text-sm text-[#8b8377]">Verificando tu acceso…</p>
                       )}
 
-                      {contenido.isSuccess && (
-                        <a
-                          href={String(contenido.data.contenido)}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex items-center gap-2 rounded-full bg-[#b23a2f] px-6 py-3 text-sm font-medium text-white hover:bg-[#963026] transition-colors"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                          Abrir contenido
-                        </a>
-                      )}
-
-                      {contenido.isError && (
+                      {prepararLectura.isError && (
                         <div className="rounded-xl border border-[#e4dccd] bg-[#f3eee5] p-4 space-y-3">
                           <p className="text-sm text-[#221e19]">
-                            {extraerMensajeError(contenido.error)}
+                            {extraerMensajeError(prepararLectura.error)}
                           </p>
                           <button
                             onClick={() => setMostrarCheckout(true)}
@@ -223,6 +232,15 @@ export function BookOpenModal({ libro, autor, genero, editorial, onClose }: Book
                           </button>
                         </div>
                       )}
+
+                      <button
+                        onClick={handleLeer}
+                        disabled={prepararLectura.isPending}
+                        className="inline-flex items-center gap-2 rounded-full bg-[#221e19] px-6 py-3 text-sm font-medium text-[#f3eee5] hover:bg-[#b23a2f] transition-colors disabled:opacity-50"
+                      >
+                        <BookOpen className="w-4 h-4" />
+                        {prepararLectura.isPending ? "Preparando…" : "Leer libro"}
+                      </button>
                     </div>
                   </motion.div>
                 )}
@@ -238,8 +256,16 @@ export function BookOpenModal({ libro, autor, genero, editorial, onClose }: Book
           autor={autor}
           onClose={() => setMostrarCheckout(false)}
           onExito={() => {
-            contenido.refetch();
+            prepararLectura.reset();
           }}
+        />
+      )}
+
+      {lectorAbierto && (
+        <BookReaderModal
+          titulo={libro.nombre}
+          urlLectura={urlLectura}
+          onClose={() => setLectorAbierto(false)}
         />
       )}
     </AnimatePresence>

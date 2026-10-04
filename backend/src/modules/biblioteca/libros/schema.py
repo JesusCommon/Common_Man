@@ -1,7 +1,7 @@
 import re
 from datetime import datetime
 from decimal import Decimal
-from pydantic import field_validator, BaseModel, Field, HttpUrl, ConfigDict
+from pydantic import field_validator, BaseModel, Field, ConfigDict
 from beanie import PydanticObjectId
 from src.modules.biblioteca.libros.document import Idiomas
 

@@ -350,7 +350,7 @@ class LibroService:
                 original_bytes,
                 libro.id,
                 str(usuario.id),
-                usuario.email,
+                usuario.correo,
             )
             
             storage.subir_version_personal(libro.id, str(usuario.id), personal_bytes)
