@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { X, Download, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, Download, ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from "lucide-react";
 import * as pdfjsLib from "pdfjs-dist";
-import type { PDFDocumentProxy } from "pdfjs-dist";
+import type { PDFDocumentProxy, RenderTask } from "pdfjs-dist";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
 
@@ -13,11 +13,15 @@ interface BookReaderModalProps {
 
 export function BookReaderModal({ titulo, urlLectura, onClose }: BookReaderModalProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const renderTaskRef = useRef<RenderTask | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const [pdf, setPdf] = useState<PDFDocumentProxy | null>(null);
   const [paginaActual, setPaginaActual] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(0);
   const [cargando, setCargando] = useState(true);
+  const [renderizando, setRenderizando] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [scale, setScale] = useState(2.0);
 
   useEffect(() => {
     let cancelado = false;
@@ -54,12 +58,18 @@ export function BookReaderModal({ titulo, urlLectura, onClose }: BookReaderModal
     const renderizarPagina = async () => {
       if (!pdf || !canvasRef.current) return;
 
+      if (renderTaskRef.current) {
+        renderTaskRef.current.cancel();
+      }
+
+      setRenderizando(true);
+
       try {
         const page = await pdf.getPage(paginaActual);
 
         if (cancelado) return;
 
-        const viewport = page.getViewport({ scale: 1.5 });
+        const viewport = page.getViewport({ scale });
         const canvas = canvasRef.current;
         const context = canvas.getContext("2d");
 
@@ -68,13 +78,25 @@ export function BookReaderModal({ titulo, urlLectura, onClose }: BookReaderModal
         canvas.height = viewport.height;
         canvas.width = viewport.width;
 
-        await page.render({
+        const renderContext = {
           canvas,
           viewport,
-        }).promise;
-      } catch {
+        };
+
+        const renderTask = page.render(renderContext);
+        renderTaskRef.current = renderTask;
+
+        await renderTask.promise;
+
         if (cancelado) return;
-        setError("Error al renderizar la página.");
+
+        setRenderizando(false);
+      } catch (err) {
+        if (cancelado) return;
+        if ((err as Error).name !== "RenderingCancelledException") {
+          setError("Error al renderizar la página.");
+        }
+        setRenderizando(false);
       }
     };
 
@@ -82,8 +104,11 @@ export function BookReaderModal({ titulo, urlLectura, onClose }: BookReaderModal
 
     return () => {
       cancelado = true;
+      if (renderTaskRef.current) {
+        renderTaskRef.current.cancel();
+      }
     };
-  }, [pdf, paginaActual]);
+  }, [pdf, paginaActual, scale]);
 
   const handleDescargar = () => {
     const link = document.createElement("a");
@@ -100,19 +125,59 @@ export function BookReaderModal({ titulo, urlLectura, onClose }: BookReaderModal
     if (paginaActual < totalPaginas) setPaginaActual(paginaActual + 1);
   };
 
+  const zoomIn = () => {
+    setScale((prev) => Math.min(prev + 0.25, 4.0));
+  };
+
+  const zoomOut = () => {
+    setScale((prev) => Math.max(prev - 0.25, 1.0));
+  };
+
+  const resetZoom = () => {
+    setScale(2.0);
+  };
+
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-      <div className="relative w-full h-full max-w-6xl max-h-[95vh] bg-white rounded-lg shadow-2xl flex flex-col overflow-hidden">
+      <div className="relative w-full h-full max-w-7xl max-h-[98vh] bg-white rounded-lg shadow-2xl flex flex-col overflow-hidden">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-50">
-          <h3 className="text-lg font-semibold text-gray-900 truncate">{titulo}</h3>
-          <div className="flex items-center gap-3">
+          <h3 className="text-lg font-semibold text-gray-900 truncate flex-1 mr-4">
+            {titulo}
+          </h3>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 px-3 py-1.5 bg-white border border-gray-300 rounded-lg">
+              <button
+                onClick={zoomOut}
+                disabled={scale <= 1.0}
+                className="p-1.5 rounded hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Reducir zoom"
+              >
+                <ZoomOut className="w-4 h-4 text-gray-700" />
+              </button>
+              <button
+                onClick={resetZoom}
+                className="px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-100 rounded transition"
+                title="Zoom por defecto"
+              >
+                {Math.round(scale * 100)}%
+              </button>
+              <button
+                onClick={zoomIn}
+                disabled={scale >= 4.0}
+                className="p-1.5 rounded hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Aumentar zoom"
+              >
+                <ZoomIn className="w-4 h-4 text-gray-700" />
+              </button>
+            </div>
+
             <button
               onClick={handleDescargar}
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition"
               title="Descargar copia personal"
             >
               <Download className="w-4 h-4" />
-              Descargar
+              <span className="hidden sm:inline">Descargar</span>
             </button>
             <button
               onClick={onClose}
@@ -123,14 +188,14 @@ export function BookReaderModal({ titulo, urlLectura, onClose }: BookReaderModal
           </div>
         </div>
 
-        <div className="flex-1 overflow-auto flex items-center justify-center bg-gray-100 p-4">
+        <div ref={scrollRef} className="flex-1 overflow-auto bg-gray-100 p-8 flex">
           {cargando ? (
-            <div className="flex flex-col items-center gap-3">
+            <div className="m-auto flex flex-col items-center gap-3">
               <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
               <p className="text-sm text-gray-600">Cargando PDF...</p>
             </div>
           ) : error ? (
-            <div className="text-center space-y-3">
+            <div className="m-auto text-center space-y-3">
               <p className="text-red-600 font-medium">{error}</p>
               <button
                 onClick={onClose}
@@ -140,7 +205,17 @@ export function BookReaderModal({ titulo, urlLectura, onClose }: BookReaderModal
               </button>
             </div>
           ) : (
-            <canvas ref={canvasRef} className="max-w-full max-h-full shadow-lg" />
+            <div className="relative m-auto">
+              <canvas
+                ref={canvasRef}
+                className="shadow-2xl bg-white block"
+              />
+              {renderizando && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/10 backdrop-blur-sm">
+                  <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                </div>
+              )}
+            </div>
           )}
         </div>
 
@@ -154,9 +229,22 @@ export function BookReaderModal({ titulo, urlLectura, onClose }: BookReaderModal
               <ChevronLeft className="w-4 h-4" />
               Anterior
             </button>
-            <span className="text-sm font-medium text-gray-700">
-              Página {paginaActual} de {totalPaginas}
-            </span>
+            <div className="flex items-center gap-4">
+              <span className="text-sm font-medium text-gray-700">
+                Página {paginaActual} de {totalPaginas}
+              </span>
+              <select
+                value={paginaActual}
+                onChange={(e) => setPaginaActual(Number(e.target.value))}
+                className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition"
+              >
+                {Array.from({ length: totalPaginas }, (_, i) => i + 1).map((num) => (
+                  <option key={num} value={num}>
+                    {num}
+                  </option>
+                ))}
+              </select>
+            </div>
             <button
               onClick={paginaSiguiente}
               disabled={paginaActual === totalPaginas}
