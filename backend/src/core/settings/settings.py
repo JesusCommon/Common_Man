@@ -66,6 +66,19 @@ class R2Settings(BaseSettings):
     )
     endpoint: str = Field(..., description="Endpoint S3 de R2")
 
+class CloudinarySettings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+        env_prefix="CLOUDINARY_",
+    )
+
+    cloud_name: str = Field(..., description="Cloud Name de Cloudinary")
+    api_key: str = Field(..., description="API Key de Cloudinary")
+    api_secret: SecretStr = Field(..., description="API Secret (secreto)")
+    folder: str = Field(default="common-man", description="Carpeta raíz de assets")
+
 
 class Settings:
     def __init__(self) -> None:
@@ -73,6 +86,7 @@ class Settings:
         self.mongo = MongoSettings()
         self.jwt = JWTSettings()
         self.r2 = R2Settings() 
+        self.cloudinary = CloudinarySettings()
 
 
 @lru_cache

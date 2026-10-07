@@ -1,4 +1,5 @@
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, UploadFile
+from src.core.storage.cloudinary_client import cloudinary_storage
 from src.modules.usuarios.document import Usuario, RolUsuario
 from src.modules.usuarios.schema import (
     UsuarioCreate,
@@ -293,3 +294,112 @@ class UsuarioService:
             skip=skip,
             limit=limit,
         )
+
+
+    async def actualizar_avatar(
+        self, identificador: UUID, foto: UploadFile
+    ) -> Usuario:
+        usuario = await self.obtener_por_identificador(identificador)
+        self._validar_activo(usuario)
+
+        if not foto.content_type or not foto.content_type.startswith("image/"):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="El archivo debe ser una imagen",
+            )
+
+        MAX_SIZE = 5 * 1024 * 1024
+        contenido = await foto.read()
+        if len(contenido) > MAX_SIZE:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="La imagen no puede superar los 5 MB",
+            )
+
+        if usuario.avatar_public_id:
+            await cloudinary_storage.eliminar_imagen(usuario.avatar_public_id)
+
+        resultado = await cloudinary_storage.subir_imagen(
+            archivo=foto,
+            carpeta="usuarios/avatares",
+            public_id=str(usuario.identificador),
+            transformaciones={
+                "width": 400,
+                "height": 400,
+                "crop": "fill",
+                "gravity": "face",
+            },
+        )
+
+        usuario.avatar = resultado["url"]
+        usuario.avatar_public_id = resultado["public_id"]
+        await usuario.save()
+
+        return usuario
+
+    async def eliminar_avatar(self, identificador: UUID) -> Usuario:
+        usuario = await self.obtener_por_identificador(identificador)
+        self._validar_activo(usuario)
+
+        if usuario.avatar_public_id:
+            await cloudinary_storage.eliminar_imagen(usuario.avatar_public_id)
+
+        usuario.avatar = None
+        usuario.avatar_public_id = None
+        await usuario.save()
+
+        return usuario
+
+    async def actualizar_portada(
+        self, identificador: UUID, foto: UploadFile
+    ) -> Usuario:
+        usuario = await self.obtener_por_identificador(identificador)
+        self._validar_activo(usuario)
+
+        if not foto.content_type or not foto.content_type.startswith("image/"):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="El archivo debe ser una imagen",
+            )
+
+        MAX_SIZE = 10 * 1024 * 1024
+        contenido = await foto.read()
+        if len(contenido) > MAX_SIZE:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="La imagen no puede superar los 10 MB",
+            )
+
+        if usuario.portada_public_id:
+            await cloudinary_storage.eliminar_imagen(usuario.portada_public_id)
+
+        resultado = await cloudinary_storage.subir_imagen(
+            archivo=foto,
+            carpeta="usuarios/portadas",
+            public_id=f"{usuario.identificador}_portada",
+            transformaciones={
+                "width": 1200,
+                "height": 400,
+                "crop": "fill",
+                "gravity": "auto",
+            },
+        )
+
+        usuario.portada = resultado["url"]
+        usuario.portada_public_id = resultado["public_id"]
+        await usuario.save()
+
+        return usuario
+
+    async def eliminar_portada(self, identificador: UUID) -> Usuario:
+        usuario = await self.obtener_por_identificador(identificador)
+        self._validar_activo(usuario)
+
+        if usuario.portada_public_id:
+            await cloudinary_storage.eliminar_imagen(usuario.portada_public_id)
+
+        usuario.portada = None
+        usuario.portada_public_id = None
+        await usuario.save()
+
+        return usuario

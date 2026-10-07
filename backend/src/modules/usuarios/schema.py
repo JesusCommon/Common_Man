@@ -82,20 +82,6 @@ class UsuarioValidaciones:
             raise ValueError("La bio no puede tener más de 280 caracteres")
         return v
 
-    @field_validator("avatar", mode="before", check_fields=False)
-    @classmethod
-    def validar_avatar(cls, v):
-        if v is None:
-            return None
-        return v
-    
-    @field_validator("portada", mode="before", check_fields=False)
-    @classmethod
-    def validar_avatar(cls, v):
-        if v is None:
-            return None
-        return v
-
 class PasswordValidacion:
     @field_validator("password", mode="before")
     @classmethod
@@ -118,7 +104,6 @@ class PasswordValidacion:
             raise ValueError("La contraseña debe tener al menos un simbolo")
         return v
 
-
 class UsuarioCreate(UsuarioValidaciones, PasswordValidacion, BaseModel):
     nombre: str = Field(...)
     apellido: str | None = Field(default=None)
@@ -127,7 +112,6 @@ class UsuarioCreate(UsuarioValidaciones, PasswordValidacion, BaseModel):
     correo: EmailStr = Field(...)
     password: str = Field(...)
 
-
 class UsuarioUpdate(UsuarioValidaciones, BaseModel):
     nombre: str | None = Field(default=None)
     apellido: str | None = Field(default=None)
@@ -135,8 +119,6 @@ class UsuarioUpdate(UsuarioValidaciones, BaseModel):
     telefono: str | None = Field(default=None)
     correo: EmailStr | None = Field(default=None)
     bio: str | None = Field(default=None)
-    avatar: HttpUrl | None = Field(default=None)
-    portada: HttpUrl | None = Field(default=None)
 
 class UsuarioAdminUpdate(UsuarioUpdate):
     rol: RolUsuario | None = Field(default=None)
@@ -169,7 +151,6 @@ class UsuarioPublicResponse(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
-
 class UsuarioPropioResponse(UsuarioPublicResponse):
     identificador: UUID
     correo: EmailStr
@@ -178,8 +159,9 @@ class UsuarioPropioResponse(UsuarioPublicResponse):
     rol: RolUsuario
     fecha_actualizacion: datetime
 
-
 class UsuarioAdminResponse(UsuarioPropioResponse):
     id: PydanticObjectId
+    avatar_public_id: str | None = None
+    portada_public_id: str | None = None
 
     model_config = ConfigDict(from_attributes=True)

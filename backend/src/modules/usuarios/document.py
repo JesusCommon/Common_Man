@@ -76,12 +76,22 @@ class Usuario(Document, TimestampMixim, StatusMixin):
     
     avatar: HttpUrl | None = Field(
         default=None,
-        description="URL de la foto de perfil"
+        description="URL de la foto de perfil (Cloudinary)"
+    )
+
+    avatar_public_id: str | None = Field(
+        default=None,
+        description="Public ID del avatar en Cloudinary (para eliminar/actualizar)"
     )
 
     portada: HttpUrl | None = Field(
         default=None,
-        description="URL de la foto de portada"
+        description="URL de la foto de portada (Cloudinary)"
+    )
+
+    portada_public_id: str | None = Field(
+        default=None,
+        description="Public ID de la portada en Cloudinary (para eliminar/actualizar)"
     )
 
     bio: str | None = Field(
@@ -95,6 +105,7 @@ class Usuario(Document, TimestampMixim, StatusMixin):
         ge=0,
         description="Cantidad de usuarios que lo siguen"
     )
+
     seguidos_count: int = Field(
         default=0,
         ge=0,
