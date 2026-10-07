@@ -1,7 +1,6 @@
 import cloudinary
 import cloudinary.uploader
-import cloudinary.api
-from fastapi import UploadFile
+import cloudinary.utils
 from src.core.settings.settings import get_settings
 
 settings = get_settings()
@@ -13,20 +12,18 @@ cloudinary.config(
     secure=True,
 )
 
-
 class CloudinaryStorage:
     def __init__(self):
         self.folder_base = settings.cloudinary.folder
 
     async def subir_imagen(
         self,
-        archivo: UploadFile,
+        contenido: bytes,
         carpeta: str,
         public_id: str | None = None,
         transformaciones: dict | None = None,
     ) -> dict:
         folder = f"{self.folder_base}/{carpeta}"
-        contenido = await archivo.read()
 
         upload_options = {
             "folder": folder,
@@ -37,10 +34,7 @@ class CloudinaryStorage:
         if public_id:
             upload_options["public_id"] = public_id
 
-        resultado = cloudinary.uploader.upload(
-            contenido,
-            **upload_options,
-        )
+        resultado = cloudinary.uploader.upload(contenido, **upload_options)
 
         url_opts = {
             "fetch_format": "auto",
@@ -69,24 +63,5 @@ class CloudinaryStorage:
             return resultado.get("result") == "ok"
         except Exception:
             return False
-
-    async def obtener_url_optimizada(
-        self,
-        public_id: str,
-        transformaciones: dict | None = None,
-    ) -> str:
-
-        url_opts = {
-            "fetch_format": "auto",
-            "quality": "auto",
-        }
-
-        if transformaciones:
-            url_opts.update(transformaciones)
-
-        return cloudinary.utils.cloudinary_url(
-            public_id,
-            **url_opts,
-        )[0]
 
 cloudinary_storage = CloudinaryStorage()

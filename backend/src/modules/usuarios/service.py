@@ -15,6 +15,7 @@ from uuid import UUID
 from src.modules.notificaciones.service import NotificacionService
 from src.modules.notificaciones.schema import NotificacionCreate
 
+
 class UsuarioService:
     def __init__(self):
         self.repo = UsuarioRepo()
@@ -308,8 +309,9 @@ class UsuarioService:
                 detail="El archivo debe ser una imagen",
             )
 
-        MAX_SIZE = 5 * 1024 * 1024
         contenido = await foto.read()
+
+        MAX_SIZE = 5 * 1024 * 1024
         if len(contenido) > MAX_SIZE:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -320,7 +322,7 @@ class UsuarioService:
             await cloudinary_storage.eliminar_imagen(usuario.avatar_public_id)
 
         resultado = await cloudinary_storage.subir_imagen(
-            archivo=foto,
+            contenido=contenido,
             carpeta="usuarios/avatares",
             public_id=str(usuario.identificador),
             transformaciones={
@@ -362,8 +364,9 @@ class UsuarioService:
                 detail="El archivo debe ser una imagen",
             )
 
-        MAX_SIZE = 10 * 1024 * 1024
         contenido = await foto.read()
+
+        MAX_SIZE = 10 * 1024 * 1024
         if len(contenido) > MAX_SIZE:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -374,7 +377,7 @@ class UsuarioService:
             await cloudinary_storage.eliminar_imagen(usuario.portada_public_id)
 
         resultado = await cloudinary_storage.subir_imagen(
-            archivo=foto,
+            contenido=contenido,
             carpeta="usuarios/portadas",
             public_id=f"{usuario.identificador}_portada",
             transformaciones={

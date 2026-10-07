@@ -9,6 +9,7 @@ from src.modules.usuarios.schema import (
     UsuarioUpdate,
 )
 from src.modules.usuarios.service import UsuarioService
+from fastapi import UploadFile
 
 class UsuarioController:
     def __init__(self):
@@ -51,8 +52,6 @@ class UsuarioController:
     
     async def obtener_perfil_publico(self, username: str) -> Usuario:
         return await self.service.obtener_perfil_publico(username)
-
-#-------------- exclusivo admin --------------------#
 
     async def actualizar_admin(
         self, id: PydanticObjectId, data: UsuarioAdminUpdate) -> Usuario:
@@ -99,3 +98,15 @@ class UsuarioController:
 
     async def obtener_id(self, id: PydanticObjectId) -> Usuario:
         return await self.service.obtener_por_id(id)
+
+    async def actualizar_avatar(self, identificador: UUID, foto: UploadFile) -> Usuario:
+        return await self.service.actualizar_avatar(identificador, foto)
+
+    async def eliminar_avatar(self, identificador: UUID) -> Usuario:
+        return await self.service.eliminar_avatar(identificador)
+
+    async def actualizar_portada(self, identificador: UUID, foto: UploadFile) -> Usuario:
+        return await self.service.actualizar_portada(identificador, foto)
+
+    async def eliminar_portada(self, identificador: UUID) -> Usuario:
+        return await self.service.eliminar_portada(identificador)

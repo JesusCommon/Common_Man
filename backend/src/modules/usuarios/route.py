@@ -1,6 +1,7 @@
 from uuid import UUID
 from beanie import PydanticObjectId
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, UploadFile, File
+
 from src.core.security.jwt import obtener_usuario_actual, obtener_usuario_admin
 from src.modules.usuarios.controller import UsuarioController
 from src.modules.usuarios.document import Usuario
@@ -65,6 +66,49 @@ async def recargar_mi_saldo(
 ):
     usuario = await controller.recargar_saldo(usuario_actual.identificador, data)
     return RespuestaConMensaje(mensaje="Saldo recargado con éxito", data=usuario)
+
+@router.patch("/me/avatar", response_model=RespuestaConMensaje[UsuarioPropioResponse])
+async def actualizar_mi_avatar(
+    foto: UploadFile = File(..., description="Imagen de perfil"),
+    usuario_actual: Usuario = Depends(obtener_usuario_actual),
+):
+    usuario = await controller.actualizar_avatar(usuario_actual.identificador, foto)
+    return RespuestaConMensaje(
+        mensaje="Avatar actualizado correctamente",
+        data=usuario,
+    )
+
+@router.delete("/me/avatar", response_model=RespuestaConMensaje[UsuarioPropioResponse])
+async def eliminar_mi_avatar(
+    usuario_actual: Usuario = Depends(obtener_usuario_actual),
+):
+    usuario = await controller.eliminar_avatar(usuario_actual.identificador)
+    return RespuestaConMensaje(
+        mensaje="Avatar eliminado correctamente",
+        data=usuario,
+    )
+
+@router.patch("/me/portada", response_model=RespuestaConMensaje[UsuarioPropioResponse])
+async def actualizar_mi_portada(
+    foto: UploadFile = File(..., description="Imagen de portada"),
+    usuario_actual: Usuario = Depends(obtener_usuario_actual),
+):
+    usuario = await controller.actualizar_portada(usuario_actual.identificador, foto)
+    return RespuestaConMensaje(
+        mensaje="Portada actualizada correctamente",
+        data=usuario,
+    )
+
+@router.delete("/me/portada", response_model=RespuestaConMensaje[UsuarioPropioResponse])
+async def eliminar_mi_portada(
+    usuario_actual: Usuario = Depends(obtener_usuario_actual),
+):
+    usuario = await controller.eliminar_portada(usuario_actual.identificador)
+    return RespuestaConMensaje(
+        mensaje="Portada eliminada correctamente",
+        data=usuario,
+    )
+
 
 @router.get("/all", response_model=Paginado[UsuarioAdminResponse], dependencies=[Depends(obtener_usuario_admin)])
 async def listar(skip: int = 0, limit: int = 20):
