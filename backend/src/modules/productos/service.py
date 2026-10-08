@@ -5,6 +5,8 @@ from src.modules.productos.document import Productos
 from src.modules.productos.schema import ProductoCreate, ProductoUpdate
 from src.modules.productos.repo import ProductoRepo
 from src.modules.categoriasProductos.repo import CategoriaRepo
+from fastapi import UploadFile
+from src.core.storage.cloudinary_client import cloudinary_storage
 
 class ProductoService:
     def __init__(self):
@@ -174,3 +176,56 @@ class ProductoService:
     async def desactivar(self, id: PydanticObjectId) -> Productos:
         await self.obtener_por_id(id)
         return await self.repo.desactivar(id)
+
+    async def actualizar_imagen(
+        self, producto_id: PydanticObjectId, imagen: UploadFile
+    ) -> Productos:
+        producto = await self.obtener_por_id(producto_id)
+
+        if not imagen.content_type or not imagen.content_type.startswith("image/"):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="El archivo debe ser una imagen",
+            )
+
+        contenido = await imagen.read()
+
+        MAX_SIZE = 5 * 1024 * 1024
+        if len(contenido) > MAX_SIZE:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="La imagen no puede superar los 5 MB",
+            )
+
+        if producto.imagen_public_id:
+            await cloudinary_storage.eliminar_imagen(producto.imagen_public_id)
+
+        resultado = await cloudinary_storage.subir_imagen(
+            contenido=contenido,
+            carpeta="productos",
+            public_id=str(producto.id),
+            transformaciones={
+                "width": 800,
+                "height": 800,
+                "crop": "fill",
+                "gravity": "auto",
+            },
+        )
+
+        producto.imagen = resultado["url"]
+        producto.imagen_public_id = resultado["public_id"]
+        await producto.save()
+
+        return producto
+
+    async def eliminar_imagen(self, producto_id: PydanticObjectId) -> Productos:
+        producto = await self.obtener_por_id(producto_id)
+
+        if producto.imagen_public_id:
+            await cloudinary_storage.eliminar_imagen(producto.imagen_public_id)
+
+        producto.imagen = None
+        producto.imagen_public_id = None
+        await producto.save()
+
+        return producto

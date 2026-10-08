@@ -1,6 +1,6 @@
 import re
 import unicodedata
-from pydantic import Field, BaseModel, field_validator, ConfigDict
+from pydantic import Field, BaseModel, field_validator, ConfigDict, HttpUrl
 from beanie import PydanticObjectId
 from datetime import datetime
 
@@ -52,22 +52,20 @@ class AutorCreate(AutorValidaciones, BaseModel):
     nombre: str = Field(...)
     apellido: str = Field(...)
     pais_nacimiento: str | None = Field(default=None)
-    imagen: str | None = Field(default=None)
 
 class AutorUpdate(AutorValidaciones, BaseModel):
     nombre: str | None = Field(default=None)
     apellido: str | None = Field(default=None)
     pais_nacimiento: str | None = Field(default=None)
-    imagen: str | None = Field(default=None)
-
 
 class AutorResponse(BaseModel):
     id: PydanticObjectId
     nombre: str
     apellido: str
     pais_nacimiento: str | None = None
-    imagen: str | None = None
     activo: bool
+    imagen: HttpUrl | None = None
+    imagen_public_id: str | None = None
     fecha_creacion: datetime
     fecha_actualizacion: datetime
 

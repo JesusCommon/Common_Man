@@ -1,4 +1,5 @@
 from beanie import PydanticObjectId
+from fastapi import UploadFile
 from src.modules.biblioteca.autor.document import Autor
 from src.modules.biblioteca.autor.schema import (
     AutorCreate,
@@ -36,3 +37,11 @@ class AutorController:
 
     async def obtener_id(self, id: PydanticObjectId) -> Autor:
         return await self.service.obtener_por_id(id)
+
+    async def actualizar_imagen(
+        self, autor_id: PydanticObjectId, imagen: UploadFile
+    ) -> Autor:
+        return await self.service.actualizar_imagen(autor_id, imagen)
+
+    async def eliminar_imagen(self, autor_id: PydanticObjectId) -> Autor:
+        return await self.service.eliminar_imagen(autor_id)

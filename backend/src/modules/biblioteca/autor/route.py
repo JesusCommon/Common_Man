@@ -1,5 +1,5 @@
 from beanie import PydanticObjectId
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, UploadFile, Depends, File
 from src.core.security.jwt import obtener_usuario_admin
 from src.modules.biblioteca.autor.controller import AutorController
 from src.modules.biblioteca.autor.schema import (
@@ -68,3 +68,30 @@ async def activar(id: PydanticObjectId):
 async def desactivar(id: PydanticObjectId):
     autor = await controller.desactivar(id)
     return RespuestaConMensaje(mensaje="autor/a desactivado/a correctamente", data=autor)
+
+@router.patch(
+    "/{id}/imagen",
+    response_model=RespuestaConMensaje[AutorResponse],
+    dependencies=[Depends(obtener_usuario_admin)],
+)
+async def actualizar_imagen_autor(
+    id: PydanticObjectId,
+    imagen: UploadFile = File(..., description="Imagen del autor"),
+):
+    autor = await controller.actualizar_imagen(id, imagen)
+    return RespuestaConMensaje(
+        mensaje="Imagen del autor actualizada correctamente",
+        data=autor,
+    )
+
+@router.delete(
+    "/{id}/imagen",
+    response_model=RespuestaConMensaje[AutorResponse],
+    dependencies=[Depends(obtener_usuario_admin)],
+)
+async def eliminar_imagen_autor(id: PydanticObjectId):
+    autor = await controller.eliminar_imagen(id)
+    return RespuestaConMensaje(
+        mensaje="Imagen del autor eliminada correctamente",
+        data=autor,
+    )

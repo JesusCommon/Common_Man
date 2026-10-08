@@ -59,9 +59,14 @@ class Libro(Document, StatusMixin, TimestampMixim):
         description="Idioma del libro"
     )
 
-    portada : str | None = Field(
+    portada: HttpUrl | None = Field(
         default=None,
         description="Portada del libro"
+    )
+
+    portada_public_id: str | None = Field(
+        default=None,
+        description="Public ID de la imagen en Cloudinary (para eliminar/actualizar)"
     )
 
     isbn: str | None = Field(

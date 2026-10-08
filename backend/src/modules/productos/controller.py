@@ -3,6 +3,7 @@ from beanie import PydanticObjectId
 from src.modules.productos.document import Productos
 from src.modules.productos.schema import ProductoCreate, ProductoUpdate
 from src.modules.productos.service import ProductoService
+from fastapi import UploadFile
 
 class ProductoController:
     def __init__(self):
@@ -82,3 +83,9 @@ class ProductoController:
 
     async def desactivar(self, id: PydanticObjectId) -> Productos:
         return await self.service.desactivar(id)
+
+    async def actualizar_imagen(self, producto_id: PydanticObjectId, imagen: UploadFile) -> Productos:
+        return await self.service.actualizar_imagen(producto_id, imagen)
+
+    async def eliminar_imagen(self, producto_id: PydanticObjectId) -> Productos:
+        return await self.service.eliminar_imagen(producto_id)

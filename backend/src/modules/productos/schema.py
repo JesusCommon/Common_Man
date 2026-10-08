@@ -1,6 +1,6 @@
 import re
 from decimal import Decimal, InvalidOperation
-from pydantic import Field, BaseModel, field_validator, ConfigDict
+from pydantic import Field, BaseModel, field_validator, ConfigDict, HttpUrl
 from beanie import PydanticObjectId
 from datetime import datetime
 
@@ -135,7 +135,6 @@ class ProductoCreate(ProductoValidaciones, BaseModel):
     descripcion_breve: str | None = Field(default=None)
     precio: Decimal = Field(...)
     stock: int = Field(default=0)
-    imagen: str | None = Field(default=None)
     categoria_id: PydanticObjectId = Field(...)
 
 class ProductoUpdate(ProductoValidaciones, BaseModel):
@@ -145,7 +144,6 @@ class ProductoUpdate(ProductoValidaciones, BaseModel):
     descripcion_breve: str | None = Field(default=None)
     precio: Decimal | None = Field(default=None)
     stock: int | None = Field(default=None)
-    imagen: str | None = Field(default=None)
     categoria_id: PydanticObjectId | None = Field(default=None)
 
 class ProductoStockUpdate(BaseModel):
@@ -161,7 +159,7 @@ class ProductoPublicResponse(BaseModel):
     descripcion_breve: str | None = None
     precio: Decimal
     stock: int
-    imagen: str | None = None
+    imagen: HttpUrl | None = None
     categoria_id: PydanticObjectId
     activo: bool
 
@@ -175,7 +173,8 @@ class ProductoAdminResponse(BaseModel):
     descripcion_breve: str | None = None
     precio: Decimal
     stock: int
-    imagen: str | None = None
+    imagen: HttpUrl | None = None
+    imagen_public_id: str | None = None
     categoria_id: PydanticObjectId
     activo: bool
     fecha_creacion: datetime

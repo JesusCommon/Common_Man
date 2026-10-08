@@ -1,6 +1,6 @@
 from decimal import Decimal
 from beanie import PydanticObjectId
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, UploadFile, Depends, Query, File
 from src.core.security.jwt import obtener_usuario_admin 
 from src.modules.productos.controller import ProductoController
 from src.modules.productos.schema import (
@@ -167,3 +167,30 @@ async def activar_producto(id: PydanticObjectId):
 async def desactivar_producto(id: PydanticObjectId):
     producto = await controller.desactivar(id)
     return RespuestaConMensaje(mensaje="Producto desactivado correctamente", data=producto)
+
+@router.patch(
+    "/{id}/imagen",
+    response_model=RespuestaConMensaje[ProductoAdminResponse],
+    dependencies=[Depends(obtener_usuario_admin)],
+)
+async def actualizar_imagen_producto(
+    id: PydanticObjectId,
+    imagen: UploadFile = File(..., description="Imagen del producto"),
+):
+    producto = await controller.actualizar_imagen(id, imagen)
+    return RespuestaConMensaje(
+        mensaje="Imagen del producto actualizada correctamente",
+        data=producto,
+    )
+
+@router.delete(
+    "/{id}/imagen",
+    response_model=RespuestaConMensaje[ProductoAdminResponse],
+    dependencies=[Depends(obtener_usuario_admin)],
+)
+async def eliminar_imagen_producto(id: PydanticObjectId):
+    producto = await controller.eliminar_imagen(id)
+    return RespuestaConMensaje(
+        mensaje="Imagen del producto eliminada correctamente",
+        data=producto,
+    )

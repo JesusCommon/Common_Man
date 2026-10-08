@@ -11,6 +11,7 @@ from src.modules.biblioteca.editorial.document import Editorial
 from src.modules.biblioteca.genero.document import Genero
 from src.core.storage.r2 import storage
 from src.core.storage.watermark import generar_version_personal_wm
+from src.core.storage.cloudinary_client import cloudinary_storage
 
 ESTADOS_CON_ACCESO = (
     EstadoCompraEnum.PAGADO,
@@ -364,3 +365,56 @@ class LibroService:
             "url_lectura": url_firmada,
             "expira_en_segundos": 900,
         }
+
+    async def actualizar_portada(
+        self, libro_id: PydanticObjectId, imagen: UploadFile
+    ) -> Libro:
+        libro = await self.obtener_por_id(libro_id)
+
+        if not imagen.content_type or not imagen.content_type.startswith("image/"):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="El archivo debe ser una imagen",
+            )
+
+        contenido = await imagen.read()
+
+        MAX_SIZE = 5 * 1024 * 1024
+        if len(contenido) > MAX_SIZE:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="La imagen no puede superar los 5 MB",
+            )
+
+        if libro.portada_public_id:
+            await cloudinary_storage.eliminar_imagen(libro.portada_public_id)
+
+        resultado = await cloudinary_storage.subir_imagen(
+            contenido=contenido,
+            carpeta="libros",
+            public_id=str(libro.id),
+            transformaciones={
+                "width": 600,
+                "height": 900,
+                "crop": "fill",
+                "gravity": "auto",
+            },
+        )
+
+        libro.portada = resultado["url"]
+        libro.portada_public_id = resultado["public_id"]
+        await libro.save()
+
+        return libro
+
+    async def eliminar_portada(self, libro_id: PydanticObjectId) -> Libro:
+        libro = await self.obtener_por_id(libro_id)
+
+        if libro.portada_public_id:
+            await cloudinary_storage.eliminar_imagen(libro.portada_public_id)
+
+        libro.portada = None
+        libro.portada_public_id = None
+        await libro.save()
+
+        return libro

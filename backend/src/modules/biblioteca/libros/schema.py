@@ -1,7 +1,7 @@
 import re
 from datetime import datetime
 from decimal import Decimal
-from pydantic import field_validator, BaseModel, Field, ConfigDict
+from pydantic import field_validator, BaseModel, Field, ConfigDict, HttpUrl
 from beanie import PydanticObjectId
 from src.modules.biblioteca.libros.document import Idiomas
 
@@ -143,7 +143,6 @@ class LibroCreate(LibroValidaciones, BaseModel):
     anio_publicacion: int = Field(...)
     paginas: int = Field(...)
     idioma: Idiomas = Field(default=Idiomas.ESPANOL)
-    portada: str | None = Field(default=None)
     isbn: str | None = Field(default=None)
     sku: str | None = Field(default=None)
     precio: Decimal = Field(...)
@@ -159,7 +158,6 @@ class LibroUpdate(LibroValidaciones, BaseModel):
     anio_publicacion: int | None = Field(default=None)
     paginas: int | None = Field(default=None)
     idioma: Idiomas | None = Field(default=None)
-    portada: str | None = Field(default=None)
     isbn: str | None = Field(default=None)
     sku: str | None = Field(default=None)
     precio: Decimal | None = Field(default=None)
@@ -177,7 +175,7 @@ class LibroResponse(BaseModel):
     anio_publicacion: int
     paginas: int
     idioma: Idiomas
-    portada: str | None = None
+    portada: HttpUrl | None = None
     isbn: str | None = None
     sku: str | None = None
     precio: Decimal
@@ -191,6 +189,7 @@ class LibroResponse(BaseModel):
 
 
 class LibroAdminResponse(LibroResponse):
+    portada_public_id: str | None = None
     contenido: str | None = None
 
     model_config = ConfigDict(from_attributes=True)

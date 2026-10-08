@@ -1,4 +1,6 @@
-from fastapi import HTTPException, status
+from fastapi import HTTPException, UploadFile, status
+from src.core.storage.cloudinary_client import cloudinary_storage
+
 from src.modules.biblioteca.autor.document import Autor
 from src.modules.biblioteca.autor.schema import (
     AutorCreate,
@@ -100,3 +102,56 @@ class AutorService:
     async def desactivar(self, id: PydanticObjectId) -> Autor:
         await self.obtener_por_id(id)
         return await self.repo.desactivar(id)
+
+    async def actualizar_imagen(
+        self, autor_id: PydanticObjectId, imagen: UploadFile
+    ) -> Autor:
+        autor = await self.obtener_por_id(autor_id)
+
+        if not imagen.content_type or not imagen.content_type.startswith("image/"):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="El archivo debe ser una imagen",
+            )
+
+        contenido = await imagen.read()
+
+        MAX_SIZE = 5 * 1024 * 1024
+        if len(contenido) > MAX_SIZE:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="La imagen no puede superar los 5 MB",
+            )
+
+        if autor.imagen_public_id:
+            await cloudinary_storage.eliminar_imagen(autor.imagen_public_id)
+
+        resultado = await cloudinary_storage.subir_imagen(
+            contenido=contenido,
+            carpeta="autores",
+            public_id=str(autor.id),
+            transformaciones={
+                "width": 600,
+                "height": 600,
+                "crop": "fill",
+                "gravity": "face",
+            },
+        )
+
+        autor.imagen = resultado["url"]
+        autor.imagen_public_id = resultado["public_id"]
+        await autor.save()
+
+        return autor
+
+    async def eliminar_imagen(self, autor_id: PydanticObjectId) -> Autor:
+        autor = await self.obtener_por_id(autor_id)
+
+        if autor.imagen_public_id:
+            await cloudinary_storage.eliminar_imagen(autor.imagen_public_id)
+
+        autor.imagen = None
+        autor.imagen_public_id = None
+        await autor.save()
+
+        return autor

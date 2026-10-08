@@ -160,3 +160,13 @@ async def activar_libro(libro_id: PydanticObjectId):
 async def desactivar_libro(libro_id: PydanticObjectId):
     libro = await controller.desactivar(libro_id)
     return RespuestaConMensaje(mensaje="Libro desactivado correctamente", data=libro)
+
+@router.patch("/{id}/imagen", response_model=RespuestaConMensaje[LibroAdminResponse], dependencies=[Depends(obtener_usuario_admin)])
+async def actualizar_imagen_libro(id: PydanticObjectId, imagen: UploadFile = File(..., description="Imagen del libro")):
+    libro = await controller.actualizar_imagen(id, imagen)
+    return RespuestaConMensaje(mensaje="Imagen del libro actualizada correctamente", data=libro)
+
+@router.delete("/{id}/imagen", response_model=RespuestaConMensaje[LibroAdminResponse], dependencies=[Depends(obtener_usuario_admin)])
+async def eliminar_imagen_libro(id: PydanticObjectId):
+    libro = await controller.eliminar_imagen(id)
+    return RespuestaConMensaje(mensaje="Imagen del libro eliminada correctamente", data=libro)

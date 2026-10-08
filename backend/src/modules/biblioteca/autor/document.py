@@ -1,5 +1,5 @@
 from beanie import Document
-from pydantic import Field
+from pydantic import Field, HttpUrl
 from pymongo import IndexModel, ASCENDING
 from src.shared.mixins import StatusMixin, TimestampMixim
 
@@ -25,9 +25,14 @@ class Autor(Document, StatusMixin, TimestampMixim):
         description="Pais de nacimiento del autor"
     )
 
-    imagen : str | None = Field(
+    imagen : HttpUrl | None = Field(
         default=None,
-        description="URL del avatar"
+        description="URL de la foto de portada (Cloudinary"
+    )
+
+    imagen_public_id : str | None = Field(
+        default=None,
+        description="Public ID de la portada en Cloudinary (para eliminar/actualizar)"
     )
 
     class Settings:

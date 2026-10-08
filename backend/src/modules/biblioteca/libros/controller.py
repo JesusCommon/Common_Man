@@ -85,3 +85,9 @@ class LibroController:
 
     async def preparar_lectura(self, libro_id: PydanticObjectId, usuario: Usuario):
         return await self.service.preparar_lectura(libro_id, usuario)
+
+    async def actualizar_imagen(self, libro_id: PydanticObjectId, imagen: UploadFile) -> Libro:
+        return await self.service.actualizar_portada(libro_id, imagen)
+
+    async def eliminar_imagen(self, libro_id: PydanticObjectId) -> Libro:
+        return await self.service.eliminar_portada(libro_id)

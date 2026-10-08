@@ -1,7 +1,7 @@
 from decimal import Decimal
 from bson import Decimal128
 from beanie import Document, PydanticObjectId
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, HttpUrl
 from pymongo import IndexModel, ASCENDING
 from src.shared.mixins import StatusMixin, TimestampMixim
 
@@ -49,11 +49,14 @@ class Productos(Document, StatusMixin, TimestampMixim):
         examples=[150]
     )
 
-    imagen: str | None = Field(
+    imagen: HttpUrl | None = Field(
         default=None,
-        max_length=500,
         description="URL de la imagen principal del producto",
-        examples=["https://cdn.midominio.com/img/camiseta.jpg"]
+    )
+
+    imagen_public_id: str | None = Field(
+        default=None,
+        descripcion="Public ID de la imagen en Cloudinary (para eliminar/actualizar)"
     )
 
     categoria_id: PydanticObjectId = Field(
