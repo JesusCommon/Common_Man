@@ -115,3 +115,23 @@ export async function desactivarProducto(id: string) {
   );
   return response;
 }
+
+export async function actualizarImagenProducto(productoId: string, imagen: File) {
+  const formData = new FormData();
+  formData.append("imagen", imagen);
+
+  const { data: response } = await apiClient.patch<RespuestaConMensaje<ProductoAdminResponse>>(
+    `/productos/${productoId}/imagen`,
+    formData,
+    { headers: { "Content-Type": "multipart/form-data" } }
+  );
+  return response;
+}
+
+export async function eliminarImagenProducto(productoId: string) {
+  const { data: response } = await apiClient.delete<RespuestaConMensaje<ProductoAdminResponse>>(
+    `/productos/${productoId}/imagen`
+  );
+  return response;
+}
+

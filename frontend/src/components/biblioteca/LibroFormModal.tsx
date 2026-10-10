@@ -3,11 +3,14 @@ import {
   useCrearLibro,
   useActualizarLibro,
   useSubirArchivoLibro,
+  useActualizarPortadaLibro,
+  useEliminarPortadaLibro,
   useAutoresPublicos,
   useEditorialesPublicas,
   useGenerosPublicos,
 } from "@/hooks";
 import { X, Upload, FileText, CheckCircle2 } from "lucide-react";
+import { ImageUpload } from "@/components/ui/ImageUpload";
 import type { Idiomas, LibroAdminResponse } from "@/api/types";
 import { extraerMensajeError } from "@/lib/errors";
 
@@ -26,7 +29,6 @@ interface LibroForm {
   anio_publicacion: string;
   paginas: string;
   idioma: Idiomas;
-  portada: string;
   isbn: string;
   sku: string;
   precio: string;
@@ -46,7 +48,6 @@ function formVacio(): LibroForm {
     anio_publicacion: String(new Date().getFullYear()),
     paginas: "",
     idioma: "Español",
-    portada: "",
     isbn: "",
     sku: "",
     precio: "",
@@ -65,7 +66,6 @@ function desdeLibro(l: LibroAdminResponse): LibroForm {
     anio_publicacion: String(l.anio_publicacion),
     paginas: String(l.paginas),
     idioma: l.idioma,
-    portada: l.portada ?? "",
     isbn: l.isbn ?? "",
     sku: l.sku ?? "",
     precio: String(l.precio),
@@ -81,9 +81,13 @@ export function LibroFormModal({ abierto, libro, onClose }: LibroFormModalProps)
   const crear = useCrearLibro();
   const actualizar = useActualizarLibro();
   const subirArchivo = useSubirArchivoLibro();
+  const actualizarPortada = useActualizarPortadaLibro();
+  const eliminarPortada = useEliminarPortadaLibro();
+
   const { data: autores } = useAutoresPublicos();
   const { data: editoriales } = useEditorialesPublicas();
   const { data: generos } = useGenerosPublicos();
+
   const [form, setForm] = useState<LibroForm>(formVacio);
   const [archivo, setArchivo] = useState<File | null>(null);
   const [mensajeExito, setMensajeExito] = useState<string | null>(null);
@@ -98,8 +102,12 @@ export function LibroFormModal({ abierto, libro, onClose }: LibroFormModalProps)
     }
   }, [libro]);
 
-  const isPending = crear.isPending || actualizar.isPending || subirArchivo.isPending;
-  const error = crear.error || actualizar.error || subirArchivo.error;
+  const isPending =
+    crear.isPending ||
+    actualizar.isPending ||
+    subirArchivo.isPending ||
+    actualizarPortada.isPending;
+  const error = crear.error || actualizar.error || subirArchivo.error || actualizarPortada.error;
 
   function set<K extends keyof LibroForm>(key: K, value: LibroForm[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -118,7 +126,6 @@ export function LibroFormModal({ abierto, libro, onClose }: LibroFormModalProps)
       anio_publicacion: Number(form.anio_publicacion),
       paginas: Number(form.paginas),
       idioma: form.idioma,
-      portada: form.portada.trim() || undefined,
       isbn: form.isbn.trim() || undefined,
       sku: form.sku.trim() || undefined,
       precio: Number(form.precio),
@@ -147,7 +154,6 @@ export function LibroFormModal({ abierto, libro, onClose }: LibroFormModalProps)
       }
 
       setMensajeExito(mensajes.join(" · "));
-
       setTimeout(() => onClose(), 1500);
     } catch {
       // El error se renderiza vía el estado `error`
@@ -357,16 +363,34 @@ export function LibroFormModal({ abierto, libro, onClose }: LibroFormModalProps)
             </div>
 
             <div className="sm:col-span-2">
-              <label className="mb-1 block text-sm font-medium text-[#52525B]">
-                URL de portada <span className="font-normal text-[#A1A19A]">(opcional)</span>
-              </label>
-              <input
-                type="url"
-                value={form.portada}
-                onChange={(e) => set("portada", e.target.value)}
-                placeholder="https://..."
-                className={inputCls}
-              />
+            <ImageUpload
+              currentImage={libro?.portada ?? null}
+              onUpload={async (file) => {
+                if (!libro) {
+                  setMensajeExito("Guarda el libro primero para subir la portada.");
+                  return;
+                }
+                const resp = await actualizarPortada.mutateAsync({
+                  libroId: libro.id,
+                  imagen: file,
+                });
+                setMensajeExito(resp.mensaje);
+              }}
+              onDelete={async () => {
+                if (!libro) return;
+                const resp = await eliminarPortada.mutateAsync(libro.id);
+                setMensajeExito(resp.mensaje);
+              }}
+              isLoading={actualizarPortada.isPending || eliminarPortada.isPending}
+              maxSizeMB={5}
+              aspectRatio="book"
+              label="Portada del libro"
+            />
+              {!libro && (
+                <p className="mt-1 text-xs text-amber-600">
+                  ⚠️ Crea el libro primero, luego podrás subir la portada al editarlo.
+                </p>
+              )}
             </div>
 
             <div className="sm:col-span-2">
@@ -473,6 +497,8 @@ export function LibroFormModal({ abierto, libro, onClose }: LibroFormModalProps)
               {isPending
                 ? subirArchivo.isPending
                   ? "Subiendo PDF..."
+                  : actualizarPortada.isPending
+                  ? "Subiendo portada..."
                   : "Guardando..."
                 : libro
                 ? "Guardar cambios"

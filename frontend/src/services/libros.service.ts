@@ -212,3 +212,26 @@ export async function desactivarLibroService(
     return { success: false, error: networkError(err as AxiosError) };
   }
 }
+
+export async function actualizarPortadaLibroService(
+  libroId: string,
+  imagen: File
+): Promise<ServiceResult<RespuestaConMensaje<LibroAdminResponse>>> {
+  try {
+    const data = await librosApi.actualizarPortadaLibro(libroId, imagen);
+    return { success: true, data };
+  } catch (err) {
+    return { success: false, error: networkError(err as AxiosError) };
+  }
+}
+
+export async function eliminarPortadaLibroService(
+  libroId: string
+): Promise<ServiceResult<RespuestaConMensaje<LibroAdminResponse>>> {
+  try {
+    const data = await librosApi.eliminarPortadaLibro(libroId);
+    return { success: true, data };
+  } catch (err) {
+    return { success: false, error: networkError(err as AxiosError) };
+  }
+}

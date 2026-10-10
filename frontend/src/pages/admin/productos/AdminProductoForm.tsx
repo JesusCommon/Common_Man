@@ -5,14 +5,17 @@ import {
   useActualizarProducto,
   useObtenerProductoPorIdAdmin,
   useListarCategoriasActivas,
+  useActualizarImagenProducto,
+  useEliminarImagenProducto,
 } from "@/hooks";
 import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/TextField";
 import { Select } from "@/components/ui/Select";
 import { Spinner } from "@/components/ui/Spinner";
 import { ErrorAlert } from "@/components/ui/ErrorAlert";
+import { ImageUpload } from "@/components/ui/ImageUpload";
 import type { ProductoCreate, ProductoUpdate } from "@/api/types";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, Save, CheckCircle2 } from "lucide-react";
 
 interface ProductoFormContentProps {
   initialData: {
@@ -22,10 +25,11 @@ interface ProductoFormContentProps {
     descripcion_breve?: string;
     precio: number;
     stock: number;
-    imagen?: string;
+    imagen?: string | null;
     categoria_id: string;
   } | null;
   isEdit: boolean;
+  productoId?: string;
   onSubmit: (data: ProductoCreate | ProductoUpdate) => void;
   isPending: boolean;
   onCancel: () => void;
@@ -35,23 +39,28 @@ interface ProductoFormContentProps {
 function ProductoFormContent({
   initialData,
   isEdit,
+  productoId,
   onSubmit,
   isPending,
   onCancel,
   categoriasOptions,
 }: ProductoFormContentProps) {
-  const [form, setForm] = useState<ProductoCreate>({
+  const actualizarImagen = useActualizarImagenProducto();
+  const eliminarImagen = useEliminarImagenProducto();
+
+  const [form, setForm] = useState<Omit<ProductoCreate, "imagen">>({
     nombre: initialData?.nombre ?? "",
     slug: initialData?.slug ?? "",
     descripcion: initialData?.descripcion ?? "",
     descripcion_breve: initialData?.descripcion_breve ?? "",
     precio: initialData?.precio ?? 0,
     stock: initialData?.stock ?? 0,
-    imagen: initialData?.imagen ?? "",
     categoria_id: initialData?.categoria_id ?? "",
   });
 
-  const handleChange = (field: keyof ProductoCreate, value: string | number) => {
+  const [mensajeImagen, setMensajeImagen] = useState<string | null>(null);
+
+  const handleChange = (field: keyof Omit<ProductoCreate, "imagen">, value: string | number) => {
     setForm((prev) => {
       const newState = { ...prev, [field]: value };
       if (field === "nombre" && !isEdit) {
@@ -75,7 +84,6 @@ function ProductoFormContent({
         descripcion_breve: form.descripcion_breve || undefined,
         precio: Number(form.precio),
         stock: Number(form.stock),
-        imagen: form.imagen || undefined,
         categoria_id: form.categoria_id,
       };
       onSubmit(updateData);
@@ -87,6 +95,8 @@ function ProductoFormContent({
       });
     }
   };
+
+  const imagenBusy = actualizarImagen.isPending || eliminarImagen.isPending;
 
   return (
     <form
@@ -156,12 +166,42 @@ function ProductoFormContent({
         rows={5}
       />
 
-      <TextField
-        label="URL de la imagen"
-        value={form.imagen || ""}
-        onChange={(v) => handleChange("imagen", v)}
-        placeholder="https://ejemplo.com/imagen.jpg"
-      />
+      <div>
+        <ImageUpload
+          currentImage={initialData?.imagen ?? null}
+          onUpload={async (file) => {
+            if (!productoId) {
+              setMensajeImagen("Guarda el producto primero para subir la imagen.");
+              return;
+            }
+            const resp = await actualizarImagen.mutateAsync({
+              productoId,
+              imagen: file,
+            });
+            setMensajeImagen(resp.mensaje);
+          }}
+          onDelete={async () => {
+            if (!productoId) return;
+            const resp = await eliminarImagen.mutateAsync(productoId);
+            setMensajeImagen(resp.mensaje);
+          }}
+          isLoading={imagenBusy}
+          maxSizeMB={5}
+          aspectRatio="square"
+          label="Imagen del producto"
+        />
+        {!productoId && (
+          <p className="mt-1 text-xs text-amber-600">
+            ⚠️ Crea el producto primero, luego podrás subir su imagen al editarlo.
+          </p>
+        )}
+        {mensajeImagen && (
+          <div className="mt-2 rounded-lg border border-emerald-200 bg-emerald-50 p-2 flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <p className="text-xs text-emerald-700">{mensajeImagen}</p>
+          </div>
+        )}
+      </div>
 
       <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
         <Button type="button" variant="ghost" onClick={onCancel} disabled={isPending}>
@@ -172,11 +212,7 @@ function ProductoFormContent({
           variant="primary"
           disabled={isPending || !form.nombre || !form.categoria_id}
         >
-          {isPending ? (
-            <Spinner size="sm" />
-          ) : (
-            <Save className="w-4 h-4 mr-2" />
-          )}
+          {isPending ? <Spinner size="sm" /> : <Save className="w-4 h-4 mr-2" />}
           {isEdit ? "Guardar Cambios" : "Crear Producto"}
         </Button>
       </div>
@@ -267,6 +303,7 @@ export default function AdminProductoForm() {
         key={isEdit ? `edit-${obtener.data?.id}` : "create"}
         initialData={obtener.data ?? null}
         isEdit={isEdit}
+        productoId={obtener.data?.id}
         onSubmit={handleSubmit}
         isPending={isPending}
         onCancel={() => navigate("/admin/productos")}

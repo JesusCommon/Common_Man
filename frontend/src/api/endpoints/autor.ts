@@ -73,3 +73,22 @@ export async function desactivarAutor(id: string) {
   );
   return response;
 }
+
+export async function actualizarImagenAutor(autorId: string, imagen: File) {
+  const formData = new FormData();
+  formData.append("imagen", imagen);
+
+  const { data: response } = await apiClient.patch<RespuestaConMensaje<AutorResponse>>(
+    `/autores/${autorId}/imagen`,
+    formData,
+    { headers: { "Content-Type": "multipart/form-data" } }
+  );
+  return response;
+}
+
+export async function eliminarImagenAutor(autorId: string) {
+  const { data: response } = await apiClient.delete<RespuestaConMensaje<AutorResponse>>(
+    `/autores/${autorId}/imagen`
+  );
+  return response;
+}

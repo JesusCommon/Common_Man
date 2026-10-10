@@ -14,8 +14,13 @@ export { useCambiarPassword } from "./usuarios/useCambiarPassword";
 export { useRecargarSaldo } from "./usuarios/useRecargarSaldo";
 export { useBuscarPersonas } from "./usuarios/useBuscarPersonas";
 export { useObtenerPerfilPublico } from "./usuarios/useObtenerPerfilPublico";
+export { useActualizarAvatar } from "./usuarios/useActualizarAvatar";
+export { useEliminarAvatar } from "./usuarios/useEliminarAvatar";
+export { useActualizarPortada } from "./usuarios/useActualizarPortada";
+export { useEliminarPortada } from "./usuarios/useEliminarPortada";
 
-// Admin
+
+// Admin Usuarios
 export { useListarUsuarios } from "./usuarios/admin/useListarUsuarios";
 export { useListarActivos } from "./usuarios/admin/useListarActivos";
 export { useListarInactivos } from "./usuarios/admin/useListarInactivos";
@@ -66,6 +71,8 @@ export { useListarProductosActivosAdmin } from "./productos/admin/useListarProdu
 export { useListarProductosInactivosAdmin } from "./productos/admin/useListarProductosInactivosAdmin";
 export { useListarTodosProductosAdmin } from "./productos/admin/useListarTodosLosProductosAdmin";
 export { useObtenerProductoPorIdAdmin } from "./productos/admin/useObtenerProductoPorId";
+export { useActualizarImagenProducto } from "./productos/admin/useActualizarImagenProducto";
+export { useEliminarImagenProducto } from "./productos/admin/useEliminarImagenProducto";
 
 //Compras
 export { useCrearCompra } from "./compras/useCrearCompra";
@@ -137,6 +144,8 @@ export { useActualizarAutor } from "./biblioteca/autor/useActualizarAutor";
 export { useActivarAutor } from "./biblioteca/autor/useActivarAutor";
 export { useDesactivarAutor } from "./biblioteca/autor/useDesactivarAutor";
 export { useAutoresDestacados } from "./biblioteca/autor/useAutoresDestacados";
+export { useActualizarImagenAutor } from "./biblioteca/autor/useActualizarImagenAutor";
+export { useEliminarImagenAutor } from "./biblioteca/autor/useElminarImagenAutor";
 
 //Genero
 export { useCrearGenero } from "./biblioteca/genero/useCrearGenero";
@@ -176,3 +185,5 @@ export { useListarLibros } from "./biblioteca/libros/useListarLibros";
 export { useMisLibros } from "./biblioteca/libros/useMisLibros";
 export { useSubirArchivoLibro }from "./biblioteca/libros/useSubirArchivoLibro";
 export { usePrepararLectura }from "./biblioteca/libros/usePrepararLectura";
+export { useActualizarPortadaLibro }from "./biblioteca/libros/useActualizarPortadaLibro";
+export { useEliminarPortadaLibro }from "./biblioteca/libros/useEliminarPortadaLibro";

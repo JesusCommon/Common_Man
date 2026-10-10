@@ -160,3 +160,22 @@ export async function desactivarLibro(libroId: string) {
   >(`/libros/${libroId}/desactivar`);
   return response;
 }
+
+export async function actualizarPortadaLibro(libroId: string, imagen: File) {
+  const formData = new FormData();
+  formData.append("imagen", imagen);
+
+  const { data: response } = await apiClient.patch<RespuestaConMensaje<LibroAdminResponse>>(
+    `/libros/${libroId}/portada`,
+    formData,
+    { headers: { "Content-Type": "multipart/form-data" } }
+  );
+  return response;
+}
+
+export async function eliminarPortadaLibro(libroId: string) {
+  const { data: response } = await apiClient.delete<RespuestaConMensaje<LibroAdminResponse>>(
+    `/libros/${libroId}/portada`
+  );
+  return response;
+}

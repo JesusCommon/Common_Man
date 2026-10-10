@@ -1,19 +1,26 @@
 import { useState } from "react";
 import { useAuthStore } from "@/store";
 import { usePerfil, useActualizarPerfil } from "@/hooks";
-import { ImagePreview } from "@/components/configuracion/ImagenPreview";
+import {
+  useActualizarAvatar,
+  useEliminarAvatar,
+  useActualizarPortada,
+  useEliminarPortada,
+} from "@/hooks";
+import { ImageUpload } from "@/components/ui/ImageUpload";
 import { Spinner } from "@/components/ui/Spinner";
 
 export function PerfilTab() {
   const user = useAuthStore((s) => s.user);
   const { data: perfil, isLoading } = usePerfil();
   const actualizarPerfil = useActualizarPerfil();
-
+  const actualizarAvatar = useActualizarAvatar();
+  const eliminarAvatar = useEliminarAvatar();
+  const actualizarPortada = useActualizarPortada();
+  const eliminarPortada = useEliminarPortada();
   const [nombre, setNombre] = useState(perfil?.nombre ?? user?.nombre ?? "");
   const [apellido, setApellido] = useState(perfil?.apellido ?? user?.apellido ?? "");
   const [bio, setBio] = useState(perfil?.bio ?? "");
-  const [avatar, setAvatar] = useState(perfil?.avatar ?? user?.avatar ?? "");
-  const [portada, setPortada] = useState(perfil?.portada ?? "");
   const [guardado, setGuardado] = useState(false);
 
   if (isLoading) {
@@ -25,13 +32,7 @@ export function PerfilTab() {
     setGuardado(false);
 
     actualizarPerfil.mutate(
-      {
-        nombre,
-        apellido,
-        bio,
-        avatar,
-        portada,
-      },
+      { nombre, apellido, bio },
       {
         onSuccess: () => {
           setGuardado(true);
@@ -40,6 +41,9 @@ export function PerfilTab() {
       }
     );
   }
+
+  const avatarValue = perfil?.avatar ?? user?.avatar ?? null;
+  const portadaValue = perfil?.portada ?? user?.portada ?? null;
 
   return (
     <div className="space-y-6">
@@ -98,25 +102,38 @@ export function PerfilTab() {
           </div>
         </section>
 
-        <section className="rounded-lg border border-gray-200 bg-white p-5 space-y-5">
-          <h2 className="text-base font-semibold text-gray-900">
-            Apariencia
-          </h2>
+        <section className="rounded-lg border border-gray-200 bg-white p-5 space-y-6">
+          <h2 className="text-base font-semibold text-gray-900">Apariencia</h2>
+          <p className="text-xs text-gray-500">
+            Las imágenes se guardan automáticamente al subirlas.
+          </p>
 
-          <ImagePreview
-            label="Avatar"
-            value={avatar}
-            onChange={setAvatar}
+          <ImageUpload
+            currentImage={avatarValue}
+            onUpload={async (file) => {
+              await actualizarAvatar.mutateAsync(file);
+            }}
+            onDelete={async () => {
+              await eliminarAvatar.mutateAsync();
+            }}
+            isLoading={actualizarAvatar.isPending}
+            maxSizeMB={5}
             aspectRatio="square"
-            placeholder="https://ejemplo.com/mi-avatar.jpg"
+            label="Avatar"
           />
 
-          <ImagePreview
-            label="Portada"
-            value={portada}
-            onChange={setPortada}
+          <ImageUpload
+            currentImage={portadaValue}
+            onUpload={async (file) => {
+              await actualizarPortada.mutateAsync(file);
+            }}
+            onDelete={async () => {
+              await eliminarPortada.mutateAsync();
+            }}
+            isLoading={actualizarPortada.isPending}
+            maxSizeMB={10}
             aspectRatio="banner"
-            placeholder="https://ejemplo.com/mi-portada.jpg"
+            label="Portada"
           />
         </section>
 

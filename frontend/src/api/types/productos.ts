@@ -46,6 +46,7 @@ export interface ProductoAdminResponse {
   precio: number;
   stock: number;
   imagen?: string;
+  portada_public_id?: string;
   categoria_id: string;
   activo: boolean;
   fecha_creacion: string;

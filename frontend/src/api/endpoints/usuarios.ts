@@ -47,6 +47,44 @@ export async function recargarMiSaldo(data: UsuarioRecargarSaldo) {
   return response;
 }
 
+export async function actualizarAvatar(foto: File) {
+  const formData = new FormData();
+  formData.append("foto", foto);
+
+  const { data: response } = await apiClient.patch<RespuestaConMensaje<UsuarioPropioResponse>>(
+    "/usuarios/me/avatar",
+    formData,
+    { headers: { "Content-Type": "multipart/form-data" } }
+  );
+  return response;
+}
+
+export async function eliminarAvatar() {
+  const { data: response } = await apiClient.delete<RespuestaConMensaje<UsuarioPropioResponse>>(
+    "/usuarios/me/avatar"
+  );
+  return response;
+}
+
+export async function actualizarPortada(foto: File) {
+  const formData = new FormData();
+  formData.append("foto", foto);
+
+  const { data: response } = await apiClient.patch<RespuestaConMensaje<UsuarioPropioResponse>>(
+    "/usuarios/me/portada",
+    formData,
+    { headers: { "Content-Type": "multipart/form-data" } }
+  );
+  return response;
+}
+
+export async function eliminarPortada() {
+  const { data: response } = await apiClient.delete<RespuestaConMensaje<UsuarioPropioResponse>>(
+    "/usuarios/me/portada"
+  );
+  return response;
+}
+
 export async function listarUsuarios(skip = 0, limit = 20) {
   const { data } = await apiClient.get<Paginado<UsuarioAdminResponse>>("/usuarios/all", { params: { skip, limit } });
   return data;

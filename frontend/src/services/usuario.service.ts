@@ -206,3 +206,39 @@ export async function desactivarCuenta(id: string): Promise<ServiceResult<Respue
     return { success: false, error: networkError(err as AxiosError) };
   }
 }
+
+export async function actualizarAvatarService(foto: File): Promise<ServiceResult<RespuestaConMensaje<UsuarioPropioResponse>>> {
+  try {
+    const data = await usersApi.actualizarAvatar(foto);
+    return { success: true, data };
+  } catch (err) {
+    return { success: false, error: networkError(err as AxiosError) };
+  }
+}
+
+export async function eliminarAvatarService(): Promise<ServiceResult<RespuestaConMensaje<UsuarioPropioResponse>>> {
+  try {
+    const data = await usersApi.eliminarAvatar();
+    return { success: true, data };
+  } catch (err) {
+    return { success: false, error: networkError(err as AxiosError) };
+  }
+}
+
+export async function actualizarPortadaService(foto: File): Promise<ServiceResult<RespuestaConMensaje<UsuarioPropioResponse>>> {
+  try {
+    const data = await usersApi.actualizarPortada(foto);
+    return { success: true, data };
+  } catch (err) {
+    return { success: false, error: networkError(err as AxiosError) };
+  }
+}
+
+export async function eliminarPortadaService(): Promise<ServiceResult<RespuestaConMensaje<UsuarioPropioResponse>>> {
+  try {
+    const data = await usersApi.eliminarPortada();
+    return { success: true, data };
+  } catch (err) {
+    return { success: false, error: networkError(err as AxiosError) };
+  }
+}

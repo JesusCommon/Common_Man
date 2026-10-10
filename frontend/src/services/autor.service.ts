@@ -130,3 +130,26 @@ export async function desactivarAutorService(
     return { success: false, error: networkError(err as AxiosError) };
   }
 }
+
+export async function actualizarImagenAutorService(
+  autorId: string,
+  imagen: File
+): Promise<ServiceResult<RespuestaConMensaje<AutorResponse>>> {
+  try {
+    const data = await autoresApi.actualizarImagenAutor(autorId, imagen);
+    return { success: true, data };
+  } catch (err) {
+    return { success: false, error: networkError(err as AxiosError) };
+  }
+}
+
+export async function eliminarImagenAutorService(
+  autorId: string
+): Promise<ServiceResult<RespuestaConMensaje<AutorResponse>>> {
+  try {
+    const data = await autoresApi.eliminarImagenAutor(autorId);
+    return { success: true, data };
+  } catch (err) {
+    return { success: false, error: networkError(err as AxiosError) };
+  }
+}

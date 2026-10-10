@@ -6,8 +6,6 @@ import {
   TelefonoSchema,
   CorreoSchema,
   BioSchema,
-  AvatarSchema,
-  PortadaSchema,
   PasswordSchema,
   MontoSchema,
   RolUsuarioSchema,
@@ -30,9 +28,7 @@ export const UsuarioUpdateSchema = z.object({
   username: UsernameSchema.optional(),
   correo: CorreoSchema.optional(),
   telefono: TelefonoSchema.optional(),
-  bio: BioSchema.optional(),
-  avatar: AvatarSchema.optional(),
-  portada: PortadaSchema.optional()
+  bio: BioSchema.optional()
 });
 
 export type UsuarioUpdateInput = z.infer<typeof UsuarioUpdateSchema>;

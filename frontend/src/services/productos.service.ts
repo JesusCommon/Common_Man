@@ -197,3 +197,26 @@ export async function desactivarProductoService(id: string): Promise<ServiceResu
     return { success: false, error: networkError(err as AxiosError) };
   }
 }
+
+export async function actualizarImagenProductoService(
+  productoId: string,
+  imagen: File
+): Promise<ServiceResult<RespuestaConMensaje<ProductoAdminResponse>>> {
+  try {
+    const data = await productosApi.actualizarImagenProducto(productoId, imagen);
+    return { success: true, data };
+  } catch (err) {
+    return { success: false, error: networkError(err as AxiosError) };
+  }
+}
+
+export async function eliminarImagenProductoService(
+  productoId: string
+): Promise<ServiceResult<RespuestaConMensaje<ProductoAdminResponse>>> {
+  try {
+    const data = await productosApi.eliminarImagenProducto(productoId);
+    return { success: true, data };
+  } catch (err) {
+    return { success: false, error: networkError(err as AxiosError) };
+  }
+}

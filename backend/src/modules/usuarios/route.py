@@ -1,7 +1,6 @@
 from uuid import UUID
 from beanie import PydanticObjectId
 from fastapi import APIRouter, Depends, Query, UploadFile, File
-
 from src.core.security.jwt import obtener_usuario_actual, obtener_usuario_admin
 from src.modules.usuarios.controller import UsuarioController
 from src.modules.usuarios.document import Usuario

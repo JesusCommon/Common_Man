@@ -57,4 +57,6 @@ export interface UsuarioPropioResponse extends UsuarioPublicResponse {
 
 export interface UsuarioAdminResponse extends UsuarioPropioResponse {
   id: string;
+  avatar_public_id?: string;
+  portada_public_id?: string;
 }

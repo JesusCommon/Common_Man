@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { useCrearAutor, useActualizarAutor } from "@/hooks";
-import { X } from "lucide-react";
+import {
+  useCrearAutor,
+  useActualizarAutor,
+  useActualizarImagenAutor,
+  useEliminarImagenAutor,
+} from "@/hooks";
+import { X, CheckCircle2 } from "lucide-react";
+import { ImageUpload } from "@/components/ui/ImageUpload";
 import type { AutorResponse } from "@/api/types";
 import { extraerMensajeError } from "@/lib/errors";
 
@@ -13,10 +19,13 @@ interface AutorFormModalProps {
 export function AutorFormModal({ abierto, autor, onClose }: AutorFormModalProps) {
   const crear = useCrearAutor();
   const actualizar = useActualizarAutor();
+  const actualizarImagen = useActualizarImagenAutor();
+  const eliminarImagen = useEliminarImagenAutor();
+
   const [nombre, setNombre] = useState(autor?.nombre ?? "");
   const [apellido, setApellido] = useState(autor?.apellido ?? "");
   const [pais, setPais] = useState(autor?.pais_nacimiento ?? "");
-  const [imagen, setImagen] = useState(autor?.imagen ?? "");
+  const [mensajeExito, setMensajeExito] = useState<string | null>(null);
 
   const prevAutorId = useRef(autor?.id);
   useEffect(() => {
@@ -24,27 +33,40 @@ export function AutorFormModal({ abierto, autor, onClose }: AutorFormModalProps)
       setNombre(autor?.nombre ?? "");
       setApellido(autor?.apellido ?? "");
       setPais(autor?.pais_nacimiento ?? "");
-      setImagen(autor?.imagen ?? "");
+      setMensajeExito(null);
       prevAutorId.current = autor?.id;
     }
   }, [autor]);
 
-  const isPending = crear.isPending || actualizar.isPending;
-  const error = crear.error || actualizar.error;
+  const isPending =
+    crear.isPending ||
+    actualizar.isPending ||
+    actualizarImagen.isPending ||
+    eliminarImagen.isPending;
+  const error =
+    crear.error || actualizar.error || actualizarImagen.error || eliminarImagen.error;
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setMensajeExito(null);
+
     const payload = {
       nombre,
       apellido,
       pais_nacimiento: pais.trim() ? pais.trim() : undefined,
-      imagen: imagen.trim() || undefined,
     };
 
-    if (autor) {
-      actualizar.mutate({ id: autor.id, data: payload }, { onSuccess: onClose });
-    } else {
-      crear.mutate(payload, { onSuccess: onClose });
+    try {
+      if (autor) {
+        const resp = await actualizar.mutateAsync({ id: autor.id, data: payload });
+        setMensajeExito(resp.mensaje);
+      } else {
+        const resp = await crear.mutateAsync(payload);
+        setMensajeExito(resp.mensaje);
+      }
+      setTimeout(() => onClose(), 1500);
+    } catch {
+      // El error se renderiza vía el estado `error`
     }
   }
 
@@ -107,38 +129,49 @@ export function AutorFormModal({ abierto, autor, onClose }: AutorFormModalProps)
               className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
           </div>
-          
-          <div>
-            <label className="mb-1 block text-sm font-medium text-[#52525B]">
-              Imagen del autor{" "}
-              <span className="font-normal text-[#A1A19A]">(opcional, URL)</span>
-            </label>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full overflow-hidden border border-[#E4E4E1] bg-[#F4F4F5] flex items-center justify-center shrink-0">
-                {imagen.trim() ? (
-                  <img src={imagen.trim()} alt="Vista previa" className="w-full h-full object-cover" />
-                ) : (
-                  <span className="text-sm font-bold text-[#2563EB]">
-                    {(nombre || "A").charAt(0).toUpperCase()}
-                  </span>
-                )}
-              </div>
-              <input
-                type="url"
-                value={imagen}
-                onChange={(e) => setImagen(e.target.value)}
-                placeholder="https://…/autor.jpg"
-                className="w-full rounded-lg border border-[#E4E4E1] px-3 py-2 text-sm focus:border-[#2563EB] focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
-              />
-            </div>
-            <p className="mt-1 text-xs text-[#A1A19A]">
-              Se muestra como avatar en la sección "Voces destacadas" de la biblioteca.
+
+          <ImageUpload
+            currentImage={autor?.imagen ?? null}
+            onUpload={async (file) => {
+              if (!autor) {
+                setMensajeExito("Crea el autor primero para subir su imagen.");
+                return;
+              }
+              const resp = await actualizarImagen.mutateAsync({
+                autorId: autor.id,
+                imagen: file,
+              });
+              setMensajeExito(resp.mensaje);
+            }}
+            onDelete={async () => {
+              if (!autor) return;
+              const resp = await eliminarImagen.mutateAsync(autor.id);
+              setMensajeExito(resp.mensaje);
+            }}
+            isLoading={actualizarImagen.isPending || eliminarImagen.isPending}
+            maxSizeMB={5}
+            aspectRatio="square"
+            label="Foto del autor"
+          />
+          {!autor && (
+            <p className="text-xs text-amber-600">
+              ⚠️ Crea el autor primero, luego podrás subir su imagen al editarlo.
             </p>
-          </div>
+          )}
+          <p className="text-xs text-gray-500">
+            Se muestra como avatar en la sección "Voces destacadas" de la biblioteca.
+          </p>
 
           {error && (
             <div className="rounded-lg border border-red-200 bg-red-50 p-3">
               <p className="text-sm text-red-700">{extraerMensajeError(error)}</p>
+            </div>
+          )}
+
+          {mensajeExito && (
+            <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+              <p className="text-sm text-emerald-700">{mensajeExito}</p>
             </div>
           )}
 
@@ -155,7 +188,13 @@ export function AutorFormModal({ abierto, autor, onClose }: AutorFormModalProps)
               disabled={isPending || !nombre.trim() || !apellido.trim()}
               className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition disabled:opacity-50"
             >
-              {isPending ? "Guardando..." : autor ? "Guardar cambios" : "Crear autor"}
+              {isPending
+                ? actualizarImagen.isPending
+                  ? "Subiendo imagen..."
+                  : "Guardando..."
+                : autor
+                ? "Guardar cambios"
+                : "Crear autor"}
             </button>
           </div>
         </form>
