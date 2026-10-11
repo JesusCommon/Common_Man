@@ -79,7 +79,7 @@ export async function actualizarImagenAutor(autorId: string, imagen: File) {
   formData.append("imagen", imagen);
 
   const { data: response } = await apiClient.patch<RespuestaConMensaje<AutorResponse>>(
-    `/autores/${autorId}/imagen`,
+    `/autor/libros/${autorId}/imagen`,
     formData,
     { headers: { "Content-Type": "multipart/form-data" } }
   );
@@ -88,7 +88,7 @@ export async function actualizarImagenAutor(autorId: string, imagen: File) {
 
 export async function eliminarImagenAutor(autorId: string) {
   const { data: response } = await apiClient.delete<RespuestaConMensaje<AutorResponse>>(
-    `/autores/${autorId}/imagen`
+    `/autor/libros/${autorId}/imagen`
   );
   return response;
 }

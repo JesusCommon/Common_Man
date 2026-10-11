@@ -21,7 +21,6 @@ export const LibroCreateSchema = z.object({
     .int("Las páginas deben ser un número entero")
     .min(1, "El libro debe tener al menos 1 página"),
   idioma: idiomaEnum,
-  portada: trimOpcional(z.string().url("La portada debe ser una URL válida")),
   isbn: trimOpcional(
     z
       .string()

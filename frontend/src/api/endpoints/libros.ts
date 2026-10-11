@@ -166,7 +166,7 @@ export async function actualizarPortadaLibro(libroId: string, imagen: File) {
   formData.append("imagen", imagen);
 
   const { data: response } = await apiClient.patch<RespuestaConMensaje<LibroAdminResponse>>(
-    `/libros/${libroId}/portada`,
+    `/libros/${libroId}/imagen`,
     formData,
     { headers: { "Content-Type": "multipart/form-data" } }
   );
@@ -175,7 +175,7 @@ export async function actualizarPortadaLibro(libroId: string, imagen: File) {
 
 export async function eliminarPortadaLibro(libroId: string) {
   const { data: response } = await apiClient.delete<RespuestaConMensaje<LibroAdminResponse>>(
-    `/libros/${libroId}/portada`
+    `/libros/${libroId}/imagen`
   );
   return response;
 }
