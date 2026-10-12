@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useAuthStore } from "@/store";
-import { usePerfil, useActualizarPerfil } from "@/hooks";
 import {
+  usePerfil,
+  useActualizarPerfil,
   useActualizarAvatar,
   useEliminarAvatar,
   useActualizarPortada,
@@ -22,6 +23,19 @@ export function PerfilTab() {
   const [apellido, setApellido] = useState(perfil?.apellido ?? user?.apellido ?? "");
   const [bio, setBio] = useState(perfil?.bio ?? "");
   const [guardado, setGuardado] = useState(false);
+
+  const userId = user?.identificador ?? null;
+  const prevUserId = useRef(userId);
+
+  useEffect(() => {
+    if (userId !== prevUserId.current) {
+      setNombre(perfil?.nombre ?? user?.nombre ?? "");
+      setApellido(perfil?.apellido ?? user?.apellido ?? "");
+      setBio(perfil?.bio ?? "");
+      setGuardado(false);
+      prevUserId.current = userId;
+    }
+  }, [userId, perfil, user]);
 
   if (isLoading) {
     return <Spinner />;

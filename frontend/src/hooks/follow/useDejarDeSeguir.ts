@@ -12,7 +12,7 @@ export function useDejarDeSeguir() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["follows"] });
-      queryClient.invalidateQueries({ queryKey: ["perfil-publico"] });
+      queryClient.invalidateQueries({ queryKey: ["usuario"] });
     },
   });
 }

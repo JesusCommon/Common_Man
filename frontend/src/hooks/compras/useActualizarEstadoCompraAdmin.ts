@@ -11,7 +11,7 @@ export function useActualizarEstadoCompraAdmin() {
       return result.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["compras", "admin"] });
+      queryClient.invalidateQueries({ queryKey: ["compras"] });
     },
   });
 }

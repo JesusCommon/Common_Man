@@ -14,7 +14,8 @@ export function useActualizarPerfil() {
     },
     onSuccess: (data) => {
       if (data.data) setUser(data.data);
-      queryClient.invalidateQueries({ queryKey: ["usuario", "perfil"] });
+      queryClient.invalidateQueries({ queryKey: ["usuario"] });
+      queryClient.invalidateQueries({ queryKey: ["usuarios"] });
     },
   });
 }

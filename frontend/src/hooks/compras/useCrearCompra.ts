@@ -12,6 +12,9 @@ export function useCrearCompra() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["compras", "mis-compras"] });
+      queryClient.invalidateQueries({ queryKey: ["libros"] });
+      queryClient.invalidateQueries({ queryKey: ["usuario", "me"] });
+      queryClient.invalidateQueries({ queryKey: ["usuario", "perfil"] });
     },
   });
 }

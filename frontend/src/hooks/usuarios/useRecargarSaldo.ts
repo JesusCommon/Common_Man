@@ -15,6 +15,7 @@ export function useRecargarSaldo() {
     onSuccess: (data) => {
       if (data.data) setUser(data.data);
       queryClient.invalidateQueries({ queryKey: ["usuario", "perfil"] });
+      queryClient.invalidateQueries({ queryKey: ["usuario", "me"] });
     },
   });
 }

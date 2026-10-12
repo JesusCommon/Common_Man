@@ -12,7 +12,7 @@ export function useSeguir() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["follows"] });
-      queryClient.invalidateQueries({ queryKey: ["perfil-publico"] });
+      queryClient.invalidateQueries({ queryKey: ["usuario"] });
     },
   });
 }

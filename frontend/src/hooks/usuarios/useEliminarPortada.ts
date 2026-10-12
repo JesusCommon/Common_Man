@@ -7,8 +7,7 @@ export function useEliminarPortada() {
   return useMutation({
     mutationFn: eliminarPortadaService,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["usuario", "me"] });
-      queryClient.invalidateQueries({ queryKey: ["usuario", "perfil"] });
+      queryClient.invalidateQueries({ queryKey: ["usuario"] });
       queryClient.invalidateQueries({ queryKey: ["usuarios"] });
     },
   });

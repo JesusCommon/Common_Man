@@ -13,6 +13,8 @@ export function useProcesarPago() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["pagos", "historial"] });
       queryClient.invalidateQueries({ queryKey: ["compras"] });
+      queryClient.invalidateQueries({ queryKey: ["usuario", "me"] });
+      queryClient.invalidateQueries({ queryKey: ["usuario", "perfil"] });
     },
   });
 }
