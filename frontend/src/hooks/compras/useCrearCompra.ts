@@ -15,6 +15,7 @@ export function useCrearCompra() {
       queryClient.invalidateQueries({ queryKey: ["libros"] });
       queryClient.invalidateQueries({ queryKey: ["usuario", "me"] });
       queryClient.invalidateQueries({ queryKey: ["usuario", "perfil"] });
+      queryClient.invalidateQueries({ queryKey: ["finanzas"] });
     },
   });
 }

@@ -15,6 +15,7 @@ export function useProcesarPago() {
       queryClient.invalidateQueries({ queryKey: ["compras"] });
       queryClient.invalidateQueries({ queryKey: ["usuario", "me"] });
       queryClient.invalidateQueries({ queryKey: ["usuario", "perfil"] });
+      queryClient.invalidateQueries({ queryKey: ["finanzas"] });
     },
   });
 }

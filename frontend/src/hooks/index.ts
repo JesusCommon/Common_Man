@@ -86,7 +86,7 @@ export { useObtenerCompraAdmin } from "./compras/useObtenerCompraAdmin";
 
 //Pagos
 export { useProcesarPago } from "./pagos/useProcesarPago";
-export { useCancelarCompra } from "./pagos/useCancelarCompra";
+export { useCancelarCompra } from "./compras/useCancelarCompra";
 export { useObtenerMovimientoDeCompra } from "./pagos/useObtenerMovimientoDeCompra";
 export { useListarHistorialMovimientos } from "./pagos/useListarHistorialMovimientos";
 

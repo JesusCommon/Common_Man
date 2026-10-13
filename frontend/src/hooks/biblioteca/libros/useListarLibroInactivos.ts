@@ -8,7 +8,7 @@ type ListarParams = {
 
 export function useListarLibrosInactivos({ skip = 0, limit = 20 }: ListarParams = {}) {
   return useQuery({
-    queryKey: ["usuarios", "inactivos", skip, limit],
+    queryKey: ["libros", "inactivos", skip, limit],
     queryFn: async () => {
       const result = await listarLibrosInactivos(skip, limit);
       if (!result.success) throw result.error;

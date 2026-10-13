@@ -13,6 +13,7 @@ export function useCancelarCompra() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["pagos", "historial"] });
       queryClient.invalidateQueries({ queryKey: ["compras"] });
+      queryClient.invalidateQueries({ queryKey: ["finanzas"] });
     },
   });
 }
