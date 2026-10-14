@@ -12,6 +12,8 @@ class TipoNotificacionEnum(str, Enum):
     SOPORTE = "soporte"
     PROMOCION = "promocion"
     FOLLOW = "seguidores"
+    MENSAJE = "mensaje"
+    SOLICITUD_MENSAJE = "solicitud_mensaje"
 
 class Notificacion(Document, TimestampMixim):
     usuario_id: PydanticObjectId = Field(

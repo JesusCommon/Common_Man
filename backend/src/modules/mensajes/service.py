@@ -13,8 +13,18 @@ from src.modules.mensajes.schema import (
     MensajeUpdate,
     UsuarioMiniResponse,
 )
+from src.modules.mensajes.events import (
+    message_event_bus,
+    MensajeNuevoEvent,
+    SolicitudNuevaEvent,
+    SolicitudProcesadaEvent,
+    MensajeLeidoEvent,
+    MensajeEditadoEvent,
+    MensajeEliminadoEvent,
+)
 from src.modules.usuarios.document import Usuario
 from src.modules.follow.document import Follow
+
 
 class MensajeService:
     def __init__(self):
@@ -106,6 +116,7 @@ class MensajeService:
             )
 
         conversacion = await self.conversaciones.obtener_entre(usuario.id, destinatario.id)
+        es_solicitud_nueva = False
 
         if conversacion:
             if conversacion.estado == EstadoConversacion.RECHAZADA:
@@ -122,6 +133,7 @@ class MensajeService:
                 conversacion.oculta_para.remove(usuario.id)
         else:
             follow_mutuo = await self._hay_follow_mutuo(usuario.id, destinatario.id)
+            es_solicitud_nueva = not follow_mutuo
             conversacion = await self.conversaciones.crear(
                 ConversacionCreate(
                     clave=generar_clave(usuario.id, destinatario.id),
@@ -151,6 +163,23 @@ class MensajeService:
         clave_dest = str(destinatario.id)
         conversacion.no_leidos[clave_dest] = conversacion.no_leidos.get(clave_dest, 0) + 1
         await self.conversaciones.guardar(conversacion)
+
+        if es_solicitud_nueva:
+            await message_event_bus.publish(SolicitudNuevaEvent(
+                conversacion_id=str(conversacion.id),
+                solicitante_id=str(usuario.id),
+                receptor_id=str(destinatario.id),
+                preview=mensaje.contenido[:50],
+            ))
+        else:
+            await message_event_bus.publish(MensajeNuevoEvent(
+                conversacion_id=str(conversacion.id),
+                remitente_id=str(usuario.id),
+                destinatario_id=str(destinatario.id),
+                mensaje_id=str(mensaje.id),
+                contenido=mensaje.contenido,
+                fecha=mensaje.fecha_creacion.isoformat(),
+            ))
 
         return self._mensaje_a_response(mensaje, usuario)
 
@@ -209,6 +238,13 @@ class MensajeService:
         await self.mensajes.marcar_leidos(conversacion_id, otro_id)
         conversacion.no_leidos[str(usuario.id)] = 0
         await self.conversaciones.guardar(conversacion)
+
+        await message_event_bus.publish(MensajeLeidoEvent(
+            conversacion_id=str(conversacion.id),
+            leido_por=str(usuario.id),
+            notificar_a=str(otro_id),
+        ))
+
         return await self._conversacion_a_response(conversacion, usuario)
 
     async def aceptar_solicitud(
@@ -229,6 +265,13 @@ class MensajeService:
             )
         conversacion.estado = EstadoConversacion.ACEPTADA
         await self.conversaciones.guardar(conversacion)
+
+        await message_event_bus.publish(SolicitudProcesadaEvent(
+            conversacion_id=str(conversacion.id),
+            estado=conversacion.estado,
+            notificar_a=str(conversacion.solicitante_id),
+        ))
+
         return await self._conversacion_a_response(conversacion, usuario)
 
     async def rechazar_solicitud(
@@ -249,6 +292,13 @@ class MensajeService:
             )
         conversacion.estado = EstadoConversacion.RECHAZADA
         await self.conversaciones.guardar(conversacion)
+
+        await message_event_bus.publish(SolicitudProcesadaEvent(
+            conversacion_id=str(conversacion.id),
+            estado=conversacion.estado,
+            notificar_a=str(conversacion.solicitante_id),
+        ))
+
         return await self._conversacion_a_response(conversacion, usuario)
 
     async def editar_mensaje(
@@ -281,6 +331,13 @@ class MensajeService:
             conversacion.ultimo_contenido = mensaje.contenido
             await self.conversaciones.guardar(conversacion)
 
+        await message_event_bus.publish(MensajeEditadoEvent(
+            conversacion_id=str(mensaje.conversacion_id),
+            mensaje_id=str(mensaje.id),
+            nuevo_contenido=mensaje.contenido,
+            participantes=[str(p) for p in conversacion.participantes],
+        ))
+
         return self._mensaje_a_response(mensaje, usuario)
 
     async def eliminar_mensaje(
@@ -305,6 +362,14 @@ class MensajeService:
         if conversacion and conversacion.ultimo_mensaje_id == mensaje.id:
             conversacion.ultimo_contenido = None
             await self.conversaciones.guardar(conversacion)
+
+        await message_event_bus.publish(MensajeEliminadoEvent(
+            conversacion_id=str(mensaje.conversacion_id),
+            mensaje_id=str(mensaje.id),
+            eliminado_por=str(usuario.id),
+            para_todos=True,
+            participantes=[str(p) for p in conversacion.participantes],
+        ))
 
         return self._mensaje_a_response(mensaje, usuario)
 

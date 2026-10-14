@@ -27,6 +27,8 @@ from src.modules.biblioteca.autor.route import router as autor_route
 from src.modules.biblioteca.editorial.route import router as editorial_route
 from src.modules.biblioteca.genero.route import router as genero_route
 from src.modules.biblioteca.libros.route import router as libro_route
+from src.modules.mensajes.route import router as mensaje_route
+from src.modules.mensajes.ws_subscriber import registrar_suscriptor_mensajes  # ← NUEVO
 from src.modules.usuarios.document import Usuario
 from src.modules.follow.document import Follow
 from src.modules.categoriasProductos.document import Categorias
@@ -42,18 +44,21 @@ from src.modules.biblioteca.autor.document import Autor
 from src.modules.biblioteca.editorial.document import Editorial
 from src.modules.biblioteca.genero.document import Genero
 from src.modules.biblioteca.libros.document import Libro
+from src.modules.mensajes.document import Mensaje
+from src.modules.mensajes.document import Conversacion
 
 
 settings = get_settings()
 setup_logging(environment=settings.app.environment, debug=settings.app.debug)
 
 document_models = [Usuario, Follow, Categorias, Productos, Compras, 
-MovimientoSaldo, ConfiguracionSistema, Direcciones, Envios, Notificacion, Reporte, Autor, Editorial, Genero, Libro]
+MovimientoSaldo, ConfiguracionSistema, Direcciones, Envios, Notificacion, Reporte, Autor, Editorial, Genero, Libro, Mensaje, Conversacion]
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await connect_db(document_models)
+    registrar_suscriptor_mensajes()  # ← NUEVO: conectar bus de eventos con WS
     yield
     await disconnect_db()
 
@@ -104,6 +109,7 @@ app.include_router(autor_route)
 app.include_router(editorial_route)
 app.include_router(genero_route)
 app.include_router(libro_route)
+app.include_router(mensaje_route)
 
 @app.get("/")
 async def health_check():
