@@ -15,3 +15,4 @@ export * from "./autor.service";
 export * from "./editorial.service";
 export * from "./genero.service";
 export * from "./libros.service";
+export * from "./mensajes.service";

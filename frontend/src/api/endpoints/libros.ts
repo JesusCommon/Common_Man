@@ -80,12 +80,12 @@ export async function listarLibros(skip = 0, limit = 20) {
   return data;
 }
 
-export async function listarInactivos(skip = 0, limit = 20) {
+export async function listarLibrosInactivos(skip = 0, limit = 20) {
   const { data } = await apiClient.get<Paginado<LibroAdminResponse>>("/libros/inactivos", { params: { skip, limit } });
   return data;
 }
 
-export async function listarActivos(skip = 0, limit = 20) {
+export async function listarLibrosActivos(skip = 0, limit = 20) {
   const { data } = await apiClient.get<Paginado<LibroAdminResponse>>("/libros/activos", { params: { skip, limit } });
   return data;
 }

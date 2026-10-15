@@ -187,3 +187,18 @@ export { useSubirArchivoLibro }from "./biblioteca/libros/useSubirArchivoLibro";
 export { usePrepararLectura }from "./biblioteca/libros/usePrepararLectura";
 export { useActualizarPortadaLibro }from "./biblioteca/libros/useActualizarPortadaLibro";
 export { useEliminarPortadaLibro }from "./biblioteca/libros/useEliminarPortadaLibro";
+
+//mensajería entre usuarios
+export { useContadoresMensajes } from "./mensajes/useContadoresMensaje";
+export { useBandeja } from "./mensajes/useBandeja";
+export { useSolicitudes } from "./mensajes/useSolicitudes";
+export { useDetalleConversacion } from "./mensajes/useDetalleConversacion";
+export { useHistorialMensajes } from "./mensajes/useHistorialMensajes";
+export { useEnviarMensaje } from "./mensajes/useEnviarMensajes";
+export { useMarcarLeido } from "./mensajes/useMarcarComoLeido";
+export { useAceptarSolicitud } from "./mensajes/useAceptarSolicitud";
+export { useRechazarSolicitud } from "./mensajes/useRechazarSolicitud";
+export { useEditarMensaje } from "./mensajes/useEditarMensajes";
+export { useEliminarMensaje } from "./mensajes/useEliminarMensajes";
+export { useOcultarMensaje } from "./mensajes/useOcultarMensajes";
+export { useOcultarConversacion } from "./mensajes/useOcultarConversacion";

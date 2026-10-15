@@ -14,3 +14,4 @@ export * from "./autor";
 export * from "./editorial";
 export * from "./genero";
 export * from "./libros";
+export * from "./mensajes";

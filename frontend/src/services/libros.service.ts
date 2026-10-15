@@ -101,7 +101,7 @@ export async function listarTodosLosLibros(skip = 0, limit = 20): Promise<Servic
 
 export async function listarLibrosInactivos(skip = 0, limit = 20): Promise<ServiceResult<Paginado<LibroAdminResponse>>> {
   try {
-    const data = await librosApi.listarInactivos(skip, limit);
+    const data = await librosApi.listarLibrosInactivos(skip, limit);
     return { success: true, data };
   } catch (err) {
     return { success: false, error: networkError(err as AxiosError) };
@@ -110,7 +110,7 @@ export async function listarLibrosInactivos(skip = 0, limit = 20): Promise<Servi
 
 export async function listarLibrosActivos(skip = 0, limit = 20): Promise<ServiceResult<Paginado<LibroAdminResponse>>> {
   try {
-    const data = await librosApi.listarActivos(skip, limit);
+    const data = await librosApi.listarLibrosActivos(skip, limit);
     return { success: true, data };
   } catch (err) {
     return { success: false, error: networkError(err as AxiosError) };

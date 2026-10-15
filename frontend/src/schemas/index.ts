@@ -15,3 +15,4 @@ export * from "./compras";
 export * from "./autor";
 export * from "./categoriasProductos";
 export * from "./comunes";
+export * from "./mensajes";
