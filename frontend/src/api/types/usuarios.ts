@@ -36,6 +36,7 @@ export interface UsuarioRecargarSaldo {
 }
 
 export interface UsuarioPublicResponse {
+  id: string;
   identificador: string;
   nombre: string;
   apellido?: string;

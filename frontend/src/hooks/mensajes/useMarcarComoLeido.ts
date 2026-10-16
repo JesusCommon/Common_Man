@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { marcarLeidoService } from "@/services";
 
-export function useMarcarLeido() {
+export function useMarcarComoLeido() {
   const queryClient = useQueryClient();
 
   return useMutation({

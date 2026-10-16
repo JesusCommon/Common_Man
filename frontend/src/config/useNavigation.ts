@@ -7,6 +7,7 @@ import {
   LifeBuoy,
   Bell,
   Settings,
+  Mails
 } from "lucide-react";
 import type { ComponentType } from "react";
 
@@ -26,4 +27,5 @@ export const userNavigationConfig: UserNavItem[] = [
   { id: "soporte", label: "Soporte", icon: LifeBuoy, route: "/soporte" },
   { id: "notificaciones", label: "Notificaciones", icon: Bell, route: "/notificaciones" },
   { id: "configuracion", label: "Configuración", icon: Settings, route: "/configuracion" },
+  { id: "mensajes", label: "Mensajes", icon: Mails, route: "/mensajes" },
 ];

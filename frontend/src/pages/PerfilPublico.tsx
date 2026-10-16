@@ -8,6 +8,7 @@ import {
   useSeguidoresDe,
   useSeguidosDe
 } from "@/hooks";
+import { useIniciarConversacion } from "@/hooks/mensajes/useIniciarConversacion";
 import { useAuthStore } from "@/store";
 import { Spinner } from "@/components/ui/Spinner";
 import { ErrorAlert } from "@/components/ui/ErrorAlert";
@@ -15,7 +16,7 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Button } from "@/components/ui/Button";
 import { UserListModal } from "@/components/perfil/UserListModal";
 import { 
-  ArrowLeft, Calendar, AtSign, UserPlus, UserCheck, Loader2, Bookmark
+  ArrowLeft, Calendar, AtSign, UserPlus, UserCheck, Loader2, Bookmark, MessageCircle
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -25,7 +26,19 @@ export default function PerfilPublico() {
   const currentUser = useAuthStore((s) => s.user);
   const isOwnProfile = currentUser?.username === username;
 
+  console.log("🧾 PerfilPublico renderizado:", { 
+    username, 
+    currentUser: currentUser?.id, 
+    isOwnProfile 
+  }); // ← DEBUG
+
   const { data: perfil, isLoading, isError, error } = useObtenerPerfilPublico(username || "");
+
+  console.log("📋 Datos de perfil cargados:", {
+    id: perfil?.id,
+    username: perfil?.username,
+    hasId: !!perfil?.id
+  }); // ← DEBUG
 
   const { data: sigueData, isLoading: isLoadingFollowStatus } = useVerificarSiSigue(
     username || "",
@@ -35,14 +48,14 @@ export default function PerfilPublico() {
   const { mutate: seguir, isPending: isSeguirPending } = useSeguir();
   const { mutate: dejarDeSeguir, isPending: isDejarDeSeguirPending } = useDejarDeSeguir();
   const isPending = isSeguirPending || isDejarDeSeguirPending;
-
   const { data: seguidoresData } = useSeguidoresDe(username || "", 0, 1);
   const { data: seguidosData } = useSeguidosDe(username || "", 0, 1);
   const seguidoresCount = seguidoresData?.total || 0;
   const seguidosCount = seguidosData?.total || 0;
-
   const [modalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState<"seguidores" | "seguidos">("seguidores");
+  const { iniciar } = useIniciarConversacion();
+  const [isIniciandoChat, setIsIniciandoChat] = useState(false);
 
   const openModal = (type: "seguidores" | "seguidos") => {
     setModalType(type);
@@ -55,6 +68,52 @@ export default function PerfilPublico() {
       dejarDeSeguir(username);
     } else {
       seguir({ username });
+    }
+  };
+
+  const handleEnviarMensaje = async () => {
+    console.log("🔵 handleEnviarMensaje LLAMADO"); // ← PRIMERA LÍNEA
+    
+    if (!perfil) {
+      console.error("❌ perfil es null/undefined");
+      return;
+    }
+    
+    if (!currentUser) {
+      console.error("❌ currentUser es null/undefined");
+      return;
+    }
+    
+    console.log("📋 Verificando IDs:", {
+      "perfil.id": perfil.id,
+      "currentUser.id": currentUser.id,
+      "perfil.id type": typeof perfil.id,
+      "currentUser.id type": typeof currentUser.id
+    });
+    
+    if (perfil.id === currentUser.id) {
+      console.warn("⚠️ Intento de enviar mensaje a uno mismo");
+      return;
+    }
+    
+    if (!perfil.id) {
+      console.error("❌ perfil.id es undefined — revisar schema backend y type frontend");
+      return;
+    }
+
+    setIsIniciandoChat(true);
+    try {
+      console.log("🚀 Iniciando conversación con:", perfil.id);
+      const conversacionId = await iniciar(perfil.id);
+      console.log("✅ Conversación creada:", conversacionId);
+      console.log("🎯 Navegando a:", `/mensajes?conversacion=${conversacionId}`);
+      navigate(`/mensajes?conversacion=${conversacionId}`);
+    } catch (error) {
+      console.error("💥 Error al iniciar conversación:", error);
+      // Mostrar error al usuario
+      alert(`Error al iniciar conversación: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+    } finally {
+      setIsIniciandoChat(false);
     }
   };
 
@@ -110,7 +169,7 @@ export default function PerfilPublico() {
         className="max-w-4xl mx-auto"
       >
         <div className="bg-white rounded-2xl shadow-sm border border-[#E4E4E1] overflow-hidden">
-                    <div className="relative h-48 sm:h-56 overflow-hidden">
+          <div className="relative h-48 sm:h-56 overflow-hidden">
             <img 
               src={coverImage} 
               alt="Cover" 
@@ -154,25 +213,44 @@ export default function PerfilPublico() {
 
                   <div className="flex flex-wrap gap-3">
                     {!isOwnProfile && currentUser ? (
-                      <Button
-                        variant={isFollowing ? "outline" : "primary"}
-                        size="lg"
-                        onClick={handleToggleFollow}
-                        disabled={isPending || isLoadingFollowStatus}
-                        className={isFollowing 
-                          ? "bg-white text-[#18181B] border border-[#E4E4E1] hover:bg-[#FAFAF8]" 
-                          : "bg-[#18181B] text-white hover:bg-[#18181B]/90 border-0"
-                        }
-                      >
-                        {isPending ? (
-                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                        ) : isFollowing ? (
-                          <UserCheck className="w-4 h-4 mr-2" />
-                        ) : (
-                          <UserPlus className="w-4 h-4 mr-2" />
-                        )}
-                        {isPending ? "Procesando..." : isFollowing ? "Siguiendo" : "Seguir"}
-                      </Button>
+                      <>
+                        <Button
+                          variant="outline"
+                          size="lg"
+                          onClick={() => {
+                            console.log("🟢 Button onClick disparado"); // ← DEBUG
+                            handleEnviarMensaje();
+                          }}
+                          disabled={isIniciandoChat}
+                          className="bg-white text-[#18181B] border border-[#E4E4E1] hover:bg-[#FAFAF8]"
+                        >
+                          {isIniciandoChat ? (
+                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                          ) : (
+                            <MessageCircle className="w-4 h-4 mr-2" />
+                          )}
+                          Mensaje
+                        </Button>
+                        <Button
+                          variant={isFollowing ? "outline" : "primary"}
+                          size="lg"
+                          onClick={handleToggleFollow}
+                          disabled={isPending || isLoadingFollowStatus}
+                          className={isFollowing 
+                            ? "bg-white text-[#18181B] border border-[#E4E4E1] hover:bg-[#FAFAF8]" 
+                            : "bg-[#18181B] text-white hover:bg-[#18181B]/90 border-0"
+                          }
+                        >
+                          {isPending ? (
+                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                          ) : isFollowing ? (
+                            <UserCheck className="w-4 h-4 mr-2" />
+                          ) : (
+                            <UserPlus className="w-4 h-4 mr-2" />
+                          )}
+                          {isPending ? "Procesando..." : isFollowing ? "Siguiendo" : "Seguir"}
+                        </Button>
+                      </>
                     ) : isOwnProfile ? (
                       <Button 
                         variant="outline" 
@@ -258,6 +336,27 @@ export default function PerfilPublico() {
         username={username || ""} 
         type={modalType} 
       />
+
+      {/* 🔥 TEST AISLADO — BORRAR DESPUÉS DE DIAGNOSTICAR ← NUEVO */}
+      <button
+        type="button"
+        onClick={() => { 
+          console.log("🟣 TEST AISLADO: click registrado"); 
+          alert("click OK"); 
+        }}
+        style={{ 
+          position: "fixed", 
+          bottom: 16, 
+          right: 16, 
+          zIndex: 9999, 
+          padding: "10px 14px", 
+          background: "#b23a2f", 
+          color: "#fff", 
+          borderRadius: 999 
+        }}
+      >
+        TEST
+      </button>
     </div>
   );
 }

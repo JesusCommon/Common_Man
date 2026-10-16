@@ -140,6 +140,7 @@ class UsuarioRecargarSaldo(BaseModel):
         return Decimal(str(v)).quantize(Decimal("0.01"))
 
 class UsuarioPublicResponse(BaseModel):
+    id: PydanticObjectId
     nombre: str
     apellido: str | None = None
     username: str
@@ -152,6 +153,7 @@ class UsuarioPublicResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 class UsuarioPropioResponse(UsuarioPublicResponse):
+    id: PydanticObjectId
     identificador: UUID
     correo: EmailStr
     telefono: str | None = None

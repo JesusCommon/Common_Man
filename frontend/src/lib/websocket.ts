@@ -1,4 +1,12 @@
 import type { NotificacionResponse } from '@/api/types';
+import type {
+  MensajeNuevoWS,
+  SolicitudNuevaWS,
+  SolicitudProcesadaWS,
+  MensajeLeidoWS,
+  MensajeEditadoWS,
+  MensajeEliminadoWS,
+} from '@/api/types/mensajes';
 
 type MessageHandler<T = unknown> = (data: T) => void;
 
@@ -6,14 +14,22 @@ interface WebSocketConfig {
   onNotification?: MessageHandler<NotificacionResponse>;
   onNotificationUpdated?: MessageHandler<NotificacionResponse>;
   onSaldoActualizado?: MessageHandler<{ saldo: number }>;
+  // Mensajes (Omit quita 'tipo' que solo existe en el evento, no en los datos)
+  onMensajeNuevo?: MessageHandler<Omit<MensajeNuevoWS, 'tipo'>>;
+  onSolicitudNueva?: MessageHandler<Omit<SolicitudNuevaWS, 'tipo'>>;
+  onSolicitudProcesada?: MessageHandler<Omit<SolicitudProcesadaWS, 'tipo'>>;
+  onMensajeLeido?: MessageHandler<Omit<MensajeLeidoWS, 'tipo'>>;
+  onMensajeEditado?: MessageHandler<Omit<MensajeEditadoWS, 'tipo'>>;
+  onMensajeEliminado?: MessageHandler<Omit<MensajeEliminadoWS, 'tipo'>>;
+  // Ciclo de vida
   onConnect?: () => void;
   onDisconnect?: () => void;
   onError?: (error: Event) => void;
 }
 
 interface WebSocketMessage {
-  type: 'NEW_NOTIFICATION' | 'NOTIFICATION_UPDATED' | 'SALDO_ACTUALIZADO' | string;
-  data: NotificacionResponse | { saldo: number } | unknown;
+  type: string;
+  data: unknown;
 }
 
 export class WebSocketManager {
@@ -34,7 +50,6 @@ export class WebSocketManager {
         .replace(/^http:/, 'ws:')
         .replace(/^https:/, 'wss:')
         .replace(/\/$/, '');
-      
       if (import.meta.env.DEV) {
         baseUrl = baseUrl.replace('localhost', '127.0.0.1');
       }
@@ -67,7 +82,6 @@ export class WebSocketManager {
 
     this.ws.onmessage = (event: MessageEvent) => {
       if (typeof event.data === 'string' && event.data === 'pong') return;
-      
       try {
         const message: WebSocketMessage = JSON.parse(event.data);
         this.handleMessage(message);
@@ -99,15 +113,32 @@ export class WebSocketManager {
       case 'SALDO_ACTUALIZADO':
         this.handlers.onSaldoActualizado?.(message.data as { saldo: number });
         break;
+      // Mensajería
+      case 'MENSAJE_NUEVO':
+        this.handlers.onMensajeNuevo?.(message.data as Omit<MensajeNuevoWS, 'tipo'>);
+        break;
+      case 'SOLICITUD_NUEVA':
+        this.handlers.onSolicitudNueva?.(message.data as Omit<SolicitudNuevaWS, 'tipo'>);
+        break;
+      case 'SOLICITUD_PROCESADA':
+        this.handlers.onSolicitudProcesada?.(message.data as Omit<SolicitudProcesadaWS, 'tipo'>);
+        break;
+      case 'MENSAJE_LEIDO':
+        this.handlers.onMensajeLeido?.(message.data as Omit<MensajeLeidoWS, 'tipo'>);
+        break;
+      case 'MENSAJE_EDITADO':
+        this.handlers.onMensajeEditado?.(message.data as Omit<MensajeEditadoWS, 'tipo'>);
+        break;
+      case 'MENSAJE_ELIMINADO':
+        this.handlers.onMensajeEliminado?.(message.data as Omit<MensajeEliminadoWS, 'tipo'>);
+        break;
     }
   }
 
   private reconnect(token: string): void {
     if (this.reconnectAttempts >= this.maxAttempts) return;
-
     this.reconnectAttempts++;
     const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
-    
     setTimeout(() => {
       this.connect(token, this.handlers);
     }, delay);
