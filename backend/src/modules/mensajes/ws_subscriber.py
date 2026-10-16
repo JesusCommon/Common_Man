@@ -14,7 +14,6 @@ from src.core.websocket.manager import manager
 from src.modules.notificaciones.document import Notificacion, TipoNotificacionEnum
 from src.modules.usuarios.document import Usuario
 
-
 async def _nombre_usuario(user_id: str) -> str:
     try:
         usuario = await Usuario.get(PydanticObjectId(user_id))
@@ -25,7 +24,6 @@ async def _nombre_usuario(user_id: str) -> str:
     except Exception:
         return "Alguien"
 
-
 async def _persistir_notificacion(
     usuario_id: str,
     tipo: TipoNotificacionEnum,
@@ -35,18 +33,33 @@ async def _persistir_notificacion(
     accion_url: str | None = None,
 ) -> None:
     try:
-        await Notificacion(
-            usuario_id=PydanticObjectId(usuario_id),
-            tipo=tipo,
-            titulo=titulo[:100],
-            mensaje=mensaje[:500],
-            referencia_id=PydanticObjectId(referencia_id) if referencia_id else None,
-            referencia_tipo="conversacion",
-            accion_url=accion_url,
-        ).insert()
+        filtro = {
+            "usuario_id": PydanticObjectId(usuario_id),
+            "tipo": tipo,
+            "leida": False,
+        }
+        if referencia_id:
+            filtro["referencia_id"] = PydanticObjectId(referencia_id)
+
+        existente = await Notificacion.find_one(filtro)
+
+        if existente:
+            existente.contador += 1
+            existente.mensaje = mensaje[:500]
+            existente.titulo = titulo[:100]
+            await existente.save()
+        else:
+            await Notificacion(
+                usuario_id=PydanticObjectId(usuario_id),
+                tipo=tipo,
+                titulo=titulo[:100],
+                mensaje=mensaje[:500],
+                referencia_id=PydanticObjectId(referencia_id) if referencia_id else None,
+                referencia_tipo="conversacion",
+                accion_url=accion_url,
+            ).insert()
     except Exception as e:
         print(f"⚠️ No se pudo persistir notificación: {e}")
-
 
 async def handle_mensaje_event(event: MensajeEvent) -> None:
 
@@ -54,7 +67,6 @@ async def handle_mensaje_event(event: MensajeEvent) -> None:
         nombre = await _nombre_usuario(event.remitente_id)
         preview = event.contenido[:60]
 
-        # WS: formato unificado { type, data }
         await manager.send_to_user(event.destinatario_id, {
             "type": "MENSAJE_NUEVO",
             "data": {

@@ -341,37 +341,47 @@ class MensajeService:
         return self._mensaje_a_response(mensaje, usuario)
 
     async def eliminar_mensaje(
-        self, usuario: Usuario, mensaje_id: PydanticObjectId
-    ) -> MensajeResponse:
-        mensaje = await self.mensajes.obtener_por_id(mensaje_id)
-        if not mensaje:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Mensaje no encontrado",
-            )
-        if mensaje.remitente_id != usuario.id:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Solo puedes eliminar tus propios mensajes",
-            )
+            self, usuario: Usuario, mensaje_id: PydanticObjectId
+        ) -> MensajeResponse:
+            mensaje = await self.mensajes.obtener_por_id(mensaje_id)
+            if not mensaje:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Mensaje no encontrado",
+                )
+            if mensaje.remitente_id != usuario.id:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Solo puedes eliminar tus propios mensajes",
+                )
 
-        mensaje.eliminado = True
-        await self.mensajes.guardar(mensaje)
+            mensaje.eliminado = True
+            await self.mensajes.guardar(mensaje)
 
-        conversacion = await self.conversaciones.obtener_por_id(mensaje.conversacion_id)
-        if conversacion and conversacion.ultimo_mensaje_id == mensaje.id:
-            conversacion.ultimo_contenido = None
-            await self.conversaciones.guardar(conversacion)
+            conversacion = await self.conversaciones.obtener_por_id(mensaje.conversacion_id)
+            if conversacion and conversacion.ultimo_mensaje_id == mensaje.id:
+                ultimo_valido = await self.mensajes.obtener_ultimo_no_eliminado(conversacion.id)
+                if ultimo_valido:
+                    conversacion.ultimo_mensaje_id = ultimo_valido.id
+                    conversacion.ultimo_contenido = ultimo_valido.contenido
+                    conversacion.ultimo_remitente_id = ultimo_valido.remitente_id
+                    conversacion.ultimo_fecha = ultimo_valido.fecha_creacion
+                else:
+                    conversacion.ultimo_mensaje_id = None
+                    conversacion.ultimo_contenido = None
+                    conversacion.ultimo_remitente_id = None
+                    conversacion.ultimo_fecha = None
+                await self.conversaciones.guardar(conversacion)
 
-        await message_event_bus.publish(MensajeEliminadoEvent(
-            conversacion_id=str(mensaje.conversacion_id),
-            mensaje_id=str(mensaje.id),
-            eliminado_por=str(usuario.id),
-            para_todos=True,
-            participantes=[str(p) for p in conversacion.participantes],
-        ))
+            await message_event_bus.publish(MensajeEliminadoEvent(
+                conversacion_id=str(mensaje.conversacion_id),
+                mensaje_id=str(mensaje.id),
+                eliminado_por=str(usuario.id),
+                para_todos=True,
+                participantes=[str(p) for p in conversacion.participantes],
+            ))
 
-        return self._mensaje_a_response(mensaje, usuario)
+            return self._mensaje_a_response(mensaje, usuario)
 
     async def ocultar_mensaje(
         self, usuario: Usuario, mensaje_id: PydanticObjectId

@@ -37,7 +37,13 @@ class ConversacionRepo(BaseRepo[Conversacion, ConversacionCreate, ConversacionUp
         return await self.model.find(
             {
                 "participantes": usuario_id,
-                "estado": EstadoConversacion.ACEPTADA.value,
+                "$or": [
+                    {"estado": EstadoConversacion.ACEPTADA.value},
+                    {
+                        "estado": EstadoConversacion.PENDIENTE.value,
+                        "solicitante_id": usuario_id,
+                    },
+                ],
                 "oculta_para": {"$ne": usuario_id},
             }
         ).sort([("ultimo_fecha", -1)]).skip(skip).limit(limit).to_list()
@@ -61,7 +67,13 @@ class ConversacionRepo(BaseRepo[Conversacion, ConversacionCreate, ConversacionUp
         return await self.model.find(
             {
                 "participantes": usuario_id,
-                "estado": EstadoConversacion.ACEPTADA.value,
+                "$or": [
+                    {"estado": EstadoConversacion.ACEPTADA.value},
+                    {
+                        "estado": EstadoConversacion.PENDIENTE.value,
+                        "solicitante_id": usuario_id,
+                    },
+                ],
                 "oculta_para": {"$ne": usuario_id},
             }
         ).to_list()
@@ -111,3 +123,13 @@ class MensajeRepo(BaseRepo[Mensaje, MensajeNuevo, MensajeUpdate]):
                 "leido": False,
             }
         ).update_many({"$set": {"leido": True}})
+
+    async def obtener_ultimo_no_eliminado(
+        self, conversacion_id: PydanticObjectId
+    ) -> Mensaje | None:
+        return await self.model.find(
+            {
+                "conversacion_id": conversacion_id,
+                "eliminado": False,
+            }
+        ).sort([("fecha_creacion", -1)]).first_or_none()
