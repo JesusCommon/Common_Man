@@ -89,8 +89,6 @@ async def enviar_mensaje(
     data: MensajeCreate,
     usuario: Usuario = Depends(obtener_usuario_actual),
 ):
-    # Opcional (rate limit anti-spam con slowapi):
-    # @limiter.limit("20/minute")
     return await controller.enviar_mensaje(usuario, destinatario_id, data)
 
 @router.patch("/{mensaje_id}", response_model=MensajeResponse)

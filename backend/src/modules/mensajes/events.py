@@ -74,6 +74,6 @@ class MessageEventBus:
             try:
                 await subscriber(event)
             except Exception as e:
-                print(f"⚠️ Error en suscriptor de eventos: {e}")
+                print(f"Error en suscriptor de eventos: {e}")
 
 message_event_bus = MessageEventBus()
