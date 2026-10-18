@@ -3,3 +3,9 @@
 ![CI](https://github.com/JesusCommon/Common_Man/actions/workflows/ci.yml/badge.svg?branch=main)
 ![Python](https://img.shields.io/badge/python-3.12-blue.svg)
 ![Tests](https://img.shields.io/badge/tests-183%2F183%20passed-brightgreen.svg)
+
+# siguientes pasos:
+
+Mejoras en UI con implementaciones de animaciones
+Mejoras aspecto del Dashboard de usuarios
+E iniciar en la ciberseguridad en protección de datos e inyecciones
