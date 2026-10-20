@@ -14,14 +14,12 @@ interface WebSocketConfig {
   onNotification?: MessageHandler<NotificacionResponse>;
   onNotificationUpdated?: MessageHandler<NotificacionResponse>;
   onSaldoActualizado?: MessageHandler<{ saldo: number }>;
-  // Mensajes (Omit quita 'tipo' que solo existe en el evento, no en los datos)
   onMensajeNuevo?: MessageHandler<Omit<MensajeNuevoWS, 'tipo'>>;
   onSolicitudNueva?: MessageHandler<Omit<SolicitudNuevaWS, 'tipo'>>;
   onSolicitudProcesada?: MessageHandler<Omit<SolicitudProcesadaWS, 'tipo'>>;
   onMensajeLeido?: MessageHandler<Omit<MensajeLeidoWS, 'tipo'>>;
   onMensajeEditado?: MessageHandler<Omit<MensajeEditadoWS, 'tipo'>>;
   onMensajeEliminado?: MessageHandler<Omit<MensajeEliminadoWS, 'tipo'>>;
-  // Ciclo de vida
   onConnect?: () => void;
   onDisconnect?: () => void;
   onError?: (error: Event) => void;
