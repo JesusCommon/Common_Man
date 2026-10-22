@@ -28,7 +28,7 @@ from src.modules.biblioteca.editorial.route import router as editorial_route
 from src.modules.biblioteca.genero.route import router as genero_route
 from src.modules.biblioteca.libros.route import router as libro_route
 from src.modules.mensajes.route import router as mensaje_route
-from src.modules.mensajes.ws_subscriber import registrar_suscriptor_mensajes  # ← NUEVO
+from src.modules.mensajes.ws_subscriber import registrar_suscriptor_mensajes
 from src.modules.usuarios.document import Usuario
 from src.modules.follow.document import Follow
 from src.modules.categoriasProductos.document import Categorias
@@ -58,7 +58,7 @@ MovimientoSaldo, ConfiguracionSistema, Direcciones, Envios, Notificacion, Report
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await connect_db(document_models)
-    registrar_suscriptor_mensajes()  # ← NUEVO: conectar bus de eventos con WS
+    registrar_suscriptor_mensajes()
     yield
     await disconnect_db()
 
