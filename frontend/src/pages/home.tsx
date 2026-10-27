@@ -17,10 +17,8 @@ export default function Home() {
   const navigate = useNavigate();
 
   return (
-    // CAMBIO 1: h-dvh (dynamic viewport height) y overflow-hidden para evitar scroll a toda costa
     <div className="h-dvh w-full bg-[#FAFAF8] text-[#18181B] flex flex-col overflow-hidden">
       
-      {/* Header: padding vertical reducido (py-4) y shrink-0 para que no se encoja */}
       <header className="flex items-center justify-between px-6 sm:px-10 py-4 max-w-7xl mx-auto w-full shrink-0">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-md bg-[#18181B] flex items-center justify-center">
@@ -47,10 +45,8 @@ export default function Home() {
         </nav>
       </header>
 
-      {/* Main: flex-1 ocupa todo el espacio restante. Padding y gap reducidos para evitar desbordamiento */}
       <main className="flex-1 max-w-7xl mx-auto px-6 sm:px-10 w-full grid lg:grid-cols-2 gap-8 lg:gap-12 items-center justify-center">
         
-        {/* Columna izquierda: copy */}
         <div className="flex flex-col justify-center">
           <motion.span
             variants={fadeUp}
@@ -68,7 +64,6 @@ export default function Home() {
             initial="hidden"
             animate="visible"
             custom={1}
-            // CAMBIO 2: Tamaños de fuente ligeramente ajustados para mejor proporción sin scroll
             className="font-[Space_Grotesk] text-3xl sm:text-4xl lg:text-5xl font-medium leading-[1.1] tracking-tight mb-4"
           >
             Un sistema que
@@ -96,7 +91,6 @@ export default function Home() {
             custom={3}
             className="flex items-center gap-4"
           >
-            {/* CAMBIO 3: Botón 1: Negro con letras blancas */}
             <Button
               size="lg"
               className="group bg-[#18181B] text-[#FAFAF8] hover:bg-[#18181B]/90 border-0 shadow-sm"
@@ -106,7 +100,6 @@ export default function Home() {
               <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-0.5" />
             </Button>
             
-            {/* CAMBIO 4: Botón 2: Blanco con letras negras (y borde sutil para que se note sobre el fondo) */}
             <Button
               size="lg"
               className="bg-[#FFFFFF] text-[#18181B] border border-[#E4E4E1] hover:bg-[#F4F4F5] hover:text-[#18181B] shadow-sm"
@@ -117,8 +110,6 @@ export default function Home() {
           </motion.div>
         </div>
 
-        {/* Columna derecha: red de módulos animada */}
-        {/* CAMBIO 5: Restringir altura máxima para que quepa siempre en pantalla */}
         <motion.div
           className="w-full h-full max-h-112.5 flex items-center justify-center"
           initial={{ opacity: 0, scale: 0.96 }}
@@ -129,7 +120,6 @@ export default function Home() {
         </motion.div>
       </main>
 
-      {/* Footer: shrink-0 y padding reducido */}
       <footer className="shrink-0 text-center text-xs text-[#A1A19A] pb-4">
         © 2026 Common Man
       </footer>
